@@ -1,0 +1,123 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.functional`
+================================
+
+.. py:module:: tlm_adjoint.functional
+
+
+Module Contents
+---------------
+
+.. py:class:: Functional(*, space=None, name=None, _fn=None)
+
+   A convenience class for defining functionals.
+
+   This allocates and stores an internal function, but note that this function
+   can change e.g. after adding terms.
+
+   :arg space: The space for the :class:`Functional`. Internal functions are
+       in this space. Defaults to `FloatSpace(Float)`.
+   :arg name: A :class:`str` name for the functional.
+
+   .. py:method:: id(self)
+
+      Return the unique :class:`int` ID associated with this
+      :class:`Functional`.
+
+      :returns: The unique :class:`int` ID.
+
+
+   .. py:method:: assign(self, term, *, annotate=None, tlm=None)
+
+      Assign to the functional,
+
+      .. math::
+
+          \mathcal{J} = b.
+
+      Note that this method allocates a new internal function.
+
+      :arg term: The value. Defines the value of :math:`b`. Valid types
+          depend upon the backend. :math:`b` may be a function, and with the
+          FEniCS or Firedrake backends may be an arity zero UFL
+          :class:`Form`.
+      :arg annotate: Whether the
+          :class:`tlm_adjoint.tlm_adjoint.EquationManager` should record the
+          solution of equations.
+      :arg tlm: Whether tangent-linear equations should be solved.
+
+
+   .. py:method:: addto(self, term=None, *, annotate=None, tlm=None)
+
+      Add to the functional. Performs two assignments,
+
+      .. math::
+
+          \mathcal{J}_\text{term} = b,
+
+      .. math::
+
+          \mathcal{J}_{new} = \mathcal{J}_\text{old}
+              + \mathcal{J}_\text{term},
+
+      where :math:`\mathcal{J}_\text{old}` and :math:`\mathcal{J}_\text{new}`
+      are, respectively, the old and new values for the functional, and
+      :math:`b` is the term to add.
+
+      Note that this method allocates a new internal function.
+
+      :arg term: The value. Defines the value of :math:`b`. Valid types
+          depend upon the backend. :math:`b` may be a function, and with
+          the FEniCS or Firedrake backends may be an arity zero UFL
+          :class:`Form`.
+      :arg annotate: Whether the
+          :class:`tlm_adjoint.tlm_adjoint.EquationManager` should record the
+          solution of equations.
+      :arg tlm: Whether tangent-linear equations should be solved.
+
+
+   .. py:method:: function(self)
+
+      Return the internal function currently storing the value.
+
+      :returns: The internal function.
+
+
+   .. py:method:: space(self)
+
+      Return the space for the functional.
+
+      :returns: The space
+
+
+   .. py:method:: value(self)
+
+      Return the current value of the functional.
+
+      The value may also be accessed by casting using :func:`float` or
+      :func:`complex`.
+
+      :returns: The scalar value.
+
+
+   .. py:method:: tlm_functional(self, *args)
+
+      Return a :class:`Functional` associated with a tangent-linear
+      variable associated with the functional.
+
+      :arg args: A :class:`Sequence` of `(M, dM)` pairs. Here `M` and `dM`
+          are each a function or a sequence of functions defining a
+          derivative and derivative direction. The tangent-linear variable is
+          the derivative of the functional with respect to each `M` and with
+          direction defined by each `dM`. Supplying a single pair requests a
+          :class:`Functional` associated with a first order tangent-linear
+          variable. Supplying multiple pairs leads to a :class:`Functional`
+          associated with higher order tangent-linear variables. The relevant
+          tangent-linear models must have been configured for the
+          :class:`tlm_adjoint.tlm_adjoint.EquationManager` `manager`.
+      :returns: A :class:`Functional` associated with the tangent-linear
+          variable.
+
+
+

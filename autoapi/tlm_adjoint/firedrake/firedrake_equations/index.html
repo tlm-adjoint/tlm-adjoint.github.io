@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.firedrake.firedrake_equations &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.firedrake_equations</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/firedrake/firedrake_equations/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint.firedrake.firedrake_equations">
+<span id="tlm-adjoint-firedrake-firedrake-equations"></span><h1><a class="reference internal" href="#module-tlm_adjoint.firedrake.firedrake_equations" title="tlm_adjoint.firedrake.firedrake_equations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.firedrake_equations</span></code></a><a class="headerlink" href="#module-tlm_adjoint.firedrake.firedrake_equations" title="Permalink to this headline"></a></h1>
+<p>This module includes functionality for use with the tlm_adjoint Firedrake
+backend.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.firedrake_equations.</span></span><span class="sig-name descname"><span class="pre">LocalSolverCache</span></span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache" title="Permalink to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.caches.Cache</span></code></a> for element-wise local block
+diagonal linear solver data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache.local_solver">
+<span class="sig-name descname"><span class="pre">local_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache.local_solver" title="Permalink to this definition"></a></dt>
+<dd><p>Compute data for an element-wise local block diagonal linear
+solver and cache the result, or return a previously cached result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> – An arity two UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code>, defining the element-wise
+local block diagonal matrix.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>replace_map</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining a map from symbolic
+variables to values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(value_ref, value)</cite>. <cite>value</cite> is a Firedrake
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Matrix</span></code> storing the assembled inverse matrix, and
+<cite>value_ref</cite> is a <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.caches.CacheRef</span></code></a> storing a
+reference to <cite>value</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.local_solver_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.firedrake_equations.</span></span><span class="sig-name descname"><span class="pre">local_solver_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.local_solver_cache" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The default <a class="reference internal" href="#tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache" title="tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSolverCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.set_local_solver_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.firedrake_equations.</span></span><span class="sig-name descname"><span class="pre">set_local_solver_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_solver_cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.set_local_solver_cache" title="Permalink to this definition"></a></dt>
+<dd><p>Set the default <a class="reference internal" href="#tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache" title="tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSolverCache</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>local_solver_cache</strong> – The new default <a class="reference internal" href="#tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache" title="tlm_adjoint.firedrake.firedrake_equations.LocalSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSolverCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.LocalProjection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.firedrake_equations.</span></span><span class="sig-name descname"><span class="pre">LocalProjection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_rhs_assembly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_adjoint_assembly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.LocalProjection" title="Permalink to this definition"></a></dt>
+<dd><p>Represents the solution of a finite element variational problem
+performing a projection onto the space for <cite>x</cite>, for the case where the mass
+matrix is element-wise local block diagonal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution.</p></li>
+<li><p><strong>rhs</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the expression to project onto the
+space for <cite>x</cite>, or a UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> defining the right-hand-side
+of the finite element variational problem. Should not depend on <cite>x</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the <code class="xref py py-class docutils literal notranslate"><span class="pre">EquationSolver</span></code> constructor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.PointInterpolation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.firedrake_equations.</span></span><span class="sig-name descname"><span class="pre">PointInterpolation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_coords</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_interp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.PointInterpolation" title="Permalink to this definition"></a></dt>
+<dd><p>Represents interpolation of a scalar-valued function at given points.</p>
+<p>The forward residual <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is defined so that <span class="math notranslate nohighlight">\(\partial
+\mathcal{F} / \partial x\)</span> is the identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A scalar-function, or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of scalar-valued
+functions, defining the forward solution.</p></li>
+<li><p><strong>y</strong> – A scalar-valued Firedrake <code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code> to interpolate.</p></li>
+<li><p><strong>X_coords</strong> – A NumPy <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> defining the coordinates at which
+to interpolate <cite>y</cite>. Shape is <cite>(n, d)</cite> where <cite>n</cite> is the number of
+interpolation points and <cite>d</cite> is the geometric dimension. Ignored if <cite>P</cite>
+is supplied.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.adjoint_derivative_action">
+<span class="sig-name descname"><span class="pre">adjoint_derivative_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.adjoint_derivative_action" title="Permalink to this definition"></a></dt>
+<dd><p>Return the action of the adjoint of a derivative of the forward
+residual on the adjoint solution. This is the <em>negative</em> of an adjoint
+right-hand-side term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_index</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. The derivative is defined by
+differentiation of the forward residual with respect to
+<cite>self.dependencies()[dep_index]</cite>.</p></li>
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The action of the adjoint of a derivative on the adjoint
+solution. Will be passed to
+<a class="reference internal" href="../../interface/index.html#tlm_adjoint.interface.subtract_adjoint_derivative_action" title="tlm_adjoint.interface.subtract_adjoint_derivative_action"><code class="xref py py-func docutils literal notranslate"><span class="pre">tlm_adjoint.interface.subtract_adjoint_derivative_action()</span></code></a>,
+and valid types depend upon the backend used. Typically this will
+be a function, or a two element <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(alpha, F)</cite>, where
+<cite>alpha</cite> is a scalar and <cite>F</cite> a function, with the value defined by
+the product of <cite>alpha</cite> and <cite>F</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.firedrake_equations.PointInterpolation.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

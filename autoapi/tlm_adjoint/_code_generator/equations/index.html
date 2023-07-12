@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint._code_generator.equations &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint._code_generator.equations</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/_code_generator/equations/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint._code_generator.equations">
+<span id="tlm-adjoint-code-generator-equations"></span><h1><a class="reference internal" href="#module-tlm_adjoint._code_generator.equations" title="tlm_adjoint._code_generator.equations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint._code_generator.equations</span></code></a><a class="headerlink" href="#module-tlm_adjoint._code_generator.equations" title="Permalink to this headline"></a></h1>
+<p>This module is used by both the FEniCS and Firedrake backends, and
+implements finite element calculations. In particular the
+<a class="reference internal" href="#tlm_adjoint._code_generator.equations.EquationSolver" title="tlm_adjoint._code_generator.equations.EquationSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationSolver</span></code></a> class implements the solution of finite element
+variational problems.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Assembly">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">Assembly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Assembly" title="Permalink to this definition"></a></dt>
+<dd><p>Represents assignment to the result of finite element assembly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The forward residual <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is defined so that <span class="math notranslate nohighlight">\(\partial
+\mathcal{F} / \partial x\)</span> is the identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution.</p></li>
+<li><p><strong>rhs</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> to assemble. Should have arity 0 or 1, and
+should not depend on the forward solution.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>match_quadrature</strong> – Whether to set quadrature parameters consistently in
+the forward, adjoint, and tangent-linears. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘Assembly’][‘match_quadrature’]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Assembly.drop_references">
+<span class="sig-name descname"><span class="pre">drop_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Assembly.drop_references" title="Permalink to this definition"></a></dt>
+<dd><p>Drop references to functions which store values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Assembly.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Assembly.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Assembly.adjoint_derivative_action">
+<span class="sig-name descname"><span class="pre">adjoint_derivative_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Assembly.adjoint_derivative_action" title="Permalink to this definition"></a></dt>
+<dd><p>Return the action of the adjoint of a derivative of the forward
+residual on the adjoint solution. This is the <em>negative</em> of an adjoint
+right-hand-side term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_index</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. The derivative is defined by
+differentiation of the forward residual with respect to
+<cite>self.dependencies()[dep_index]</cite>.</p></li>
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The action of the adjoint of a derivative on the adjoint
+solution. Will be passed to
+<a class="reference internal" href="../../interface/index.html#tlm_adjoint.interface.subtract_adjoint_derivative_action" title="tlm_adjoint.interface.subtract_adjoint_derivative_action"><code class="xref py py-func docutils literal notranslate"><span class="pre">tlm_adjoint.interface.subtract_adjoint_derivative_action()</span></code></a>,
+and valid types depend upon the backend used. Typically this will
+be a function, or a two element <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(alpha, F)</cite>, where
+<cite>alpha</cite> is a scalar and <cite>F</cite> a function, with the value defined by
+the product of <cite>alpha</cite> and <cite>F</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Assembly.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Assembly.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Assembly.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Assembly.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.EquationSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">EquationSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_adjoint_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_tlm_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_rhs_assembly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defer_adjoint_assembly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.EquationSolver" title="Permalink to this definition"></a></dt>
+<dd><p>Represents the solution of a finite element variational problem.</p>
+<p>Caching is based on the approach described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>J. R. Maddison and P. E. Farrell, ‘Rapid development and adjoining of
+transient finite element models’, Computer Methods in Applied
+Mechanics and Engineering, 276, 95–121, 2014, doi:
+10.1016/j.cma.2014.03.010</p></li>
+</ul>
+</div></blockquote>
+<p>The arguments <cite>eq</cite>, <cite>x</cite>, <cite>bcs</cite>, <cite>J</cite>, <cite>form_compiler_parameters</cite>, and
+<cite>solver_parameters</cite> are based on the interface for the FEniCS <code class="xref py py-func docutils literal notranslate"><span class="pre">solve()</span></code>
+function (see e.g. FEniCS 2017.1.0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eq</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> defining the finite element variational
+problem.</p></li>
+<li><p><strong>x</strong> – A function defining the forward solution.</p></li>
+<li><p><strong>bcs</strong> – Dirichlet boundary conditions.</p></li>
+<li><p><strong>J</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> defining a Jacobian matrix approximation to use
+in a non-linear forward solve.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>solver_parameters</strong> – Linear or non-linear solver parameters.</p></li>
+<li><p><strong>adjoint_solver_parameters</strong> – Linear solver parameters to use in an
+adjoint solve.</p></li>
+<li><p><strong>tlm_solver_parameters</strong> – Linear solver parameters to use when solving
+tangent-linear problems.</p></li>
+<li><p><strong>initial_guess</strong> – Deprecated.</p></li>
+<li><p><strong>cache_jacobian</strong> – Whether to cache the forward Jacobian matrix and
+linear solver data. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver][‘cache_jacobian’]</cite>. If
+<cite>None</cite> then caching is autodetected.</p></li>
+<li><p><strong>cache_adjoint_jacobian</strong> – Whether to cache the adjoint Jacobian matrix
+and linear solver data. Defaults to <cite>cache_jacobian</cite>.</p></li>
+<li><p><strong>cache_tlm_jacobian</strong> – Whether to cache the Jacobian matrix and linear
+solver data when solving tangent-linear problems. Defaults to
+<cite>cache_jacobian</cite>.</p></li>
+<li><p><strong>cache_rhs_assembly</strong> – Whether to enable right-hand-side caching. If
+enabled then right-hand-side terms are divided into terms which are
+cached, terms which are converted into matrix multiplication by a
+cached matrix, and terms which are not cached. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver’][‘cache_rhs_assembly’]</cite>.</p></li>
+<li><p><strong>match_quadrature</strong> – Whether to set quadrature parameters consistently in
+the forward, adjoint, and tangent-linears. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver’][‘match_quadrature’]</cite>.</p></li>
+<li><p><strong>defer_adjoint_assembly</strong> – Whether to use ‘deferred’ adjoint assembly. If
+adjoint assembly is deferred then initially only symbolic expressions
+for adjoint right-hand-side terms are constructed. Finite element
+assembly can occur later (with default form compiler parameters), when
+further adjoint right-hand-side terms are available. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver’][‘defer_adjoint_assembly’]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.EquationSolver.drop_references">
+<span class="sig-name descname"><span class="pre">drop_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.EquationSolver.drop_references" title="Permalink to this definition"></a></dt>
+<dd><p>Drop references to functions which store values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.EquationSolver.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.EquationSolver.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.EquationSolver.subtract_adjoint_derivative_actions">
+<span class="sig-name descname"><span class="pre">subtract_adjoint_derivative_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_Bs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.EquationSolver.subtract_adjoint_derivative_actions" title="Permalink to this definition"></a></dt>
+<dd><p>Subtract terms from other adjoint right-hand-sides.</p>
+<p>Can be overridden for an optimized implementation, but otherwise uses
+<a class="reference internal" href="../../equation/index.html#tlm_adjoint.equation.Equation.adjoint_derivative_action" title="tlm_adjoint.equation.Equation.adjoint_derivative_action"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tlm_adjoint.equation.Equation.adjoint_derivative_action()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_Bs</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> whose items are <cite>(dep_index, dep_B)</cite>.
+Each <cite>dep_B</cite> is a <a class="reference internal" href="../../adjoint/index.html#tlm_adjoint.adjoint.AdjointRHS" title="tlm_adjoint.adjoint.AdjointRHS"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.adjoint.AdjointRHS</span></code></a> which
+should be updated by subtracting derivative information computed by
+differentiating with respect to <cite>self.dependencies()[dep_index]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.EquationSolver.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.EquationSolver.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.EquationSolver.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.EquationSolver.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.expr_new_x">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">expr_new_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.expr_new_x" title="Permalink to this definition"></a></dt>
+<dd><p>If an expression depends on <cite>x</cite>, then record the assignment <cite>x_old =
+x</cite>, and replace <cite>x</cite> with <cite>x_old</cite> in the expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code>.</p></li>
+<li><p><strong>x</strong> – Defines <cite>x</cite>.</p></li>
+<li><p><strong>annotate</strong> – Whether the <a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a>
+should record the solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> with <cite>x</cite> replaced with <cite>x_old</cite>, or <cite>expr</cite> if
+the expression does not depend on <cite>x</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.linear_equation_new_x">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">linear_equation_new_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.linear_equation_new_x" title="Permalink to this definition"></a></dt>
+<dd><p>If a symbolic expression for a linear finite element variational
+problem depends on the symbolic variable representing the problem solution,
+then record the assignment <cite>x_old = x</cite>, and replace <cite>x</cite> with <cite>x_old</cite> in the
+symbolic expression.</p>
+<p>Required for the case where a ‘new’ value is computed by solving a linear
+finite element variational problem depending on the ‘old’ value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eq</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> defining the finite element variational
+problem.</p></li>
+<li><p><strong>x</strong> – A function defining the solution to the finite element variational
+problem.</p></li>
+<li><p><strong>annotate</strong> – Whether the <a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a>
+should record the solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> with <cite>x</cite> replaced with <cite>x_old</cite>, or <cite>eq</cite>
+if the symbolic expression does not depend on <cite>x</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.Projection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">Projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.Projection" title="Permalink to this definition"></a></dt>
+<dd><p>Represents the solution of a finite element variational problem
+performing a projection onto the space for <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution.</p></li>
+<li><p><strong>rhs</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the expression to project onto the
+space for <cite>x</cite>, or a UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> defining the right-hand-side
+of the finite element variational problem. Should not depend on <cite>x</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the <a class="reference internal" href="#tlm_adjoint._code_generator.equations.EquationSolver" title="tlm_adjoint._code_generator.equations.EquationSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationSolver</span></code></a> constructor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.DirichletBCApplication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">DirichletBCApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.DirichletBCApplication" title="Permalink to this definition"></a></dt>
+<dd><p>Represents the application of a Dirichlet boundary condition to a zero
+valued function. Specifically, with the Firedrake backend this represents:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">zero</span><span class="p">()</span>
+<span class="n">DirichletBC</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">function_space</span><span class="p">(),</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The forward residual <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is defined so that <span class="math notranslate nohighlight">\(\partial
+\mathcal{F} / \partial x\)</span> is the identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function, updated by the above operations.</p></li>
+<li><p><strong>y</strong> – A function, defines the Dirichet boundary condition.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to <cite>DirichletBC</cite>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.DirichletBCApplication.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.DirichletBCApplication.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.DirichletBCApplication.adjoint_derivative_action">
+<span class="sig-name descname"><span class="pre">adjoint_derivative_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.DirichletBCApplication.adjoint_derivative_action" title="Permalink to this definition"></a></dt>
+<dd><p>Return the action of the adjoint of a derivative of the forward
+residual on the adjoint solution. This is the <em>negative</em> of an adjoint
+right-hand-side term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_index</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. The derivative is defined by
+differentiation of the forward residual with respect to
+<cite>self.dependencies()[dep_index]</cite>.</p></li>
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The action of the adjoint of a derivative on the adjoint
+solution. Will be passed to
+<a class="reference internal" href="../../interface/index.html#tlm_adjoint.interface.subtract_adjoint_derivative_action" title="tlm_adjoint.interface.subtract_adjoint_derivative_action"><code class="xref py py-func docutils literal notranslate"><span class="pre">tlm_adjoint.interface.subtract_adjoint_derivative_action()</span></code></a>,
+and valid types depend upon the backend used. Typically this will
+be a function, or a two element <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(alpha, F)</cite>, where
+<cite>alpha</cite> is a scalar and <cite>F</cite> a function, with the value defined by
+the product of <cite>alpha</cite> and <cite>F</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.DirichletBCApplication.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.DirichletBCApplication.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.DirichletBCApplication.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.DirichletBCApplication.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.ExprEvaluation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.equations.</span></span><span class="sig-name descname"><span class="pre">ExprEvaluation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rhs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.ExprEvaluation" title="Permalink to this definition"></a></dt>
+<dd><p>Represents interpolation of <cite>rhs</cite> onto the space for <cite>x</cite>.</p>
+<p>The forward residual <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is defined so that <span class="math notranslate nohighlight">\(\partial
+\mathcal{F} / \partial x\)</span> is the identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution.</p></li>
+<li><p><strong>rhs</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the expression to interpolate onto
+the space for <cite>x</cite>. Should not depend on <cite>x</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.ExprEvaluation.drop_references">
+<span class="sig-name descname"><span class="pre">drop_references</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.ExprEvaluation.drop_references" title="Permalink to this definition"></a></dt>
+<dd><p>Drop references to functions which store values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.ExprEvaluation.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.ExprEvaluation.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.ExprEvaluation.adjoint_derivative_action">
+<span class="sig-name descname"><span class="pre">adjoint_derivative_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.ExprEvaluation.adjoint_derivative_action" title="Permalink to this definition"></a></dt>
+<dd><p>Return the action of the adjoint of a derivative of the forward
+residual on the adjoint solution. This is the <em>negative</em> of an adjoint
+right-hand-side term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_index</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. The derivative is defined by
+differentiation of the forward residual with respect to
+<cite>self.dependencies()[dep_index]</cite>.</p></li>
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The action of the adjoint of a derivative on the adjoint
+solution. Will be passed to
+<a class="reference internal" href="../../interface/index.html#tlm_adjoint.interface.subtract_adjoint_derivative_action" title="tlm_adjoint.interface.subtract_adjoint_derivative_action"><code class="xref py py-func docutils literal notranslate"><span class="pre">tlm_adjoint.interface.subtract_adjoint_derivative_action()</span></code></a>,
+and valid types depend upon the backend used. Typically this will
+be a function, or a two element <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(alpha, F)</cite>, where
+<cite>alpha</cite> is a scalar and <cite>F</cite> a function, with the value defined by
+the product of <cite>alpha</cite> and <cite>F</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.ExprEvaluation.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.ExprEvaluation.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.equations.ExprEvaluation.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.equations.ExprEvaluation.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

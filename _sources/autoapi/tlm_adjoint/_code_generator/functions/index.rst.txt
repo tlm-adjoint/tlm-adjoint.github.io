@@ -1,0 +1,169 @@
+:py:mod:`tlm_adjoint._code_generator.functions`
+===============================================
+
+.. py:module:: tlm_adjoint._code_generator.functions
+
+.. autoapi-nested-parse::
+
+   This module is used by both the FEniCS and Firedrake backends, and includes
+   functionality for handling UFL :class:`Coefficient` objects and boundary
+   conditions.
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Constant(value=None, *args, name=None, domain=None, space=None, space_type='primal', shape=None, comm=None, static=False, cache=None, checkpoint=None, **kwargs)
+
+
+
+   Extends the backend `Constant` class.
+
+   :arg value: The initial value. `None` indicates a value of zero.
+   :arg name: A :class:`str` name.
+   :arg domain: The domain on which the :class:`Constant` is defined.
+   :arg space: The space on which the :class:`Constant` is defined.
+   :arg space_type: The space type for the :class:`Constant`. `'primal'`,
+       `'dual'`, `'conjugate'`, or `'conjugate_dual'`.
+   :arg shape: A :class:`tuple` of :class:`int` objects defining the shape of
+       the value.
+   :arg comm: An :class:`mpi4py.MPI.Comm`, communicator for the
+       :class:`Constant`.
+   :arg static: Defines the default value for `cache` and `checkpoint`.
+   :arg cache: Defines whether results involving this :class:`Constant` may be
+       cached. Default `static`.
+   :arg checkpoint: Defines whether a
+       :class:`tlm_adjoint.checkpointing.CheckpointStorage` should store this
+       :class:`Constant` by value (`checkpoint=True`) or reference
+       (`checkpoint=False`). Default `not static`.
+
+   Remaining arguments are passed to the backend `Constant` constructor.
+
+
+.. py:class:: Function(*args, space_type='primal', static=False, cache=None, checkpoint=None, **kwargs)
+
+
+
+   Extends the backend `Function` class.
+
+   :arg space_type: The space type for the :class:`Function`. `'primal'`,
+       `'dual'`, `'conjugate'`, or `'conjugate_dual'`.
+   :arg static: Defines the default value for `cache` and `checkpoint`.
+   :arg cache: Defines whether results involving this :class:`Function` may be
+       cached. Default `static`.
+   :arg checkpoint: Defines whether a
+       :class:`tlm_adjoint.checkpointing.CheckpointStorage` should store this
+       :class:`Function` by value (`checkpoint=True`) or reference
+       (`checkpoint=False`). Default `not static`.
+
+   Remaining arguments are passed to the backend `Function` constructor.
+
+
+.. py:class:: Zero
+
+   Mixin for defining a zero-valued function. Used for zero-valued
+   functions for which UFL zero elimination should not be applied.
+
+
+.. py:class:: ZeroConstant(*, name=None, domain=None, space_type='primal', shape=None, comm=None)
+
+
+
+   A :class:`Constant` which is flagged as having a value of zero.
+
+   Arguments are passed to the :class:`Constant` constructor, together with
+   `static=True`, `cache=True`, and `checkpoint=False`
+
+
+.. py:class:: ZeroFunction(*args, space_type='primal', **kwargs)
+
+
+
+   A :class:`Function` which is flagged as having a value of zero.
+
+   Arguments are passed to the :class:`Function` constructor, together with
+   `static=True`, `cache=True`, and `checkpoint=False`
+
+
+.. py:function:: extract_coefficients(expr)
+
+   :returns: Functions on which the supplied UFL :class:`Expr` or
+       :class:`Form` depends.
+
+
+.. py:function:: eliminate_zeros(expr, *, force_non_empty_form=False)
+
+   Apply zero elimination for :class:`Zero` objects in the supplied UFL
+   :class:`Expr` or :class:`Form`.
+
+   :arg expr: A UFL :class:`Expr` or :class:`Form`.
+   :arg force_non_empty_form: If `True` and if `expr` is a UFL :class:`Form`,
+       then the returned form is guaranteed to be non-empty, and may be
+       assembled.
+   :returns: A UFL :class:`Expr` or :class:`Form` with zero elimination
+       applied. May return `expr`.
+
+
+.. py:class:: DirichletBC(V, g, sub_domain, *args, static=None, homogeneous=None, _homogeneous=None, **kwargs)
+
+
+
+   Extends the backend `DirichletBC`.
+
+   :arg static: A flag that indicates that the value for this
+       :class:`DirichletBC` will not change, and which determines whether
+       calculations involving this :class:`DirichletBC` can be cached. If
+       `None` then autodetected from the value.
+   :arg homogeneous: Deprecated.
+
+   Remaining arguments are passed to the backend `DirichletBC` constructor.
+
+   .. py:method:: homogenize(self)
+
+      Homogenize the :class:`DirichletBC`, setting its value to zero.
+              
+
+
+   .. py:method:: set_value(self, *args, **kwargs)
+
+      Set the :class:`DirichletBC` value.
+
+      Arguments are passed to the base class `set_value` method.
+
+
+
+.. py:class:: HomogeneousDirichletBC(V, sub_domain, *args, **kwargs)
+
+
+
+   A :class:`DirichletBC` whose value is zero.
+
+   Arguments are passed to the :class:`DirichletBC` constructor, together with
+   `static=True`.
+
+
+.. py:class:: Replacement(x)
+
+
+
+   A UFL :class:`Coefficient` representing a symbolic variable but with no
+   value.
+
+
+.. py:class:: ReplacementConstant(x)
+
+
+
+   A backend `Constant` representing a symbolic variable but with no
+   value.
+
+
+.. py:class:: ReplacementFunction(x)
+
+
+
+   A backend `Function` representing a symbolic variable but with no
+   value.
+
+

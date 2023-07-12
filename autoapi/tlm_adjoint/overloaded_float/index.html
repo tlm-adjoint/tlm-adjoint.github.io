@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.overloaded_float &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.overloaded_float</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/overloaded_float/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint.overloaded_float">
+<span id="tlm-adjoint-overloaded-float"></span><h1><a class="reference internal" href="#module-tlm_adjoint.overloaded_float" title="tlm_adjoint.overloaded_float"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.overloaded_float</span></code></a><a class="headerlink" href="#module-tlm_adjoint.overloaded_float" title="Permalink to this headline"></a></h1>
+<p>This module defines types which allow for basic floating point level
+algorithmic differentiation. The implementation is intended to be used for a
+small number of calculations, for example after the calculation of a functional
+obtained from a finite element model.</p>
+<p>For example, if annotation and operator overloading is enabled</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>will lead to annotation of equations associated with the floating point
+calculations.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.FloatSpace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">FloatSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">float_cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.FloatSpace" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the real or complex space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>float_cls</strong> – The <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> class, in particular used to
+instantiate new functions in <a class="reference internal" href="../interface/index.html#tlm_adjoint.interface.space_new" title="tlm_adjoint.interface.space_new"><code class="xref py py-func docutils literal notranslate"><span class="pre">tlm_adjoint.interface.space_new()</span></code></a>.
+Defaults to <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.</p></li>
+<li><p><strong>dtype</strong> – The data type associated with the space. Typically
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.float64</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.complex128</span></code>. Defaults to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.complex128</span></code>.</p></li>
+<li><p><strong>comm</strong> – The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpi4py.MPI.Comm</span></code> associated with the space.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.no_float_overloading">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">no_float_overloading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.no_float_overloading" title="Permalink to this definition"></a></dt>
+<dd><p>Decorator to disable <a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fn</strong> – A callable for which <a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading
+should be disabled.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A callable for which <a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator
+overloading is disabled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.paused_float_overloading">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">paused_float_overloading</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.paused_float_overloading" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a context manager which can be used to temporarily disable
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A context manager which can be used to temporarily disable
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.SymbolicFloat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">SymbolicFloat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="Permalink to this definition"></a></dt>
+<dd><p>A SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Symbol</span></code> which is also a ‘function’, defining a scalar
+variable.</p>
+<p>If constructing SymPy expressions then the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> class
+should be used instead of the <a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> subclass, or else
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading should be disabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – A scalar or SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the initial value. If
+a SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> then, if annotation or derivation and solution of
+tangent-linear equations is enabled, an assignment is processed by the
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> <cite>manager</cite>.</p></li>
+<li><p><strong>name</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> name for the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.</p></li>
+<li><p><strong>space_type</strong> – The space type for the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>. <cite>‘primal’</cite>,
+<cite>‘dual’</cite>, <cite>‘conjugate’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+<li><p><strong>static</strong> – Defines the default value for <cite>cache</cite> and <cite>checkpoint</cite>.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving this <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>
+may be cached. Default <cite>static</cite>.</p></li>
+<li><p><strong>checkpoint</strong> – Defines whether a
+<a class="reference internal" href="../checkpointing/index.html#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.checkpointing.CheckpointStorage</span></code></a> should store this
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> by value (<cite>checkpoint=True</cite>) or reference
+(<cite>checkpoint=False</cite>). Default <cite>not static</cite>.</p></li>
+<li><p><strong>dtype</strong> – The data type associated with the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.
+Typically <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.float64</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.complex128</span></code>. Defaults
+to <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.complex128</span></code>.</p></li>
+<li><p><strong>comm</strong> – The <code class="xref py py-class docutils literal notranslate"><span class="pre">mpi4py.MPI.Comm</span></code> associated with the
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.</p></li>
+<li><p><strong>annotate</strong> – Whether the <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a>
+should record the solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.SymbolicFloat.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.SymbolicFloat.assign" title="Permalink to this definition"></a></dt>
+<dd><p><a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> assignment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – A scalar or SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the value.</p></li>
+<li><p><strong>annotate</strong> – Whether the
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> should record the
+solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.SymbolicFloat.addto">
+<span class="sig-name descname"><span class="pre">addto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.SymbolicFloat.addto" title="Permalink to this definition"></a></dt>
+<dd><p><a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> in-place addition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – A scalar or SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the value to add.</p></li>
+<li><p><strong>annotate</strong> – Whether the
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> should record the
+solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.SymbolicFloat.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.SymbolicFloat.value" title="Permalink to this definition"></a></dt>
+<dd><p>Return the current value associated with the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.</p>
+<p>If the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> has complex type, and the value has zero
+complex part, then this method will return the real part with real
+type.</p>
+<p>The value may also be accessed by casting using <code class="xref py py-func docutils literal notranslate"><span class="pre">float()</span></code> or
+<code class="xref py py-func docutils literal notranslate"><span class="pre">complex()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.OverloadedFloat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">OverloadedFloat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="Permalink to this definition"></a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> with operator overloading. Also
+defines methods for NumPy integration.</p>
+<p>If constructing SymPy expressions then the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> class
+should be used instead of the <a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> subclass, or else
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading should be disabled.</p>
+<p>For argument documentation see <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.Float">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">Float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.Float" title="Permalink to this definition"></a></dt>
+<dd><p>A subclass of <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> with operator overloading. Also
+defines methods for NumPy integration.</p>
+<p>If constructing SymPy expressions then the <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> class
+should be used instead of the <a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> subclass, or else
+<a class="reference internal" href="#tlm_adjoint.overloaded_float.OverloadedFloat" title="tlm_adjoint.overloaded_float.OverloadedFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">OverloadedFloat</span></code></a> operator overloading should be disabled.</p>
+<p>For argument documentation see <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.FloatEquation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.overloaded_float.</span></span><span class="sig-name descname"><span class="pre">FloatEquation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.FloatEquation" title="Permalink to this definition"></a></dt>
+<dd><p>Represents an assignment to a <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> <cite>x</cite>,</p>
+<div class="math notranslate nohighlight">
+\[x = \mathcal{G} \left( y_1, y_2, \ldots \right),\]</div>
+<p>for some <span class="math notranslate nohighlight">\(\mathcal{G}\)</span> defined by a SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code>. The forward
+residual is defined</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{F} \left( x, y_1, y_2, \ldots \right)
+    = x - \mathcal{G} \left( y_1, y_2, \ldots \right).\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A <a class="reference internal" href="#tlm_adjoint.overloaded_float.SymbolicFloat" title="tlm_adjoint.overloaded_float.SymbolicFloat"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolicFloat</span></code></a> defining the forward solution <span class="math notranslate nohighlight">\(x\)</span></p></li>
+<li><p><strong>expr</strong> – A SymPy <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> defining the right-hand-side.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.FloatEquation.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.FloatEquation.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.FloatEquation.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.FloatEquation.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.FloatEquation.subtract_adjoint_derivative_actions">
+<span class="sig-name descname"><span class="pre">subtract_adjoint_derivative_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_Bs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.FloatEquation.subtract_adjoint_derivative_actions" title="Permalink to this definition"></a></dt>
+<dd><p>Subtract terms from other adjoint right-hand-sides.</p>
+<p>Can be overridden for an optimized implementation, but otherwise uses
+<a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation.adjoint_derivative_action" title="tlm_adjoint.equation.Equation.adjoint_derivative_action"><code class="xref py py-meth docutils literal notranslate"><span class="pre">tlm_adjoint.equation.Equation.adjoint_derivative_action()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_Bs</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> whose items are <cite>(dep_index, dep_B)</cite>.
+Each <cite>dep_B</cite> is a <a class="reference internal" href="../adjoint/index.html#tlm_adjoint.adjoint.AdjointRHS" title="tlm_adjoint.adjoint.AdjointRHS"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.adjoint.AdjointRHS</span></code></a> which
+should be updated by subtracting derivative information computed by
+differentiating with respect to <cite>self.dependencies()[dep_index]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.overloaded_float.FloatEquation.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.overloaded_float.FloatEquation.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

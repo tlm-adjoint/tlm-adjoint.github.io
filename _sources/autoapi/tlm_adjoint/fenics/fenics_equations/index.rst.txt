@@ -1,0 +1,204 @@
+:py:mod:`tlm_adjoint.fenics.fenics_equations`
+=============================================
+
+.. py:module:: tlm_adjoint.fenics.fenics_equations
+
+.. autoapi-nested-parse::
+
+   This module includes functionality for use with the tlm_adjoint FEniCS
+   backend.
+
+
+
+Module Contents
+---------------
+
+.. py:class:: LocalSolverCache
+
+
+
+   A :class:`tlm_adjoint.caches.Cache` for element-wise local block
+   diagonal linear solvers.
+
+   .. py:method:: local_solver(self, form, solver_type=None, *, replace_map=None)
+
+      Construct an element-wise local block diagonal linear solver and
+      cache the result, or return a previously cached result.
+
+      :arg form: An arity two UFL :class:`Form`, defining the element-wise
+          local block diagonal matrix.
+      :arg local_solver: DOLFIN :class:`LocalSolver.SolverType`. Defaults
+          to `dolfin.LocalSolver.SolverType.LU`.
+      :arg replace_map: A :class:`Mapping` defining a map from symbolic
+          variables to values.
+      :returns: A :class:`tuple` `(value_ref, value)`. `value` is a DOLFIN
+          :class:`LocalSolver` and `value_ref` is a
+          :class:`tlm_adjoint.caches.CacheRef` storing a reference to
+          `value`.
+
+
+
+.. py:function:: local_solver_cache()
+
+   :returns: The default :class:`LocalSolverCache`.
+
+
+.. py:function:: set_local_solver_cache(local_solver_cache)
+
+   Set the default :class:`LocalSolverCache`.
+
+   :arg local_solver_cache: The new default :class:`LocalSolverCache`.
+
+
+.. py:class:: LocalProjection(x, rhs, *, form_compiler_parameters=None, cache_jacobian=None, cache_rhs_assembly=None, match_quadrature=None, defer_adjoint_assembly=None)
+
+
+
+   Represents the solution of a finite element variational problem
+   performing a projection onto the space for `x`, for the case where the mass
+   matrix is element-wise local block diagonal.
+
+   :arg x: A DOLFIN :class:`Function` defining the forward solution.
+   :arg rhs: A UFL :class:`Expr` defining the expression to project onto the
+       space for `x`, or a UFL :class:`Form` defining the right-hand-side
+       of the finite element variational problem. Should not depend on `x`.
+
+   Remaining arguments are passed to the :class:`EquationSolver` constructor.
+
+
+
+.. py:class:: Interpolation(x, y, *, x_coords=None, P=None, tolerance=0.0)
+
+
+
+   Represents interpolation of the scalar-valued function `y` onto the
+   space for `x`.
+
+   The forward residual :math:`\mathcal{F}` is defined so that :math:`\partial
+   \mathcal{F} / \partial x` is the identity.
+
+   Internally this builds (or uses a supplied) interpolation matrix for the
+   local process *only*. This behaves correctly if the there are no edges
+   between owned and non-owned nodes in the degree of freedom graph associated
+   with the discrete function space for `y`.
+
+   :arg x: A scalar-valued DOLFIN :class:`Function` defining the forward
+       solution.
+   :arg y: A scalar-valued DOLFIN :class:`Function` to interpolate onto the
+       space for `x`.
+   :arg X_coords: A NumPy :class:`ndarray` defining the coordinates at which
+       to interpolate `y`. Shape is `(n, d)` where `n` is the number of
+       process local degrees of freedom for `x` and `d` is the geometric
+       dimension. Defaults to the process local degree of freedom locations
+       for `x`. Ignored if `P` is supplied.
+   :arg P: The interpolation matrix. A SciPy :class:`spmatrix`.
+   :arg tolerance: Maximum permitted distance of an interpolation point from
+       a cell in the mesh for `y`. Ignored if `P` is supplied.
+
+
+
+.. py:class:: PointInterpolation(X, y, X_coords=None, *, P=None, tolerance=0.0)
+
+
+
+   Represents interpolation of a scalar-valued function at given points.
+
+   The forward residual :math:`\mathcal{F}` is defined so that :math:`\partial
+   \mathcal{F} / \partial x` is the identity.
+
+   Internally this builds (or uses a supplied) interpolation matrix for the
+   local process *only*. This behaves correctly if the there are no edges
+   between owned and non-owned nodes in the degree of freedom graph associated
+   with the discrete function space for `y`.
+
+   :arg X: A scalar function, or a :class:`Sequence` of scalar functions,
+       defining the forward solution.
+   :arg y: A scalar-valued DOLFIN :class:`Function` to interpolate.
+   :arg X_coords: A NumPy :class:`ndarray` defining the coordinates at which
+       to interpolate `y`. Shape is `(n, d)` where `n` is the number of
+       interpolation points and `d` is the geometric dimension. Ignored if `P`
+       is supplied.
+   :arg P: The interpolation matrix. A SciPy :class:`spmatrix`.
+   :arg tolerance: Maximum permitted distance of an interpolation point from
+       a cell in the mesh for `y`. Ignored if `P` is supplied.
+
+   .. py:method:: forward_solve(self, X, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: adjoint_derivative_action(self, nl_deps, dep_index, adj_X)
+
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A function if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of functions.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`tlm_adjoint.interface.subtract_adjoint_derivative_action`,
+          and valid types depend upon the backend used. Typically this will
+          be a function, or a two element :class:`tuple` `(alpha, F)`, where
+          `alpha` is a scalar and `F` a function, with the value defined by
+          the product of `alpha` and `F`.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_X, nl_deps, B)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+
+

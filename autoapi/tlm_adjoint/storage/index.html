@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.storage &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.storage</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/storage/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint.storage">
+<span id="tlm-adjoint-storage"></span><h1><a class="reference internal" href="#module-tlm_adjoint.storage" title="tlm_adjoint.storage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.storage</span></code></a><a class="headerlink" href="#module-tlm_adjoint.storage" title="Permalink to this headline"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.storage.</span></span><span class="sig-name descname"><span class="pre">Storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage" title="Permalink to this definition"></a></dt>
+<dd><p>Used to save and load a forward solution value.</p>
+<p>With <cite>save=True</cite> the first forward solve saves the value of <cite>x</cite>. With
+<cite>save=False</cite>, or on any subsequent forward solve, the value of the forward
+solution is loaded into <cite>x</cite>.</p>
+<p>When processed by the <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> this
+is equivalent to an assignment</p>
+<div class="math notranslate nohighlight">
+\[x = x_\text{value},\]</div>
+<p>where <span class="math notranslate nohighlight">\(x_\text{value}\)</span> is the value which is saved or loaded. The
+forward residual is defined</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{F} \left( x \right) = x - x_\text{value}.\]</div>
+<p>This is an abstract base class. Information required to save and load data
+is provided by overloading abstract methods. This class does <em>not</em> inherit
+from <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, so that methods may be implemented as needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution, whose value is saved or
+loaded.</p></li>
+<li><p><strong>key</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> key for the saved or loaded data.</p></li>
+<li><p><strong>save</strong> – If <cite>True</cite> then the first forward solve saves the value of <cite>x</cite>.
+If <cite>False</cite> then the first forward solve loads the value of <cite>x</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.key">
+<span class="sig-name descname"><span class="pre">key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.key" title="Permalink to this definition"></a></dt>
+<dd><p>Return the key associated with saved or loaded data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> key.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.is_saved">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_saved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.is_saved" title="Permalink to this definition"></a></dt>
+<dd><p>Return whether a value can be loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if a value can be loaded, and <cite>False</cite> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.load">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load data, storing the result in <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – A function in which the loaded data is stored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.save">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.save" title="Permalink to this definition"></a></dt>
+<dd><p>Save the value of <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – A function whose value should be saved.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.forward_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> is paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function if the forward solution has a single component,
+otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions. May define an initial
+guess, and should be set by this method. Subclasses may replace
+this argument with <cite>x</cite> if the forward solution has a single
+component.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions, defining values of
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.adjoint_jacobian_solve" title="Permalink to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+defining the initial guess for an iterative solve. May be modified
+or returned. Subclasses may replace this argument with <cite>adj_x</cite> if
+the adjoint solution has a single component.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A function (if the adjoint solution has a
+single component) or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions (otherwise)
+storing the value of the right-hand-side. May be modified or
+returned. Subclasses may replace this argument with <cite>b</cite> if the
+adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.adjoint_derivative_action">
+<span class="sig-name descname"><span class="pre">adjoint_derivative_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.adjoint_derivative_action" title="Permalink to this definition"></a></dt>
+<dd><p>Return the action of the adjoint of a derivative of the forward
+residual on the adjoint solution. This is the <em>negative</em> of an adjoint
+right-hand-side term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining values of
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_index</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>. The derivative is defined by
+differentiation of the forward residual with respect to
+<cite>self.dependencies()[dep_index]</cite>.</p></li>
+<li><p><strong>adj_X</strong> – The adjoint solution. A function if the adjoint solution
+has a single component, otherwise a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions.
+Should not be modified. Subclasses may replace this argument with
+<cite>adj_x</cite> if the adjoint solution has a single component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The action of the adjoint of a derivative on the adjoint
+solution. Will be passed to
+<a class="reference internal" href="../interface/index.html#tlm_adjoint.interface.subtract_adjoint_derivative_action" title="tlm_adjoint.interface.subtract_adjoint_derivative_action"><code class="xref py py-func docutils literal notranslate"><span class="pre">tlm_adjoint.interface.subtract_adjoint_derivative_action()</span></code></a>,
+and valid types depend upon the backend used. Typically this will
+be a function, or a two element <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(alpha, F)</cite>, where
+<cite>alpha</cite> is a scalar and <cite>F</cite> a function, with the value defined by
+the product of <cite>alpha</cite> and <cite>F</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.Storage.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.Storage.tangent_linear" title="Permalink to this definition"></a></dt>
+<dd><p>Derive an <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code> corresponding to a associated equation
+in a tangent-linear model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control.</p></li>
+<li><p><strong>dM</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the derivative
+direction. The tangent-linear model computes directional
+derivatives with respect to the control defined by <cite>M</cite> and with
+direction defined by <cite>dM</cite>.</p></li>
+<li><p><strong>tlm_map</strong> – A <a class="reference internal" href="../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tangent_linear.TangentLinearMap</span></code></a>
+storing values for tangent-linear variables.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code>, corresponding to the tangent-linear
+equation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.MemoryStorage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.storage.</span></span><span class="sig-name descname"><span class="pre">MemoryStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.MemoryStorage" title="Permalink to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint.storage.Storage" title="tlm_adjoint.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a> which stores the value in memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution, whose value is saved or
+loaded.</p></li>
+<li><p><strong>d</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> in which data is stored with key <cite>key</cite>.</p></li>
+<li><p><strong>key</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> key for the saved or loaded data.</p></li>
+<li><p><strong>save</strong> – If <cite>True</cite> then the first forward solve saves the value of <cite>x</cite>.
+If <cite>False</cite> then the first forward solve loads the value of <cite>x</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.MemoryStorage.is_saved">
+<span class="sig-name descname"><span class="pre">is_saved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.MemoryStorage.is_saved" title="Permalink to this definition"></a></dt>
+<dd><p>Return whether a value can be loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if a value can be loaded, and <cite>False</cite> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.MemoryStorage.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.MemoryStorage.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load data, storing the result in <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – A function in which the loaded data is stored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.MemoryStorage.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.MemoryStorage.save" title="Permalink to this definition"></a></dt>
+<dd><p>Save the value of <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – A function whose value should be saved.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.HDF5Storage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.storage.</span></span><span class="sig-name descname"><span class="pre">HDF5Storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.HDF5Storage" title="Permalink to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint.storage.Storage" title="tlm_adjoint.storage.Storage"><code class="xref py py-class docutils literal notranslate"><span class="pre">Storage</span></code></a> which stores the value on disk using the h5py
+library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A function defining the forward solution, whose value is saved or
+loaded.</p></li>
+<li><p><strong>h</strong> – An h5py <code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code>.</p></li>
+<li><p><strong>key</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> key for the saved or loaded data.</p></li>
+<li><p><strong>save</strong> – If <cite>True</cite> then the first forward solve saves the value of <cite>x</cite>.
+If <cite>False</cite> then the first forward solve loads the value of <cite>x</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.HDF5Storage.is_saved">
+<span class="sig-name descname"><span class="pre">is_saved</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.HDF5Storage.is_saved" title="Permalink to this definition"></a></dt>
+<dd><p>Return whether a value can be loaded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if a value can be loaded, and <cite>False</cite> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.HDF5Storage.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.HDF5Storage.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load data, storing the result in <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – A function in which the loaded data is stored.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.storage.HDF5Storage.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.storage.HDF5Storage.save" title="Permalink to this definition"></a></dt>
+<dd><p>Save the value of <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – A function whose value should be saved.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint._code_generator.functions &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint._code_generator.functions</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/_code_generator/functions/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint._code_generator.functions">
+<span id="tlm-adjoint-code-generator-functions"></span><h1><a class="reference internal" href="#module-tlm_adjoint._code_generator.functions" title="tlm_adjoint._code_generator.functions"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint._code_generator.functions</span></code></a><a class="headerlink" href="#module-tlm_adjoint._code_generator.functions" title="Permalink to this headline"></a></h1>
+<p>This module is used by both the FEniCS and Firedrake backends, and includes
+functionality for handling UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Coefficient</span></code> objects and boundary
+conditions.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.Constant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.Constant" title="Permalink to this definition"></a></dt>
+<dd><p>Extends the backend <cite>Constant</cite> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The initial value. <cite>None</cite> indicates a value of zero.</p></li>
+<li><p><strong>name</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> name.</p></li>
+<li><p><strong>domain</strong> – The domain on which the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> is defined.</p></li>
+<li><p><strong>space</strong> – The space on which the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> is defined.</p></li>
+<li><p><strong>space_type</strong> – The space type for the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>. <cite>‘primal’</cite>,
+<cite>‘dual’</cite>, <cite>‘conjugate’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+<li><p><strong>shape</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> objects defining the shape of
+the value.</p></li>
+<li><p><strong>comm</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">mpi4py.MPI.Comm</span></code>, communicator for the
+<a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>.</p></li>
+<li><p><strong>static</strong> – Defines the default value for <cite>cache</cite> and <cite>checkpoint</cite>.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving this <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> may be
+cached. Default <cite>static</cite>.</p></li>
+<li><p><strong>checkpoint</strong> – Defines whether a
+<a class="reference internal" href="../../checkpointing/index.html#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.checkpointing.CheckpointStorage</span></code></a> should store this
+<a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> by value (<cite>checkpoint=True</cite>) or reference
+(<cite>checkpoint=False</cite>). Default <cite>not static</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the backend <cite>Constant</cite> constructor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.Function">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">Function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.Function" title="Permalink to this definition"></a></dt>
+<dd><p>Extends the backend <cite>Function</cite> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space_type</strong> – The space type for the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Function" title="tlm_adjoint._code_generator.functions.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a>. <cite>‘primal’</cite>,
+<cite>‘dual’</cite>, <cite>‘conjugate’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+<li><p><strong>static</strong> – Defines the default value for <cite>cache</cite> and <cite>checkpoint</cite>.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving this <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Function" title="tlm_adjoint._code_generator.functions.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> may be
+cached. Default <cite>static</cite>.</p></li>
+<li><p><strong>checkpoint</strong> – Defines whether a
+<a class="reference internal" href="../../checkpointing/index.html#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.checkpointing.CheckpointStorage</span></code></a> should store this
+<a class="reference internal" href="#tlm_adjoint._code_generator.functions.Function" title="tlm_adjoint._code_generator.functions.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> by value (<cite>checkpoint=True</cite>) or reference
+(<cite>checkpoint=False</cite>). Default <cite>not static</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the backend <cite>Function</cite> constructor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.Zero">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">Zero</span></span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.Zero" title="Permalink to this definition"></a></dt>
+<dd><p>Mixin for defining a zero-valued function. Used for zero-valued
+functions for which UFL zero elimination should not be applied.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.ZeroConstant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">ZeroConstant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.ZeroConstant" title="Permalink to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> which is flagged as having a value of zero.</p>
+<p>Arguments are passed to the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Constant" title="tlm_adjoint._code_generator.functions.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> constructor, together with
+<cite>static=True</cite>, <cite>cache=True</cite>, and <cite>checkpoint=False</cite></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.ZeroFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">ZeroFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.ZeroFunction" title="Permalink to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Function" title="tlm_adjoint._code_generator.functions.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> which is flagged as having a value of zero.</p>
+<p>Arguments are passed to the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Function" title="tlm_adjoint._code_generator.functions.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> constructor, together with
+<cite>static=True</cite>, <cite>cache=True</cite>, and <cite>checkpoint=False</cite></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.extract_coefficients">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">extract_coefficients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.extract_coefficients" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Functions on which the supplied UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> or
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> depends.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.eliminate_zeros">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">eliminate_zeros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_non_empty_form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.eliminate_zeros" title="Permalink to this definition"></a></dt>
+<dd><p>Apply zero elimination for <a class="reference internal" href="#tlm_adjoint._code_generator.functions.Zero" title="tlm_adjoint._code_generator.functions.Zero"><code class="xref py py-class docutils literal notranslate"><span class="pre">Zero</span></code></a> objects in the supplied UFL
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code>.</p></li>
+<li><p><strong>force_non_empty_form</strong> – If <cite>True</cite> and if <cite>expr</cite> is a UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code>,
+then the returned form is guaranteed to be non-empty, and may be
+assembled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Expr</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> with zero elimination
+applied. May return <cite>expr</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.DirichletBC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">DirichletBC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_domain</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">homogeneous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_homogeneous</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="Permalink to this definition"></a></dt>
+<dd><p>Extends the backend <cite>DirichletBC</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>static</strong> – A flag that indicates that the value for this
+<a class="reference internal" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="tlm_adjoint._code_generator.functions.DirichletBC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirichletBC</span></code></a> will not change, and which determines whether
+calculations involving this <a class="reference internal" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="tlm_adjoint._code_generator.functions.DirichletBC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirichletBC</span></code></a> can be cached. If
+<cite>None</cite> then autodetected from the value.</p></li>
+<li><p><strong>homogeneous</strong> – Deprecated.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the backend <cite>DirichletBC</cite> constructor.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.DirichletBC.homogenize">
+<span class="sig-name descname"><span class="pre">homogenize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.DirichletBC.homogenize" title="Permalink to this definition"></a></dt>
+<dd><p>Homogenize the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="tlm_adjoint._code_generator.functions.DirichletBC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirichletBC</span></code></a>, setting its value to zero.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.DirichletBC.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.DirichletBC.set_value" title="Permalink to this definition"></a></dt>
+<dd><p>Set the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="tlm_adjoint._code_generator.functions.DirichletBC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirichletBC</span></code></a> value.</p>
+<p>Arguments are passed to the base class <cite>set_value</cite> method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.HomogeneousDirichletBC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">HomogeneousDirichletBC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_domain</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.HomogeneousDirichletBC" title="Permalink to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="tlm_adjoint._code_generator.functions.DirichletBC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirichletBC</span></code></a> whose value is zero.</p>
+<p>Arguments are passed to the <a class="reference internal" href="#tlm_adjoint._code_generator.functions.DirichletBC" title="tlm_adjoint._code_generator.functions.DirichletBC"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirichletBC</span></code></a> constructor, together with
+<cite>static=True</cite>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.Replacement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">Replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.Replacement" title="Permalink to this definition"></a></dt>
+<dd><p>A UFL <code class="xref py py-class docutils literal notranslate"><span class="pre">Coefficient</span></code> representing a symbolic variable but with no
+value.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.ReplacementConstant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">ReplacementConstant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.ReplacementConstant" title="Permalink to this definition"></a></dt>
+<dd><p>A backend <cite>Constant</cite> representing a symbolic variable but with no
+value.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint._code_generator.functions.ReplacementFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint._code_generator.functions.</span></span><span class="sig-name descname"><span class="pre">ReplacementFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint._code_generator.functions.ReplacementFunction" title="Permalink to this definition"></a></dt>
+<dd><p>A backend <cite>Function</cite> representing a symbolic variable but with no
+value.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

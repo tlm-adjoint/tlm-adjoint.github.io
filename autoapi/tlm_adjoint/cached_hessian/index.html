@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.cached_hessian &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.cached_hessian</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/cached_hessian/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint.cached_hessian">
+<span id="tlm-adjoint-cached-hessian"></span><h1><a class="reference internal" href="#module-tlm_adjoint.cached_hessian" title="tlm_adjoint.cached_hessian"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.cached_hessian</span></code></a><a class="headerlink" href="#module-tlm_adjoint.cached_hessian" title="Permalink to this headline"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.cached_hessian.CachedHessian">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.cached_hessian.</span></span><span class="sig-name descname"><span class="pre">CachedHessian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">J</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_adjoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.cached_hessian.CachedHessian" title="Permalink to this definition"></a></dt>
+<dd><p>Represents a Hessian matrix associated with a given forward model. Uses
+a cached forward calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>J</strong> – A function or <a class="reference internal" href="../functional/index.html#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.functional.Functional</span></code></a> defining
+the Hessian matrix.</p></li>
+<li><p><strong>manager</strong> – The <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> used to
+record the forward. This must have used <cite>‘memory’</cite> checkpointing with
+automatic dropping of function references disabled. <cite>manager()</cite> is used
+if not supplied.</p></li>
+<li><p><strong>cache_adjoint</strong> – Whether to cache the first order adjoint calculation.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.cached_hessian.CachedHessian.compute_gradient">
+<span class="sig-name descname"><span class="pre">compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.cached_hessian.CachedHessian.compute_gradient" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the (conjugate of the) derivative of a functional with
+respect to a control using an adjoint model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+control variable.</p></li>
+<li><p><strong>M0</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+control value. <cite>M</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The derivative. A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions,
+depending on the type of <cite>M</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.cached_hessian.CachedHessian.action">
+<span class="sig-name descname"><span class="pre">action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.cached_hessian.CachedHessian.action" title="Permalink to this definition"></a></dt>
+<dd><p>Compute (the conjugate of) a Hessian matrix action on some
+<span class="math notranslate nohighlight">\(\zeta\)</span> using an adjoint of a tangent-linear model. i.e.
+considering derivatives to be column vectors, compute</p>
+<div class="math notranslate nohighlight">
+\[\left( \frac{d}{dm} \left[
+    \frac{d \mathcal{J}}{d m}^T \zeta \right] \right)^{*,T}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+control variable.</p></li>
+<li><p><strong>dM</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining
+<span class="math notranslate nohighlight">\(\zeta\)</span>. The (conjugate of the) Hessian matrix action on
+<span class="math notranslate nohighlight">\(\zeta\)</span> is computed.</p></li>
+<li><p><strong>M0</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+control value. <cite>M</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tuple <cite>(J, dJ, ddJ)</cite>. <cite>J</cite> is the value of the functional.
+<cite>dJ</cite> is the value of <span class="math notranslate nohighlight">\(\left( d \mathcal{J} / d m \right)^T
+\zeta\)</span>. <cite>ddJ</cite> stores the (conjugate of the) result of the Hessian
+matrix action on <span class="math notranslate nohighlight">\(\zeta\)</span>, and is a function or a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions depending on the type of <cite>M</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.cached_hessian.CachedGaussNewton">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.cached_hessian.</span></span><span class="sig-name descname"><span class="pre">CachedGaussNewton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_inv_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_inv_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.cached_hessian.CachedGaussNewton" title="Permalink to this definition"></a></dt>
+<dd><p>Represents a Gauss-Newton approximation to a Hessian matrix associated
+with a given forward model. Uses a cached forward calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the state.</p></li>
+<li><p><strong>R_inv_action</strong> – See <a class="reference internal" href="../hessian/index.html#tlm_adjoint.hessian.GaussNewton" title="tlm_adjoint.hessian.GaussNewton"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.hessian.GaussNewton</span></code></a>.</p></li>
+<li><p><strong>B_inv_action</strong> – See <a class="reference internal" href="../hessian/index.html#tlm_adjoint.hessian.GaussNewton" title="tlm_adjoint.hessian.GaussNewton"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.hessian.GaussNewton</span></code></a>.</p></li>
+<li><p><strong>J_space</strong> – The space for the functional. <cite>FloatSpace(Float)</cite> is used if
+not supplied.</p></li>
+<li><p><strong>manager</strong> – The <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> used to
+record the forward. This must have used <cite>‘memory’</cite> checkpointing with
+automatic dropping of function references disabled. <cite>manager()</cite> is used
+if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.cached_hessian.CachedGaussNewton.action">
+<span class="sig-name descname"><span class="pre">action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.cached_hessian.CachedGaussNewton.action" title="Permalink to this definition"></a></dt>
+<dd><p>Compute (the conjugate of) a Hessian matrix action on some
+<span class="math notranslate nohighlight">\(\zeta\)</span>, using the Gauss-Newton approximation for the Hessian
+matrix. i.e. compute</p>
+<div class="math notranslate nohighlight">
+\[\left( H \zeta \right)^{*,T}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>M</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+control variable.</p></li>
+<li><p><strong>dM</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining
+<span class="math notranslate nohighlight">\(\zeta\)</span>. The (conjugate of the) approximated Hessian matrix
+action on <span class="math notranslate nohighlight">\(\zeta\)</span> is computed.</p></li>
+<li><p><strong>M0</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+control value. <cite>M</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The (conjugate of the) result of the approximated Hessian
+matrix action on <span class="math notranslate nohighlight">\(\zeta\)</span>. A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>
+of functions depending on the type of <cite>M</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

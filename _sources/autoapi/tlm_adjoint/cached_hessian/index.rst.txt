@@ -1,0 +1,106 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.cached_hessian`
+====================================
+
+.. py:module:: tlm_adjoint.cached_hessian
+
+
+Module Contents
+---------------
+
+.. py:class:: CachedHessian(J, *, manager=None, cache_adjoint=True)
+
+
+
+   Represents a Hessian matrix associated with a given forward model. Uses
+   a cached forward calculation.
+
+   :arg J: A function or :class:`tlm_adjoint.functional.Functional` defining
+       the Hessian matrix.
+   :arg manager: The :class:`tlm_adjoint.tlm_adjoint.EquationManager` used to
+       record the forward. This must have used `'memory'` checkpointing with
+       automatic dropping of function references disabled. `manager()` is used
+       if not supplied.
+   :arg cache_adjoint: Whether to cache the first order adjoint calculation.
+
+   .. py:method:: compute_gradient(self, M, M0=None)
+
+      Compute the (conjugate of the) derivative of a functional with
+      respect to a control using an adjoint model.
+
+      :arg M: A function or a :class:`Sequence` of functions defining the
+          control variable.
+      :arg M0: A function or a :class:`Sequence` of functions defining the
+          control value. `M` is used if not supplied.
+      :returns: The derivative. A function or :class:`Sequence` of functions,
+          depending on the type of `M`.
+
+
+   .. py:method:: action(self, M, dM, M0=None)
+
+      Compute (the conjugate of) a Hessian matrix action on some
+      :math:`\zeta` using an adjoint of a tangent-linear model. i.e.
+      considering derivatives to be column vectors, compute
+
+      .. math::
+
+          \left( \frac{d}{dm} \left[
+              \frac{d \mathcal{J}}{d m}^T \zeta \right] \right)^{*,T}.
+
+      :arg M: A function or a :class:`Sequence` of functions defining the
+          control variable.
+      :arg dM: A function or a :class:`Sequence` of functions defining
+          :math:`\zeta`. The (conjugate of the) Hessian matrix action on
+          :math:`\zeta` is computed.
+      :arg M0: A function or a :class:`Sequence` of functions defining the
+          control value. `M` is used if not supplied.
+      :returns: A tuple `(J, dJ, ddJ)`. `J` is the value of the functional.
+          `dJ` is the value of :math:`\left( d \mathcal{J} / d m \right)^T
+          \zeta`. `ddJ` stores the (conjugate of the) result of the Hessian
+          matrix action on :math:`\zeta`, and is a function or a
+          :class:`Sequence` of functions depending on the type of `M`.
+
+
+
+
+.. py:class:: CachedGaussNewton(X, R_inv_action, B_inv_action=None, *, J_space=None, manager=None)
+
+
+
+   Represents a Gauss-Newton approximation to a Hessian matrix associated
+   with a given forward model. Uses a cached forward calculation.
+
+   :arg X: A function or a :class:`Sequence` of functions defining the state.
+   :arg R_inv_action: See :class:`tlm_adjoint.hessian.GaussNewton`.
+   :arg B_inv_action: See :class:`tlm_adjoint.hessian.GaussNewton`.
+   :arg J_space: The space for the functional. `FloatSpace(Float)` is used if
+       not supplied.
+   :arg manager: The :class:`tlm_adjoint.tlm_adjoint.EquationManager` used to
+       record the forward. This must have used `'memory'` checkpointing with
+       automatic dropping of function references disabled. `manager()` is used
+       if not supplied.
+
+   .. py:method:: action(self, M, dM, M0=None)
+
+      Compute (the conjugate of) a Hessian matrix action on some
+      :math:`\zeta`, using the Gauss-Newton approximation for the Hessian
+      matrix. i.e. compute
+
+      .. math::
+
+          \left( H \zeta \right)^{*,T}.
+
+      :arg M: A function or a :class:`Sequence` of functions defining the
+          control variable.
+      :arg dM: A function or a :class:`Sequence` of functions defining
+          :math:`\zeta`. The (conjugate of the) approximated Hessian matrix
+          action on :math:`\zeta` is computed.
+      :arg M0: A function or a :class:`Sequence` of functions defining the
+          control value. `M` is used if not supplied.
+      :returns: The (conjugate of the) result of the approximated Hessian
+          matrix action on :math:`\zeta`. A function or a :class:`Sequence`
+          of functions depending on the type of `M`.
+
+
+

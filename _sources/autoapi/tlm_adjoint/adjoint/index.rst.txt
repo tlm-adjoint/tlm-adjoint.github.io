@@ -1,0 +1,220 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.adjoint`
+=============================
+
+.. py:module:: tlm_adjoint.adjoint
+
+
+Module Contents
+---------------
+
+.. py:class:: AdjointRHS(x)
+
+   The right-hand-side of an adjoint equation, for an adjoint variable
+   associated with an equation solving for a forward variable `x`.
+
+   :arg x: A function defining the forward variable.
+
+   .. py:method:: b(self, *, copy=False)
+
+      Return the right-hand-side, as a function. Note that any deferred
+      contributions *are* added to the function before it is returned -- see
+      :meth:`finalize`.
+
+      :arg copy: If `True` then a copy of the internal function storing the
+          right-hand-side value is returned. If `False` the internal function
+          itself is returned.
+      :returns: A function storing the right-hand-side value.
+
+
+   .. py:method:: initialize(self)
+
+      Allocate an internal function to store the right-hand-side. Called
+      by the :meth:`finalize` and :meth:`sub` methods, and typically need not
+      be called manually.
+
+
+   .. py:method:: finalize(self)
+
+      Subtracting of terms from the internal function storing the
+      right-hand-side may be deferred. In particular finite element assembly
+      may be deferred until a more complete expression, consisting of
+      multiple terms, has been constructed. This method updates the internal
+      function so that all deferred contributions are subtracted.
+
+
+   .. py:method:: sub(self, b)
+
+      Subtract a term from the right-hand-side.
+
+      :arg b: The term to subtract.
+          :func:`tlm_adjoint.interface.subtract_adjoint_derivative_action` is
+          used to subtract the term.
+
+
+   .. py:method:: is_empty(self)
+
+      Return whether the right-hand-side is 'empty', meaning that the
+      :meth:`initialize` method has not been called.
+
+      :returns: `True` if the :meth:`initialize` method has not been called,
+          and `False` otherwise.
+
+
+
+.. py:class:: AdjointEquationRHS(eq)
+
+   The right-hand-side of an adjoint equation, for adjoint variables
+   associated with an equation solving for multiple forward variables `X`.
+
+   Multiple :class:`AdjointRHS` objects. The :class:`AdjointRHS` objects may
+   be accessed by index, e.g.
+
+   .. code-block:: python
+
+       adj_eq_rhs = AdjointEquationRHS(eq)
+       adj_rhs = adj_eq_rhs[m]
+
+   :arg eq: A :class:`tlm_adjoint.equation.Equation`. `eq.X()` defines the
+       forward variables.
+
+   .. py:method:: b(self, *, copy=False)
+
+      For the case where there is a single forward variable, return a
+      function associated with the right-hand-side.
+
+      :arg copy: If `True` then a copy of the internal function storing the
+          right-hand-side value is returned. If `False` the internal function
+          itself is returned.
+      :returns: A function storing the right-hand-side value.
+
+
+   .. py:method:: B(self, *, copy=False)
+
+      Return functions associated with the right-hand-sides.
+
+      :arg copy: If `True` then copies of the internal functions storing the
+          right-hand-side values are returned. If `False` the internal
+          functions themselves are returned.
+      :returns: A :class:`tuple` of functions storing the right-hand-side
+          values.
+
+
+   .. py:method:: finalize(self)
+
+      Call the :meth:`AdjointRHS.finalize` methods of all
+      :class:`AdjointRHS` objects.
+
+
+   .. py:method:: is_empty(self)
+
+      Return whether all of the :class:`AdjointRHS` objects are 'empty',
+      meaning that the :meth:`AdjointRHS.initialize` method has not been
+      called for any :class:`AdjointRHS`.
+
+      :returns: `True` if the :meth:`AdjointRHS.initialize` method has not
+          been called for any :class:`AdjointRHS`, and `False` otherwise.
+
+
+
+.. py:class:: AdjointBlockRHS(block)
+
+   The right-hand-side of multiple adjoint equations.
+
+   Multiple :class:`AdjointEquationRHS` objects. The
+   :class:`AdjointEquationRHS` objects may be accessed by index, e.g.
+
+   .. code-block:: python
+
+       adj_block_rhs = AdjointBlockRHS(block)
+       adj_eq_rhs = adj_block_rhs[k]
+
+   :class:`AdjointRHS` objects may be accessed e.g.
+
+   .. code-block:: python
+
+       adj_rhs = adj_block_rhs[(k, m)]
+
+   :arg block: A :class:`Sequence` of :class:`tlm_adjoint.equation.Equation`
+       objects.
+
+   .. py:method:: pop(self)
+
+      Remove and return the last :class:`AdjointEquationRHS` in the
+      :class:`AdjointBlockRHS`.
+
+      :returns: A :class:`tuple` `(n, B)`. `B` is the removed
+          :class:`AdjointEquationRHS`, associated with block `n`.
+
+
+   .. py:method:: finalize(self)
+
+      Call the :meth:`AdjointEquationRHS.finalize` methods of all
+      :class:`AdjointEquationRHS` objects.
+
+
+   .. py:method:: is_empty(self)
+
+      Return whether there are no :class:`AdjointEquationRHS` objects in
+      the :class:`AdjointBlockRHS`.
+
+      :returns: `True` if there are no :class:`AdjointEquationRHS` objects in
+          the :class:`AdjointBlockRHS`, and `False` otherwise.
+
+
+
+.. py:class:: AdjointModelRHS(blocks)
+
+   The right-hand-side of multiple blocks of adjoint equations.
+
+   Multiple :class:`AdjointBlockRHS` objects. The :class:`AdjointBlockRHS`
+   objects may be accessed by index, e.g.
+
+   .. code-block:: python
+
+       adj_model_rhs = AdjointModelRHS(block)
+       adj_block_rhs = adj_block_rhs[p]
+
+   :class:`AdjointEquationRHS` objects may be accessed e.g.
+
+   .. code-block:: python
+
+       adj_eq_rhs = adj_block_rhs[(p, k)]
+
+   :class:`AdjointRHS` objects may be accessed e.g.
+
+   .. code-block:: python
+
+       adj_rhs = adj_block_rhs[(p, k, m)]
+
+   If the last block of adjoint equations contains no equations then it is
+   automatically removed from the :class:`AdjointModelRHS`.
+
+   :arg blocks: A :class:`Sequence` of :class:`Sequence` objects each
+       containing :class:`tlm_adjoint.equation.Equation` objects, or a
+       :class:`Mapping` with items `(index, block)` where `index` is an
+       :class:`int` and `block` a :class:`Sequence` of
+       :class:`tlm_adjoint.equation.Equation` objects. In the latter case
+       blocks are ordered by `index`.
+
+   .. py:method:: pop(self)
+
+      Remove and return the last :class:`AdjointEquationRHS` in the last
+      :class:`AdjointBlockRHS` in the :class:`AdjointModelRHS`.
+
+      :returns: A :class:`tuple` `((n, i), B)`. `B` is the removed
+          :class:`AdjointEquationRHS`, associated with equation `i` in block
+          `n`.
+
+
+   .. py:method:: is_empty(self)
+
+      Return whether there are no :class:`AdjointBlockRHS` objects in the
+      :class:`AdjointModelRHS`.
+
+      :returns: `True` if there are no :class:`AdjointBlockRHS` objects in
+          the :class:`AdjointModelRHS`, and `False` otherwise.
+
+
+

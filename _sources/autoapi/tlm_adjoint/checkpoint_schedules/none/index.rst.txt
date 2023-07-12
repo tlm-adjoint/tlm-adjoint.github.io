@@ -1,0 +1,39 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.checkpoint_schedules.none`
+===============================================
+
+.. py:module:: tlm_adjoint.checkpoint_schedules.none
+
+
+Module Contents
+---------------
+
+.. py:class:: NoneCheckpointSchedule
+
+
+
+   A checkpointing schedule for the case where no adjoint calculation is
+   performed.
+
+   Online, zero adjoint calculations permitted.
+
+   .. py:method:: iter(self)
+
+      A generator which should be overridden in derived classes in order
+      to define a checkpointing schedule.
+
+
+   .. py:method:: is_exhausted(self)
+
+      Return whether the schedule has concluded. Note that some schedules
+      permit multiple adjoint calculation, and may never conclude.
+
+
+   .. py:method:: uses_disk_storage(self)
+
+      Return whether the schedule may use disk storage. If `False` then no
+      disk storage is required.
+
+
+

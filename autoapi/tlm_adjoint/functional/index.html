@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.functional &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.functional</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/functional/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint.functional">
+<span id="tlm-adjoint-functional"></span><h1><a class="reference internal" href="#module-tlm_adjoint.functional" title="tlm_adjoint.functional"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.functional</span></code></a><a class="headerlink" href="#module-tlm_adjoint.functional" title="Permalink to this headline"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.functional.</span></span><span class="sig-name descname"><span class="pre">Functional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional" title="Permalink to this definition"></a></dt>
+<dd><p>A convenience class for defining functionals.</p>
+<p>This allocates and stores an internal function, but note that this function
+can change e.g. after adding terms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space</strong> – The space for the <a class="reference internal" href="#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">Functional</span></code></a>. Internal functions are
+in this space. Defaults to <cite>FloatSpace(Float)</cite>.</p></li>
+<li><p><strong>name</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> name for the functional.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.id">
+<span class="sig-name descname"><span class="pre">id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.id" title="Permalink to this definition"></a></dt>
+<dd><p>Return the unique <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> ID associated with this
+<a class="reference internal" href="#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">Functional</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The unique <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> ID.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">term</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.assign" title="Permalink to this definition"></a></dt>
+<dd><p>Assign to the functional,</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{J} = b.\]</div>
+<p>Note that this method allocates a new internal function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>term</strong> – The value. Defines the value of <span class="math notranslate nohighlight">\(b\)</span>. Valid types
+depend upon the backend. <span class="math notranslate nohighlight">\(b\)</span> may be a function, and with the
+FEniCS or Firedrake backends may be an arity zero UFL
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code>.</p></li>
+<li><p><strong>annotate</strong> – Whether the
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> should record the
+solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.addto">
+<span class="sig-name descname"><span class="pre">addto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">term</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.addto" title="Permalink to this definition"></a></dt>
+<dd><p>Add to the functional. Performs two assignments,</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{J}_\text{term} = b,\]</div>
+<div class="math notranslate nohighlight">
+\[\mathcal{J}_{new} = \mathcal{J}_\text{old}
+    + \mathcal{J}_\text{term},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{J}_\text{old}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{J}_\text{new}\)</span>
+are, respectively, the old and new values for the functional, and
+<span class="math notranslate nohighlight">\(b\)</span> is the term to add.</p>
+<p>Note that this method allocates a new internal function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>term</strong> – The value. Defines the value of <span class="math notranslate nohighlight">\(b\)</span>. Valid types
+depend upon the backend. <span class="math notranslate nohighlight">\(b\)</span> may be a function, and with
+the FEniCS or Firedrake backends may be an arity zero UFL
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code>.</p></li>
+<li><p><strong>annotate</strong> – Whether the
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> should record the
+solution of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether tangent-linear equations should be solved.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.function">
+<span class="sig-name descname"><span class="pre">function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.function" title="Permalink to this definition"></a></dt>
+<dd><p>Return the internal function currently storing the value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The internal function.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.space">
+<span class="sig-name descname"><span class="pre">space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.space" title="Permalink to this definition"></a></dt>
+<dd><p>Return the space for the functional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.value" title="Permalink to this definition"></a></dt>
+<dd><p>Return the current value of the functional.</p>
+<p>The value may also be accessed by casting using <code class="xref py py-func docutils literal notranslate"><span class="pre">float()</span></code> or
+<code class="xref py py-func docutils literal notranslate"><span class="pre">complex()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The scalar value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.functional.Functional.tlm_functional">
+<span class="sig-name descname"><span class="pre">tlm_functional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.functional.Functional.tlm_functional" title="Permalink to this definition"></a></dt>
+<dd><p>Return a <a class="reference internal" href="#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">Functional</span></code></a> associated with a tangent-linear
+variable associated with the functional.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>args</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of <cite>(M, dM)</cite> pairs. Here <cite>M</cite> and <cite>dM</cite>
+are each a function or a sequence of functions defining a
+derivative and derivative direction. The tangent-linear variable is
+the derivative of the functional with respect to each <cite>M</cite> and with
+direction defined by each <cite>dM</cite>. Supplying a single pair requests a
+<a class="reference internal" href="#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">Functional</span></code></a> associated with a first order tangent-linear
+variable. Supplying multiple pairs leads to a <a class="reference internal" href="#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">Functional</span></code></a>
+associated with higher order tangent-linear variables. The relevant
+tangent-linear models must have been configured for the
+<a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> <cite>manager</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">Functional</span></code></a> associated with the tangent-linear
+variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

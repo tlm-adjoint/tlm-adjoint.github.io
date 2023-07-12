@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.optimization &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.optimization</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/optimization/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="module-tlm_adjoint.optimization">
+<span id="tlm-adjoint-optimization"></span><h1><a class="reference internal" href="#module-tlm_adjoint.optimization" title="tlm_adjoint.optimization"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.optimization</span></code></a><a class="headerlink" href="#module-tlm_adjoint.optimization" title="Permalink to this headline"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.minimize_scipy">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">minimize_scipy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.minimize_scipy" title="Permalink to this definition"></a></dt>
+<dd><p>Provides an interface with <code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code> for
+gradient-based optimization.</p>
+<p>Note that the control variable is gathered onto the root process so that
+the serial <code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code> function may be used.</p>
+<p>All keyword arguments except for <cite>manager</cite> are passed to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code>.</p>
+<p><strong>Important note:</strong> No exception is raised if <cite>return_value.success</cite> is
+<cite>False</cite>. Calling code should check this attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> – A callable which accepts one or more function arguments, and
+which returns a function or <a class="reference internal" href="../functional/index.html#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.functional.Functional</span></code></a>
+defining the forward functional.</p></li>
+<li><p><strong>M0</strong> – A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control
+variable, and the initial guess for the optimization.</p></li>
+<li><p><strong>manager</strong> – A <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> which
+should be used internally. <cite>manager().new()</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(M, return_value)</cite>. <cite>M</cite> is function or a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions depending on the type of <cite>M0</cite>, and
+stores the result. <cite>return_value</cite> is the return value of
+<code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.LBFGSHessianApproximation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">LBFGSHessianApproximation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.LBFGSHessianApproximation" title="Permalink to this definition"></a></dt>
+<dd><p>L-BFGS Hessian matrix approximation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>m</strong> – Maximum number of vector pairs to retain in the L-BFGS Hessian
+matrix approximation.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.LBFGSHessianApproximation.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_inner_Y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.LBFGSHessianApproximation.append" title="Permalink to this definition"></a></dt>
+<dd><p>Add a step + gradient change pair.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+step.</p></li>
+<li><p><strong>Y</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+gradient change.</p></li>
+<li><p><strong>S_inner_Y</strong> – The projection of the gradient change onto the step.
+A separate argument so that a value consistent with
+that used in the line search can be supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.LBFGSHessianApproximation.inverse_action">
+<span class="sig-name descname"><span class="pre">inverse_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H_0_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.LBFGSHessianApproximation.inverse_action" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the action of the approximate Hessian matrix inverse on some
+given direction.</p>
+<p>Implements the L-BFGS Hessian matrix inverse action approximation as in
+Algorithm 7.4 of</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Jorge Nocedal and Stephen J. Wright, ‘Numerical optimization’,
+Springer, New York, NY, 2006, Second edition,
+doi: 10.1007/978-0-387-40065-5</p></li>
+</ul>
+</div></blockquote>
+<p>Uses ‘theta scaling’ as in equation (3.7) of</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Richard H. Byrd, Peihuang Lu, and Jorge Nocedal, and Ciyou Zhu,
+‘A limited memory algorithm for bound constrained optimization’,
+SIAM Journal on Scientific Computing, 16(5), 1190–1208, 1995,
+doi: 10.1137/0916069</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+direction on which to compute the approximate Hessian matrix
+inverse action.</p></li>
+<li><p><strong>H_0_action</strong> – A callable defining the action of the non-updated
+Hessian matrix inverse approximation on some direction. Accepts one
+or more functions as arguments, defining the direction, and returns
+a function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the action
+on this direction. Should correspond to a positive definite
+operator. An identity is used if not supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions storing the
+result.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.l_bfgs">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">l_bfgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s_atol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_atol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converged</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_its</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H_0_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_inv_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.l_bfgs" title="Permalink to this definition"></a></dt>
+<dd><p>Functional minimization using the L-BFGS algorithm.</p>
+<p>Implements Algorithm 7.5 of</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Jorge Nocedal and Stephen J. Wright, ‘Numerical optimization’,
+Springer, New York, NY, 2006, Second edition,
+doi: 10.1007/978-0-387-40065-5</p></li>
+</ul>
+</div></blockquote>
+<p>in a more general inner product space.</p>
+<p>By default uses ‘theta scaling’ to define the initial Hessian matrix
+inverse approximation, based on the approach in equation (3.7) and point 7
+on p. 1204 of</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Richard H. Byrd, Peihuang Lu, and Jorge Nocedal, and Ciyou Zhu, ‘A
+limited memory algorithm for bound constrained optimization’, SIAM
+Journal on Scientific Computing, 16(5), 1190–1208, 1995,
+doi: 10.1137/0916069</p></li>
+</ul>
+</div></blockquote>
+<p>and with an initial value for the scaling parameter based on the discussion
+in ‘Implementation’ in section 6.1 of</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Jorge Nocedal and Stephen J. Wright, ‘Numerical optimization’,
+Springer, New York, NY, 2006, Second edition,
+doi: 10.1007/978-0-387-40065-5</p></li>
+</ul>
+</div></blockquote>
+<p>Precisely the Hessian matrix inverse approximation, before being updated,
+is scaled by <span class="math notranslate nohighlight">\(1 / \theta\)</span> with, on the first iteration,</p>
+<div class="math notranslate nohighlight">
+\[\theta = \frac{\sqrt{\left| g_k^* M^{-1} g_k \right|}}{\delta}\]</div>
+<p>and on later iterations</p>
+<div class="math notranslate nohighlight">
+\[\theta = \frac{y_k^* H_0 y_k}{y_k^* s_k},\]</div>
+<p>where <span class="math notranslate nohighlight">\(g_k\)</span>, <span class="math notranslate nohighlight">\(y_k\)</span>, and <span class="math notranslate nohighlight">\(s_k\)</span> are respectively the
+gradient, gradient change, and step, and where <span class="math notranslate nohighlight">\(M^{-1}\)</span> and
+<span class="math notranslate nohighlight">\(H_0\)</span> are defined by <cite>M_inv_action</cite> and <cite>H_0_action</cite> respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>F</strong> – A callable defining the functional. Accepts one or more functions
+as arguments, and returns the value of the functional. Input arguments
+should not be modified.</p></li>
+<li><p><strong>Fp</strong> – A callable defining the functional gradient. Accepts one or more
+functions as inputs, and returns a function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+functions storing the value of the gradient. Input arguments should not
+be modified.</p></li>
+<li><p><strong>X0</strong> – A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+initial guess for the parameters.</p></li>
+<li><p><strong>m</strong> – The maximum number of step + gradient change pairs to use in the
+Hessian matrix inverse approximation.</p></li>
+<li><p><strong>s_atol</strong> – Absolute tolerance for the step change norm convergence
+criterion.</p></li>
+<li><p><strong>g_atol</strong> – Absolute tolerance for the gradient norm convergence
+criterion.</p></li>
+<li><p><strong>converged</strong> – <p>A callable defining a callback, and which can be used to
+define custom convergence criteria. Takes the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">converged</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">F_old</span><span class="p">,</span> <span class="n">F_new</span><span class="p">,</span> <span class="n">X_new</span><span class="p">,</span> <span class="n">G_new</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>with</p>
+<blockquote>
+<div><ul>
+<li><p><cite>it</cite>: The iteration number.</p></li>
+<li><p><cite>F_old</cite>: The previous value of the functional.</p></li>
+<li><p><cite>F_new</cite>: The new value of the functional.</p></li>
+<li><p><cite>X_new</cite>: A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining
+the new value of the parameters.</p></li>
+<li><p><cite>G_new</cite>: A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining
+the new value of the gradient.</p></li>
+<li><p><cite>S</cite>: A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+step.</p></li>
+<li><p><cite>Y</cite>: A function or a sequence of functions defining the gradient
+change.</p></li>
+</ul>
+</div></blockquote>
+<p>Returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> indicating whether the optimization has
+converged.</p>
+</p></li>
+<li><p><strong>max_its</strong> – The maximum number of iterations.</p></li>
+<li><p><strong>H_0_action</strong> – A callable defining the action of the non-updated Hessian
+matrix inverse approximation on some direction. Accepts one or more
+functions as arguments, defining the direction, and returns a function
+or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the action on this
+direction. Should correspond to a positive definite operator. An
+identity is used if not supplied.</p></li>
+<li><p><strong>theta_scale</strong> – Whether to apply ‘theta scaling’, discussed above.</p></li>
+<li><p><strong>delta</strong> – Controls the initial value of <span class="math notranslate nohighlight">\(\theta\)</span> in ‘theta
+scaling’. If <cite>None</cite> then on the first iteration <span class="math notranslate nohighlight">\(\theta\)</span> is set
+equal to one.</p></li>
+<li><p><strong>M_action</strong> – <p>A callable defining a primal space inner product,</p>
+<div class="math notranslate nohighlight">
+\[\left&lt; x, y \right&gt;_M = y^* M x,\]</div>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> are degree of freedom vectors for primal
+space elements and <span class="math notranslate nohighlight">\(M\)</span> is a Hermitian and positive definite
+matrix. Accepts one or more functions as arguments, defining the
+direction, and returns a function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions
+defining the action of <span class="math notranslate nohighlight">\(M\)</span> on this direction. An identity is used
+if not supplied. Required if <cite>H_0_action</cite> or <cite>M_inv_action</cite> are
+supplied.</p>
+</p></li>
+<li><p><strong>M_inv_action</strong> – <p>A callable defining a (conjugate) dual space inner
+product,</p>
+<div class="math notranslate nohighlight">
+\[\left&lt; x, y \right&gt;_{M^{-1}} = y^* M^{-1} x,\]</div>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> are degree of freedom vectors for
+(conjugate) dual space elements and <span class="math notranslate nohighlight">\(M\)</span> is as for <cite>M_action</cite>.
+Accepts one or more functions as arguments, defining the direction, and
+returns a function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the
+action of <span class="math notranslate nohighlight">\(M^{-1}\)</span> on this direction. <cite>H_0_action</cite> is used if not
+supplied.</p>
+</p></li>
+<li><p><strong>c1</strong> – <p>Armijo condition parameter. <span class="math notranslate nohighlight">\(c_1\)</span> in equation (3.6a) of</p>
+<ul>
+<li><p>Jorge Nocedal and Stephen J. Wright, ‘Numerical optimization’,
+Springer, New York, NY, 2006, Second edition,
+doi: 10.1007/978-0-387-40065-5</p></li>
+</ul>
+</p></li>
+<li><p><strong>c2</strong> – <p>Curvature condition parameter. <span class="math notranslate nohighlight">\(c_2\)</span> in equation (3.6b) of</p>
+<ul>
+<li><p>Jorge Nocedal and Stephen J. Wright, ‘Numerical optimization’,
+Springer, New York, NY, 2006, Second edition,
+doi: 10.1007/978-0-387-40065-5</p></li>
+</ul>
+</p></li>
+<li><p><strong>comm</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">mpi4py.MPI.Comm</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> <cite>(X, (it, F_calls, Fp_calls, hessian_approx))</cite>
+with</p>
+<ul class="simple">
+<li><p><cite>X</cite>: The solution. A function or a <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code> of functions.</p></li>
+<li><p><cite>it</cite>: The number of iterations.</p></li>
+<li><p><cite>F_calls</cite>: The number of functional evaluations.</p></li>
+<li><p><cite>Fp_calls</cite>: The number of gradient evaluations.</p></li>
+<li><p><cite>hessian_approx</cite>: The <a class="reference internal" href="#tlm_adjoint.optimization.LBFGSHessianApproximation" title="tlm_adjoint.optimization.LBFGSHessianApproximation"><code class="xref py py-class docutils literal notranslate"><span class="pre">LBFGSHessianApproximation</span></code></a>.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.minimize_l_bfgs">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">minimize_l_bfgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.minimize_l_bfgs" title="Permalink to this definition"></a></dt>
+<dd><p>Functional minimization using the L-BFGS algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> – A callable which accepts one or more function arguments, and
+which returns a function or <a class="reference internal" href="../functional/index.html#tlm_adjoint.functional.Functional" title="tlm_adjoint.functional.Functional"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.functional.Functional</span></code></a>
+defining the forward functional.</p></li>
+<li><p><strong>M0</strong> – A function or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of functions defining the control
+variable, and the initial guess for the optimization.</p></li>
+<li><p><strong>manager</strong> – A <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint.EquationManager</span></code></a> which
+should be used internally. <cite>manager().new()</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments and the return value are described in the
+<a class="reference internal" href="#tlm_adjoint.optimization.l_bfgs" title="tlm_adjoint.optimization.l_bfgs"><code class="xref py py-func docutils literal notranslate"><span class="pre">l_bfgs()</span></code></a> documentation.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

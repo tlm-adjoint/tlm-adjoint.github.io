@@ -1,0 +1,52 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.checkpoint_schedules.mixed`
+================================================
+
+.. py:module:: tlm_adjoint.checkpoint_schedules.mixed
+
+
+Module Contents
+---------------
+
+.. py:class:: MixedCheckpointSchedule(max_n, snapshots, *, storage='disk')
+
+
+
+   A checkpointing schedule which mixes storage of forward restart data and
+   non-linear dependency data in checkpointing units. Assumes that the data
+   required to restart the forward has the same size as the data required to
+   advance the adjoint over a step.
+
+   Described in
+
+       - James R. Maddison, 'On the implementation of checkpointing with
+         high-level algorithmic differentiation',
+         https://arxiv.org/abs/2305.09568v1, 2023
+
+   Offline, one adjoint calculation permitted.
+
+   :arg max_n: The number of forward steps in the initial forward calculation.
+   :arg snapshots: The number of available checkpointing units.
+   :arg storage: Checkpointing unit storage location. Either `'RAM'` or
+       `'disk'`.
+
+   .. py:method:: iter(self)
+
+      A generator which should be overridden in derived classes in order
+      to define a checkpointing schedule.
+
+
+   .. py:method:: is_exhausted(self)
+
+      Return whether the schedule has concluded. Note that some schedules
+      permit multiple adjoint calculation, and may never conclude.
+
+
+   .. py:method:: uses_disk_storage(self)
+
+      Return whether the schedule may use disk storage. If `False` then no
+      disk storage is required.
+
+
+

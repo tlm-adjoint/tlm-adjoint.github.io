@@ -1,0 +1,39 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.checkpoint_schedules.memory`
+=================================================
+
+.. py:module:: tlm_adjoint.checkpoint_schedules.memory
+
+
+Module Contents
+---------------
+
+.. py:class:: MemoryCheckpointSchedule(max_n=None)
+
+
+
+   A checkpointing schedule where all forward restart and non-linear
+   dependency data are stored in memory.
+
+   Online, unlimited adjoint calculations permitted.
+
+   .. py:method:: iter(self)
+
+      A generator which should be overridden in derived classes in order
+      to define a checkpointing schedule.
+
+
+   .. py:method:: is_exhausted(self)
+
+      Return whether the schedule has concluded. Note that some schedules
+      permit multiple adjoint calculation, and may never conclude.
+
+
+   .. py:method:: uses_disk_storage(self)
+
+      Return whether the schedule may use disk storage. If `False` then no
+      disk storage is required.
+
+
+

@@ -1,0 +1,226 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.storage`
+=============================
+
+.. py:module:: tlm_adjoint.storage
+
+
+Module Contents
+---------------
+
+.. py:class:: Storage(x, key, *, save=False)
+
+
+
+   Used to save and load a forward solution value.
+
+   With `save=True` the first forward solve saves the value of `x`. With
+   `save=False`, or on any subsequent forward solve, the value of the forward
+   solution is loaded into `x`.
+
+   When processed by the :class:`tlm_adjoint.tlm_adjoint.EquationManager` this
+   is equivalent to an assignment
+
+   .. math::
+
+       x = x_\text{value},
+
+   where :math:`x_\text{value}` is the value which is saved or loaded. The
+   forward residual is defined
+
+   .. math::
+
+       \mathcal{F} \left( x \right) = x - x_\text{value}.
+
+   This is an abstract base class. Information required to save and load data
+   is provided by overloading abstract methods. This class does *not* inherit
+   from :class:`abc.ABC`, so that methods may be implemented as needed.
+
+   :arg x: A function defining the forward solution, whose value is saved or
+       loaded.
+   :arg key: A :class:`str` key for the saved or loaded data.
+   :arg save: If `True` then the first forward solve saves the value of `x`.
+       If `False` then the first forward solve loads the value of `x`.
+
+   .. py:method:: key(self)
+
+      Return the key associated with saved or loaded data.
+
+      :returns: The :class:`str` key.
+
+
+   .. py:method:: is_saved(self)
+      :abstractmethod:
+
+      Return whether a value can be loaded.
+
+      :returns: `True` if a value can be loaded, and `False` otherwise.
+
+
+   .. py:method:: load(self, x)
+      :abstractmethod:
+
+      Load data, storing the result in `x`.
+
+      :arg x: A function in which the loaded data is stored.
+
+
+   .. py:method:: save(self, x)
+      :abstractmethod:
+
+      Save the value of `x`.
+
+      :arg x: A function whose value should be saved.
+
+
+   .. py:method:: forward_solve(self, x, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: adjoint_derivative_action(self, nl_deps, dep_index, adj_x)
+
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A function if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of functions.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`tlm_adjoint.interface.subtract_adjoint_derivative_action`,
+          and valid types depend upon the backend used. Typically this will
+          be a function, or a two element :class:`tuple` `(alpha, F)`, where
+          `alpha` is a scalar and `F` a function, with the value defined by
+          the product of `alpha` and `F`.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+
+.. py:class:: MemoryStorage(x, d, key, *, save=False)
+
+
+
+   A :class:`Storage` which stores the value in memory.
+
+   :arg x: A function defining the forward solution, whose value is saved or
+       loaded.
+   :arg d: A :class:`dict` in which data is stored with key `key`.
+   :arg key: A :class:`str` key for the saved or loaded data.
+   :arg save: If `True` then the first forward solve saves the value of `x`.
+       If `False` then the first forward solve loads the value of `x`
+
+   .. py:method:: is_saved(self)
+
+      Return whether a value can be loaded.
+
+      :returns: `True` if a value can be loaded, and `False` otherwise.
+
+
+   .. py:method:: load(self, x)
+
+      Load data, storing the result in `x`.
+
+      :arg x: A function in which the loaded data is stored.
+
+
+   .. py:method:: save(self, x)
+
+      Save the value of `x`.
+
+      :arg x: A function whose value should be saved.
+
+
+
+.. py:class:: HDF5Storage(x, h, key, *, save=False)
+
+
+
+   A :class:`Storage` which stores the value on disk using the h5py
+   library.
+
+   :arg x: A function defining the forward solution, whose value is saved or
+       loaded.
+   :arg h: An h5py :class:`File`.
+   :arg key: A :class:`str` key for the saved or loaded data.
+   :arg save: If `True` then the first forward solve saves the value of `x`.
+       If `False` then the first forward solve loads the value of `x`
+
+   .. py:method:: is_saved(self)
+
+      Return whether a value can be loaded.
+
+      :returns: `True` if a value can be loaded, and `False` otherwise.
+
+
+   .. py:method:: load(self, x)
+
+      Load data, storing the result in `x`.
+
+      :arg x: A function in which the loaded data is stored.
+
+
+   .. py:method:: save(self, x)
+
+      Save the value of `x`.
+
+      :arg x: A function whose value should be saved.
+
+
+

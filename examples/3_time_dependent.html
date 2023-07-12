@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time-dependent example &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Time-dependent example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/3_time_dependent.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="Time-dependent-example">
+<h1>Time-dependent example<a class="headerlink" href="#Time-dependent-example" title="Permalink to this headline"></a></h1>
+<p>This notebook describes the calculation of derivative information for a time-dependent problem using tlm_adjoint with the <a class="reference external" href="https://firedrakeproject.org/">Firedrake</a> backend. Overheads associated with building the records of calculations are discussed, and a checkpointing schedule is applied.</p>
+<p>The binomial checkpointing schedule is based on the method described in:</p>
+<ul class="simple">
+<li><p>Andreas Griewank and Andrea Walther, ‘Algorithm 799: revolve: an implementation of checkpointing for the reverse or adjoint mode of computational differentiation’, ACM Transactions on Mathematical Software, 26(1), pp. 19–45, 2000, doi: 10.1145/347837.347846</p></li>
+</ul>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Permalink to this headline"></a></h2>
+<p>We consider the solution of a linear time-dependent partial differential equation, followed by the calculation of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the final time solution. We assume real spaces and a real build of Firedrake throughout.</p>
+<p>Specifically we consider the advection-diffusion equation in two dimensions, in the form</p>
+<div class="math notranslate nohighlight">
+\[\partial_t u + \partial_x \psi \partial_y u - \partial_y \psi \partial_x u = \kappa \left( \partial_{xx} + \partial_{yy} \right) u,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\psi\)</span> vanishes on the domain boundary, and subject to zero flux boundary conditions. We consider the spatial domain <span class="math notranslate nohighlight">\(\left( x, y \right) \in \left( 0, 1 \right)^2\)</span> and temporal domain <span class="math notranslate nohighlight">\(t \in \left[ 0, 0.1 \right]\)</span>, with <span class="math notranslate nohighlight">\(\psi \left( x, y \right) = -\sin \left( \pi x \right) \sin \left( \pi y \right)\)</span> and <span class="math notranslate nohighlight">\(\kappa = 0.01\)</span>, and an initial condition
+<span class="math notranslate nohighlight">\(u \left( x, y, t=0 \right) = \exp \left[ -50 \left( \left( x - 0.75 \right)^2 + \left( y - 0.5 \right)^2 \right) \right]\)</span>.</p>
+<p>The problem is discretized using <span class="math notranslate nohighlight">\(P_1\)</span> continuous finite elements to represent both the solution <span class="math notranslate nohighlight">\(u\)</span> at each time level and the stream function <span class="math notranslate nohighlight">\(\psi\)</span>. The problem is discretized in time using the implicit trapezoidal rule.</p>
+<p>A simple implementation in Firedrake takes the form:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+<span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+<span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+     <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+     <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+<span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+<span class="n">problem</span> <span class="o">=</span> <span class="n">LinearVariationalProblem</span><span class="p">(</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+    <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">LinearVariationalSolver</span><span class="p">(</span>
+    <span class="n">problem</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+<span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">J</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Adding-tlm_adjoint">
+<h2>Adding tlm_adjoint<a class="headerlink" href="#Adding-tlm_adjoint" title="Permalink to this headline"></a></h2>
+<p>We first modify the code so that tlm_adjoint processes the calculations:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tlm_adjoint.firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">problem</span> <span class="o">=</span> <span class="n">LinearVariationalProblem</span><span class="p">(</span>
+        <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">LinearVariationalSolver</span><span class="p">(</span>
+        <span class="n">problem</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Later we will configure a checkpointing schedule. Resetting the manager resets the record of forward equations but does not reset the checkpointing configuration, and so in this example whenever we reset the manager we also return it to the default checkpointing configuration with <code class="docutils literal notranslate"><span class="pre">reset_manager(&quot;memory&quot;,</span> <span class="pre">{})</span></code>.</p>
+</section>
+<section id="Computing-derivatives-using-an-adjoint">
+<h2>Computing derivatives using an adjoint<a class="headerlink" href="#Computing-derivatives-using-an-adjoint" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> function can be used to compute derivatives using the adjoint method. Here we compute the derivative of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the final timestep solution, considered a function of the control defined by the initial condition <code class="docutils literal notranslate"><span class="pre">u_0</span></code> and stream function <code class="docutils literal notranslate"><span class="pre">psi</span></code>, with respect to this control:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dJ_du_0</span><span class="p">,</span> <span class="n">dJ_dpsi</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>As a simple check of the result, note that the solution to the (discretized) partial differential equation is unchanged by the addition of a constant to the stream function. Hence we expect the directional derivative with respect to the stream function, with direction equal to the unity valued function, to be zero. This is indeed found to be the case (except for roundoff errors):</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">one</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">)</span>
+<span class="n">one</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">dJ_dpsi_one</span> <span class="o">=</span> <span class="n">function_inner</span><span class="p">(</span><span class="n">one</span><span class="p">,</span> <span class="n">dJ_dpsi</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dJ_dpsi_one</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Computing-Hessian-information-using-an-adjoint-of-a-tangent-linear">
+<h2>Computing Hessian information using an adjoint of a tangent-linear<a class="headerlink" href="#Computing-Hessian-information-using-an-adjoint-of-a-tangent-linear" title="Permalink to this headline"></a></h2>
+<p>We next compute a Hessian action. Although the following calculation does work, it is inefficient – you may wish to skip forward to the optimized calculations.</p>
+<p>Here we compute a ‘mixed’ Hessian action, by defining a directional derivative with respect to the stream function, and then differentiating this with respect to the initial condition:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tlm_adjoint.firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">problem</span> <span class="o">=</span> <span class="n">LinearVariationalProblem</span><span class="p">(</span>
+        <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">LinearVariationalSolver</span><span class="p">(</span>
+        <span class="n">problem</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">psi</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dpsi_zeta</span> <span class="o">=</span> <span class="n">function_tlm</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">function</span><span class="p">(),</span> <span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dpsi_zeta_du_0</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dpsi_zeta</span><span class="p">,</span> <span class="n">u_0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Optimization">
+<h2>Optimization<a class="headerlink" href="#Optimization" title="Permalink to this headline"></a></h2>
+<p>In the above we have successfully built a record of calculations, and used this to compute derivative information. However there are two issues:</p>
+<ol class="arabic simple">
+<li><p>Building the record has a noticable cost – the forward calculation has slowed down. In the second order calculation overheads associated with the tangent-linear lead to substantial additional costs.</p></li>
+<li><p>tlm_adjoint records the solution of the partial differential equation on all time levels. The memory usage here is manageable. However memory limits will be exceeded for larger problems with more fields, spatial degrees of freedom, or timesteps.</p></li>
+</ol>
+<p>Let’s fix these issues in order.</p>
+<section id="Optimizing-the-annotation">
+<h3>Optimizing the annotation<a class="headerlink" href="#Optimizing-the-annotation" title="Permalink to this headline"></a></h3>
+<p>In the above code tlm_adjoint builds a new record for each finite element variational problem it encounters. Even though only one <code class="docutils literal notranslate"><span class="pre">LinearVariationalSolver</span></code> is instantiated, an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> record is instantiated on each call to the <code class="docutils literal notranslate"><span class="pre">solve</span></code> method. Building the record is sufficiently expensive that the forward calculation noticeably slows down, and this also leads to significant extra processing in the derivative calculations.</p>
+<p>Instead we can instantiate an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> directly, and reuse it. However if we do only that then the code will be far <em>slower</em>. A single <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> will be used, but new linear solver data will be constructed each time its <code class="docutils literal notranslate"><span class="pre">solve</span></code> method is called. We need to also apply an optimization analogous to the <code class="docutils literal notranslate"><span class="pre">constant_jacobian=True</span></code> argument supplied to <code class="docutils literal notranslate"><span class="pre">LinearVariationalProblem</span></code>.</p>
+<p>A simple fix is to add <code class="docutils literal notranslate"><span class="pre">cache_jacobian=True</span></code> when instantiating the <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>eq = EquationSolver(
+    lhs == rhs, u_np1,
+    solver_parameters={&quot;ksp_type&quot;: &quot;preonly&quot;,
+                       &quot;pc_type&quot;: &quot;lu&quot;},
+    cache_jacobian=True)
+</pre></div>
+</div>
+<p>This works, but we can instead let tlm_adjoint detect that linear solver data can be cached. We can do that by adding <code class="docutils literal notranslate"><span class="pre">static=True</span></code> when instantiating variables whose value is unchanged throughout the forward calculation:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tlm_adjoint.firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>If we now query the relevant tlm_adjoint caches:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>we find that linear solver data associated with a single matrix has been cached. We also find that two assembled objects have been cached – it turns out that there are two cached matrices. As well as caching the matrix associated with the left-hand-side of the discrete problem, a matrix associated with the <em>right-hand-side</em> has been assembled and cached. Assembly of the right-hand-side has been converted into a matrix multiply. If we wished we could disable right-hand-side optimizations by
+adding <code class="docutils literal notranslate"><span class="pre">cache_rhs_assembly=False</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>eq = EquationSolver(
+    lhs == rhs, u_np1,
+    solver_parameters={&quot;ksp_type&quot;: &quot;preonly&quot;,
+                       &quot;pc_type&quot;: &quot;lu&quot;},
+    cache_rhs_assembly=False)
+</pre></div>
+</div>
+</section>
+<section id="Using-a-checkpointing-schedule">
+<h3>Using a checkpointing schedule<a class="headerlink" href="#Using-a-checkpointing-schedule" title="Permalink to this headline"></a></h3>
+<p>To address the storage issue we enable checkpointing. Here we enable binomial checkpointing with storage of a maximum of <span class="math notranslate nohighlight">\(100\)</span> forward restart checkpoints in memory:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tlm_adjoint.firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;tlm_adjoint&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">new_block</span><span class="p">()</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">configure_checkpointing</span><span class="p">(</span><span class="s2">&quot;multistage&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;snaps_in_ram&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;blocks&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">})</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The key changes here are:</p>
+<ul class="simple">
+<li><p>Configuration of a checkpointing schedule using <code class="docutils literal notranslate"><span class="pre">configure_checkpointing</span></code>. Here binomial checkpointing is applied, with a maximum of <span class="math notranslate nohighlight">\(100\)</span> forward restart checkpoints stored in memory, indicated using the <code class="docutils literal notranslate"><span class="pre">&quot;snaps_in_ram&quot;</span></code> parameter. The total number of steps is indicated using the <code class="docutils literal notranslate"><span class="pre">&quot;blocks&quot;</span></code> parameter.</p></li>
+<li><p>The indication of the steps using <code class="docutils literal notranslate"><span class="pre">new_block()</span></code>.</p></li>
+</ul>
+<p>Extra logging output is also enabled so that we can see the details of the checkpointing schedule.</p>
+</section>
+<section id="Computing-derivatives">
+<h3>Computing derivatives<a class="headerlink" href="#Computing-derivatives" title="Permalink to this headline"></a></h3>
+<p>We are now ready to compute derivatives. However a key restriction is that we can, with this checkpointing schedule, only perform the adjoint calculation <em>once</em> per forward calculation. We cannot call <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> a second time, without first rerunning the entire forward calculation.</p>
+<p>In the following we compute both first and second derivative information using a single adjoint calculation:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tlm_adjoint.firedrake</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;tlm_adjoint&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">new_block</span><span class="p">()</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta_u_0</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_u_0&quot;</span><span class="p">)</span>
+<span class="n">zeta_psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">zeta_psi</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+<span class="n">configure_tlm</span><span class="p">(((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">),</span> <span class="p">(</span><span class="n">zeta_u_0</span><span class="p">,</span> <span class="n">zeta_psi</span><span class="p">)))</span>
+
+<span class="n">configure_checkpointing</span><span class="p">(</span><span class="s2">&quot;multistage&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;snaps_in_ram&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;blocks&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">})</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dpsi_zeta</span> <span class="o">=</span> <span class="n">function_tlm</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">function</span><span class="p">(),</span> <span class="p">((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">),</span> <span class="p">(</span><span class="n">zeta_u_0</span><span class="p">,</span> <span class="n">zeta_psi</span><span class="p">)))</span>
+
+<span class="n">dJ_du_0</span><span class="p">,</span> <span class="n">dJ_dpsi</span><span class="p">,</span> <span class="n">d2J_dpsi_zeta_du_0</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span>
+    <span class="n">dJ_dpsi_zeta</span><span class="p">,</span> <span class="p">(</span><span class="n">zeta_u_0</span><span class="p">,</span> <span class="n">zeta_psi</span><span class="p">,</span> <span class="n">u_0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>The derivative calculation now alternates between forward + tangent-linear calculations, and adjoint calculations.</p>
+<p>If we wished we could perform higher order adjoint calculations, using a binomial checkpointing schedule, by supplying a higher order tangent-linear configuration and differentiating the result.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

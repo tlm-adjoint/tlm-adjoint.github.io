@@ -1,0 +1,107 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.instructions`
+==================================
+
+.. py:module:: tlm_adjoint.instructions
+
+
+Module Contents
+---------------
+
+.. py:class:: Instruction
+
+
+
+   An adjoint tape record which defines instructions to be performed during
+   forward or adjoint calculations.
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+.. py:class:: GarbageCollection(comm=None, *, generation=2, garbage_cleanup=True)
+
+
+
+   An :class:`Instruction` which indicates that garbage collection should
+   be performed during forward and adjoint calculations.
+
+   :arg comm: Communicator to use for PETSc garbage cleanup.
+   :arg generation: Python garbage collection generation. If a value of `None`
+       is provided then Python garbage collection is not performed.
+   :arg garbage_cleanup: Whether to perform PETSc garbage cleanup.
+
+   .. py:method:: forward_solve(self, x, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+

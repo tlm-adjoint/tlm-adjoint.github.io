@@ -1,0 +1,508 @@
+:py:mod:`tlm_adjoint._code_generator.equations`
+===============================================
+
+.. py:module:: tlm_adjoint._code_generator.equations
+
+.. autoapi-nested-parse::
+
+   This module is used by both the FEniCS and Firedrake backends, and
+   implements finite element calculations. In particular the
+   :class:`EquationSolver` class implements the solution of finite element
+   variational problems.
+
+
+
+Module Contents
+---------------
+
+.. py:class:: Assembly(x, rhs, *, form_compiler_parameters=None, match_quadrature=None)
+
+
+
+   Represents assignment to the result of finite element assembly:
+
+   .. code-block:: python
+
+       x = assemble(rhs)
+
+   The forward residual :math:`\mathcal{F}` is defined so that :math:`\partial
+   \mathcal{F} / \partial x` is the identity.
+
+   :arg x: A function defining the forward solution.
+   :arg rhs: A UFL :class:`Form` to assemble. Should have arity 0 or 1, and
+       should not depend on the forward solution.
+   :arg form_compiler_parameters: Form compiler parameters.
+   :arg match_quadrature: Whether to set quadrature parameters consistently in
+       the forward, adjoint, and tangent-linears. Defaults to
+       `parameters['tlm_adjoint']['Assembly']['match_quadrature']`.
+
+   .. py:method:: drop_references(self)
+
+      Drop references to functions which store values.
+              
+
+
+   .. py:method:: forward_solve(self, x, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: adjoint_derivative_action(self, nl_deps, dep_index, adj_x)
+
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A function if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of functions.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`tlm_adjoint.interface.subtract_adjoint_derivative_action`,
+          and valid types depend upon the backend used. Typically this will
+          be a function, or a two element :class:`tuple` `(alpha, F)`, where
+          `alpha` is a scalar and `F` a function, with the value defined by
+          the product of `alpha` and `F`.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+
+
+.. py:class:: EquationSolver(eq, x, bcs=None, *, J=None, form_compiler_parameters=None, solver_parameters=None, adjoint_solver_parameters=None, tlm_solver_parameters=None, initial_guess=None, cache_jacobian=None, cache_adjoint_jacobian=None, cache_tlm_jacobian=None, cache_rhs_assembly=None, match_quadrature=None, defer_adjoint_assembly=None)
+
+
+
+   Represents the solution of a finite element variational problem.
+
+   Caching is based on the approach described in
+
+       - J. R. Maddison and P. E. Farrell, 'Rapid development and adjoining of
+         transient finite element models', Computer Methods in Applied
+         Mechanics and Engineering, 276, 95--121, 2014, doi:
+         10.1016/j.cma.2014.03.010
+
+   The arguments `eq`, `x`, `bcs`, `J`, `form_compiler_parameters`, and
+   `solver_parameters` are based on the interface for the FEniCS :func:`solve`
+   function (see e.g. FEniCS 2017.1.0).
+
+   :arg eq: A UFL :class:`Equation` defining the finite element variational
+       problem.
+   :arg x: A function defining the forward solution.
+   :arg bcs: Dirichlet boundary conditions.
+   :arg J: A UFL :class:`Form` defining a Jacobian matrix approximation to use
+       in a non-linear forward solve.
+   :arg form_compiler_parameters: Form compiler parameters.
+   :arg solver_parameters: Linear or non-linear solver parameters.
+   :arg adjoint_solver_parameters: Linear solver parameters to use in an
+       adjoint solve.
+   :arg tlm_solver_parameters: Linear solver parameters to use when solving
+       tangent-linear problems.
+   :arg initial_guess: Deprecated.
+   :arg cache_jacobian: Whether to cache the forward Jacobian matrix and
+       linear solver data. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver]['cache_jacobian']`. If
+       `None` then caching is autodetected.
+   :arg cache_adjoint_jacobian: Whether to cache the adjoint Jacobian matrix
+       and linear solver data. Defaults to `cache_jacobian`.
+   :arg cache_tlm_jacobian: Whether to cache the Jacobian matrix and linear
+       solver data when solving tangent-linear problems. Defaults to
+       `cache_jacobian`.
+   :arg cache_rhs_assembly: Whether to enable right-hand-side caching. If
+       enabled then right-hand-side terms are divided into terms which are
+       cached, terms which are converted into matrix multiplication by a
+       cached matrix, and terms which are not cached. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver']['cache_rhs_assembly']`.
+   :arg match_quadrature: Whether to set quadrature parameters consistently in
+       the forward, adjoint, and tangent-linears. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver']['match_quadrature']`.
+   :arg defer_adjoint_assembly: Whether to use 'deferred' adjoint assembly. If
+       adjoint assembly is deferred then initially only symbolic expressions
+       for adjoint right-hand-side terms are constructed. Finite element
+       assembly can occur later (with default form compiler parameters), when
+       further adjoint right-hand-side terms are available. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver']['defer_adjoint_assembly']`.
+
+   .. py:method:: drop_references(self)
+
+      Drop references to functions which store values.
+              
+
+
+   .. py:method:: forward_solve(self, x, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: subtract_adjoint_derivative_actions(self, adj_x, nl_deps, dep_Bs)
+
+      Subtract terms from other adjoint right-hand-sides.
+
+      Can be overridden for an optimized implementation, but otherwise uses
+      :meth:`tlm_adjoint.equation.Equation.adjoint_derivative_action`.
+
+      :arg adj_X: The adjoint solution. A function if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of functions.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg dep_Bs: A :class:`Mapping` whose items are `(dep_index, dep_B)`.
+          Each `dep_B` is a :class:`tlm_adjoint.adjoint.AdjointRHS` which
+          should be updated by subtracting derivative information computed by
+          differentiating with respect to `self.dependencies()[dep_index]`.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+
+.. py:function:: expr_new_x(expr, x, *, annotate=None, tlm=None)
+
+   If an expression depends on `x`, then record the assignment `x_old =
+   x`, and replace `x` with `x_old` in the expression.
+
+   :arg expr: A UFL :class:`Expr`.
+   :arg x: Defines `x`.
+   :arg annotate: Whether the :class:`tlm_adjoint.tlm_adjoint.EquationManager`
+       should record the solution of equations.
+   :arg tlm: Whether tangent-linear equations should be solved.
+   :returns: A UFL :class:`Expr` with `x` replaced with `x_old`, or `expr` if
+       the expression does not depend on `x`.
+
+
+.. py:function:: linear_equation_new_x(eq, x, *, annotate=None, tlm=None)
+
+   If a symbolic expression for a linear finite element variational
+   problem depends on the symbolic variable representing the problem solution,
+   then record the assignment `x_old = x`, and replace `x` with `x_old` in the
+   symbolic expression.
+
+   Required for the case where a 'new' value is computed by solving a linear
+   finite element variational problem depending on the 'old' value.
+
+   :arg eq: A UFL :class:`Equation` defining the finite element variational
+       problem.
+   :arg x: A function defining the solution to the finite element variational
+       problem.
+   :arg annotate: Whether the :class:`tlm_adjoint.tlm_adjoint.EquationManager`
+       should record the solution of equations.
+   :arg tlm: Whether tangent-linear equations should be solved.
+   :returns: A UFL :class:`Equation` with `x` replaced with `x_old`, or `eq`
+       if the symbolic expression does not depend on `x`.
+
+
+.. py:class:: Projection(x, rhs, *args, **kwargs)
+
+
+
+   Represents the solution of a finite element variational problem
+   performing a projection onto the space for `x`.
+
+   :arg x: A function defining the forward solution.
+   :arg rhs: A UFL :class:`Expr` defining the expression to project onto the
+       space for `x`, or a UFL :class:`Form` defining the right-hand-side
+       of the finite element variational problem. Should not depend on `x`.
+
+   Remaining arguments are passed to the :class:`EquationSolver` constructor.
+
+
+
+.. py:class:: DirichletBCApplication(x, y, *args, **kwargs)
+
+
+
+   Represents the application of a Dirichlet boundary condition to a zero
+   valued function. Specifically, with the Firedrake backend this represents:
+
+   .. code-block:: python
+
+       x.zero()
+       DirichletBC(x.function_space(), y, *args, **kwargs).apply(x)
+
+   The forward residual :math:`\mathcal{F}` is defined so that :math:`\partial
+   \mathcal{F} / \partial x` is the identity.
+
+   :arg x: A function, updated by the above operations.
+   :arg y: A function, defines the Dirichet boundary condition.
+
+   Remaining arguments are passed to `DirichletBC`.
+
+   .. py:method:: forward_solve(self, x, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: adjoint_derivative_action(self, nl_deps, dep_index, adj_x)
+
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A function if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of functions.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`tlm_adjoint.interface.subtract_adjoint_derivative_action`,
+          and valid types depend upon the backend used. Typically this will
+          be a function, or a two element :class:`tuple` `(alpha, F)`, where
+          `alpha` is a scalar and `F` a function, with the value defined by
+          the product of `alpha` and `F`.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+
+
+.. py:class:: ExprEvaluation(x, rhs)
+
+
+
+   Represents interpolation of `rhs` onto the space for `x`.
+
+   The forward residual :math:`\mathcal{F}` is defined so that :math:`\partial
+   \mathcal{F} / \partial x` is the identity.
+
+   :arg x: A function defining the forward solution.
+   :arg rhs: A UFL :class:`Expr` defining the expression to interpolate onto
+       the space for `x`. Should not depend on `x`.
+
+   .. py:method:: drop_references(self)
+
+      Drop references to functions which store values.
+              
+
+
+   .. py:method:: forward_solve(self, x, deps=None)
+
+      Compute the forward solution.
+
+      Can assume that the currently active
+      :class:`tlm_adjoint.tlm_adjoint.EquationManager` is paused.
+
+      :arg X: A function if the forward solution has a single component,
+          otherwise a :class:`Sequence` of functions. May define an initial
+          guess, and should be set by this method. Subclasses may replace
+          this argument with `x` if the forward solution has a single
+          component.
+      :arg deps: A :class:`tuple` of functions, defining values of
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+   .. py:method:: adjoint_derivative_action(self, nl_deps, dep_index, adj_x)
+
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A function if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of functions.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`tlm_adjoint.interface.subtract_adjoint_derivative_action`,
+          and valid types depend upon the backend used. Typically this will
+          be a function, or a two element :class:`tuple` `(alpha, F)`, where
+          `alpha` is a scalar and `F` a function, with the value defined by
+          the product of `alpha` and `F`.
+
+
+   .. py:method:: adjoint_jacobian_solve(self, adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of functions defining values of
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A function (if the adjoint solution has a
+          single component) or :class:`Sequence` of functions (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A function or :class:`Sequence` of functions storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+   .. py:method:: tangent_linear(self, M, dM, tlm_map)
+
+      Derive an :class:`Equation` corresponding to a associated equation
+      in a tangent-linear model.
+
+      :arg M: A :class:`Sequence` of functions defining the control.
+      :arg dM: A :class:`Sequence` of functions defining the derivative
+          direction. The tangent-linear model computes directional
+          derivatives with respect to the control defined by `M` and with
+          direction defined by `dM`.
+      :arg tlm_map: A :class:`tlm_adjoint.tangent_linear.TangentLinearMap`
+          storing values for tangent-linear variables.
+      :returns: An :class:`Equation`, corresponding to the tangent-linear
+          equation.
+
+
+
+

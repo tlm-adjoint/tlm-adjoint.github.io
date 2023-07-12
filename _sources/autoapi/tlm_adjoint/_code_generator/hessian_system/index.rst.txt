@@ -1,0 +1,165 @@
+:orphan:
+
+:py:mod:`tlm_adjoint._code_generator.hessian_system`
+====================================================
+
+.. py:module:: tlm_adjoint._code_generator.hessian_system
+
+
+Module Contents
+---------------
+
+.. py:class:: HessianSystem(H, M, *, nullspace=None, comm=None)
+
+
+
+   Defines a linear system involving a Hessian matrix,
+
+   .. math::
+
+       H u = b.
+
+   :arg H: A :class:`tlm_adjoint.hessian.Hessian` defining :math:`H`.
+   :arg M: A function or a :class:`Sequence` of functions defining the
+       control.
+   :arg nullspace: A
+       :class:`tlm_adjoint._code_generator.block_system.Nullspace` or a
+       :class:`Sequence` of
+       :class:`tlm_adjoint._code_generator.block_system.Nullspace` objects
+       defining the nullspace and left nullspace of the Hessian matrix. `None`
+       indicates a
+       :class:`tlm_adjoint._code_generator.block_system.NoneNullspace`.
+   :arg comm: MPI communicator.
+
+   .. py:method:: solve(self, u, b, **kwargs)
+
+      Solve a linear system involving a Hessian matrix,
+
+      .. math::
+
+          H u = b.
+
+      :arg u: A function or a :class:`Sequence` of functions defining the
+          solution :math:`u`.
+      :arg b: A function or a :class:`Sequence` of functions defining the
+          conjugate of the right-hand-side :math:`b`.
+
+      Remaining arguments are handed to the base class :meth:`solve` method.
+
+
+
+.. py:function:: hessian_eigendecompose(H, m, B_inv_action, B_action, *, nullspace=None, problem_type=None, configure=None, correct_eigenvectors=True, **kwargs)
+
+   Interface with SLEPc via slepc4py, for the matrix free solution of
+   generalized eigenproblems
+
+   .. math::
+
+       H v = \lambda B^{-1} v,
+
+   where :math:`H` is a Hessian matrix.
+
+   Despite the notation :math:`B^{-1}` may be singular, defining an inverse
+   operator only on an appropriate subspace.
+
+   :arg H: A :class:`tlm_adjoint.hessian.Hessian`.
+   :arg m: A backend :class:`Function` defining the control.
+   :arg B_inv_action: A callable accepting a backend :class:`Function`
+       defining `v` and computing the conjugate of the action of
+       :math:`B^{-1}` on :math:`v`, returning the result as a backend
+       :class:`Function`.
+   :arg B_action: A callable accepting a backend :class:`Function` defining
+       :math:`v` and computing the action of :math:`B` on the conjugate of
+       :math:`v`, returning the result as a backend :class:`Function`.
+   :arg nullspace: A
+       :class:`tlm_adjoint._code_generator.block_system.Nullspace` defining
+       the nullspace and left nullspace of :math:`H` and :math:`B^{-1}`.
+   :arg problem_type: The eigenproblem type -- see
+       :class:`slepc4py.SLEPc.EPS.ProblemType`. Defaults to
+       `slepc4py.SLEPc.EPS.ProblemType.GHEP` in the real case and
+       `slepc4py.SLEPc.EPS.ProblemType.GNHEP` in the complex case.
+   :arg configure: A callable accepting a single :class:`slepc4py.SLEPc.EPS`
+       argument. Used for detailed manual configuration. Called after all
+       other configuration options are set, but before the :meth:`EPS.setUp`
+       method is called.
+   :arg correct_eigenvectors: Whether to apply a nullspace correction to the
+       eigenvectors.
+
+   Remaining keyword arguments are passed to
+   :func:`tlm_adjoint.eigendecomposition.eigendecompose`.
+
+
+.. py:function:: B_inv_orthonormality_test(V, B_inv_action)
+
+   Check for :math:`B^{-1}`-orthonormality.
+
+   Requires real spaces.
+
+   :arg B_inv_action: A callable accepting a backend :class:`Function`
+       defining `v` and computing the action of :math:`B^{-1}` on :math:`v`,
+       returning the result as a backend :class:`Function`.
+   :arg V: A :class:`Sequence` of functions to test for
+       :math:`B^{-1}`-orthonormality.
+   :returns: A :class:`tuple` `(max_diagonal_error_norm,
+       max_off_diagonal_error_norm)` with
+
+           - `max_diagonal_error_norm`: The maximum :math:`B^{-1}`
+             normalization error magnitude.
+           - `max_diagonal_error_norm`: The maximum :math:`B^{-1}`
+             orthogonality error magnitude.
+
+
+.. py:function:: hessian_eigendecomposition_pc(B_action, Lam, V)
+
+   Construct a Hessian matrix preconditioner using a partial spectrum
+   generalized eigendecomposition. Assumes that the Hessian matrix consists of
+   two terms
+
+   .. math::
+
+       H = R^{-1} + B^{-1},
+
+   where :math:`R` and :math:`B` are symmetric.
+
+   Assumes real spaces. Despite the notation :math:`R^{-1}` and :math:`B^{-1}`
+   (and later :math:`H^{-1}`) may be singular, defining inverse operators only
+   on an appropriate subspace. :math:`B` is assumed to define a symmetric
+   positive definite operator on that subspace.
+
+   The approximation is defined via
+
+   .. math::
+
+       H^{-1} \approx B + V \Lambda \left( I + \Lambda \right)^{-1} V^T
+
+   where
+
+   .. math::
+
+       R^{-1} V = B^{-1} V \Lambda,
+
+   and where :math:`\Lambda` is a diagonal matrix and :math:`V` has
+   :math:`B^{-1}`-orthonormal columns, :math:`V^T B^{-1} V = I`.
+
+   This low rank update approximation for the Hessian matrix inverse is
+   described in
+
+       - Tobin Isaac, Noemi Petra, Georg Stadler, and Omar Ghattas, 'Scalable
+         and efficient algorithms for the propagation of uncertainty from data
+         through inference to prediction for large-scale problems, with
+         application to flow of the Antarctic ice sheet', Journal of
+         Computational Physics, 296, pp. 348--368, 2015, doi:
+         10.1016/j.jcp.2015.04.047
+
+   See in particular their equation (20).
+
+   :arg B_action: A callable accepting a backend :class:`Function` defining
+       :math:`v` and computing the action of :math:`B` on :math:`v`, returning
+       the result as a backend :class:`Function`.
+   :arg Lam: A :class:`Sequence` defining the diagonal of :math:`\Lambda`.
+   :arg V: A :class:`Sequence` of backend :class:`Function` objects defining
+       the columns of :math:`V`.
+   :returns: A callable suitable for use as the `pc_fn` argument to
+       :meth:`HessianSystem.solve`.
+
+
