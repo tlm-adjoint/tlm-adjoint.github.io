@@ -1,0 +1,104 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.eigendecomposition`
+========================================
+
+.. py:module:: tlm_adjoint.eigendecomposition
+
+
+Module Contents
+---------------
+
+.. py:function:: eigendecompose(space, A_action, *, B_action=None, arg_space_type='primal', action_space_type=None, N_eigenvalues=None, solver_type=None, problem_type=None, which=None, tolerance=1e-12, pre_callback=None, post_callback=None)
+
+   Interface with SLEPc via slepc4py, for the matrix free solution of
+   eigenproblems
+
+   .. math::
+
+       A v = \lambda v,
+
+   or generalized eigenproblems
+
+   .. math::
+
+       A v = \lambda B v.
+
+   Originally developed by loosely following the slepc4py 3.6.0 demo
+   demo/ex3.py. slepc4py 3.6.0 license information follows:
+
+   .. code-block:: text
+
+       =========================
+       LICENSE: SLEPc for Python
+       =========================
+
+       :Author:  Lisandro Dalcin
+       :Contact: dalcinl@gmail.com
+
+
+       Copyright (c) 2015, Lisandro Dalcin.
+       All rights reserved.
+
+       Redistribution and use in source and binary forms, with or without
+       modification, are permitted provided that the following conditions
+       are met:
+
+       * Redistributions of source code must retain the above copyright
+         notice, this list of conditions and the following disclaimer.
+
+       * Redistributions in binary form must reproduce the above copyright
+         notice, this list of conditions and the following disclaimer in the
+         documentation and/or other materials provided with the distribution.
+
+       THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
+       "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+       LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+       A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+       HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+       SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+       LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+       DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+       THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+       (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   :arg space: The space for each eigenvector.
+   :arg A_action: A callable. Accepts a single variable argument, and returns
+       a variable containing the result after left multiplication of the input
+       by :math:`A`.
+   :arg B_action: A callable. Accepts a single variable argument, and returns
+       a variable containing the result after left multiplication of the input
+       by :math:`B`.
+   :arg arg_space_type: The space type of eigenvectors. `'primal'`, `'dual'`,
+       `'conjugate'`, or `'conjugate_dual'`.
+   :arg action_space_type: The space type of the result of multiplication by
+       :math:`A` or :math:`B`. `'primal'`, `'dual'`, `'conjugate'`, or
+       `'conjugate_dual'`. Defaults to the space type conjugate dual to
+       `arg_space_type`.
+   :arg N_eigenvalues: An :class:`int`, the number of eigenvalues to attempt
+       to compute. Defaults to the dimension of `space`.
+   :arg problem_type: The eigenproblem type -- see
+       `slepc4py.SLEPc.EPS.ProblemType`. Defaults to
+       `slepc4py.SLEPc.EPS.ProblemType.GNHEP` if `B_action` is supplied, or
+       `slepc4py.SLEPc.EPS.ProblemType.NHEP` otherwise.
+   :arg which: Which eigenvalues to attempt to compute -- see
+       `slepc4py.SLEPc.EPS.Which`. Defaults to
+       `slepc4py.SLEPc.EPS.Which.LARGEST_MAGNITUDE`.
+   :arg tolerance: Convergence tolerance. By default the convergence criterion
+       is defined using `slepc4py.SLEPc.EPS.Conv.REL`.
+   :arg pre_callback: A callable accepting a single `slepc4py.SLEPc.EPS`
+       argument. Used for detailed manual configuration. Called after all
+       other configuration options are set, but before the
+       `slepc4py.SLEPc.EPS.setUp` method is called.
+   :arg post_callback: A callable accepting a single `slepc4py.SLEPc.EPS`
+       argument. Called after the `slepc4py.SLEPc.EPS.solve` method has been
+       called.
+   :returns: A :class:`tuple` `(lam, V)`. `lam` is a :class:`numpy.ndarray`
+       containing eigenvalues. For non-Hermitian algorithms and a real build
+       of PETSc, `V` is a :class:`tuple` `(V_r, V_i)`, where `V_r` and `V_i`
+       are each a :class:`tuple` of variables containing respectively the real
+       and complex parts of corresponding eigenvectors. Otherwise `V` is a
+       :class:`tuple` of variables containing corresponding eigenvectors.
+
+

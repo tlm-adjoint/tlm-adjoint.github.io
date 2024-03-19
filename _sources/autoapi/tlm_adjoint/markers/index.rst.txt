@@ -1,0 +1,120 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.markers`
+=============================
+
+.. py:module:: tlm_adjoint.markers
+
+
+Module Contents
+---------------
+
+.. py:class:: ControlsMarker(M)
+
+
+
+
+   Represents
+
+   .. math::
+
+       m = m_\text{input},
+
+   where :math:`m` is the control and :math:`m_\text{input}` the input value
+   for the control. The forward residual is defined
+
+   .. math::
+
+       \mathcal{F} \left( m \right) = m - m_\text{input}.
+
+   :arg M: A variable or a :class:`Sequence` of variables defining the
+       control :math:`m`. May be static.
+
+   .. py:method:: adjoint_jacobian_solve(adj_X, nl_deps, B)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable (if the adjoint solution has a
+          single component) or :class:`Sequence` of variables (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable (if the adjoint solution has a
+          single component) or :class:`Sequence` of variables (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+.. py:class:: FunctionalMarker(J)
+
+
+
+
+   Represents
+
+   .. math::
+
+       J_\text{output} = J,
+
+   where :math:`J` is the functional and :math:`J_\text{output}` is the output
+   value for the functional. The forward residual is defined
+
+   .. math::
+
+       \mathcal{F} \left( J_\text{output}, J \right) = J_\text{output} - J.
+
+   :arg J: A variable defining the functional :math:`J`.
+
+   .. py:method:: adjoint_derivative_action(nl_deps, dep_index, adj_x)
+
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A variable if the adjoint solution
+          has a single component, otherwise a :class:`Sequence` of variables.
+          Should not be modified. Subclasses may replace this argument with
+          `adj_x` if the adjoint solution has a single component.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`.subtract_adjoint_derivative_action`, and valid types depend
+          upon the adjoint variable type. Typically this will be a variable,
+          or a two element :class:`tuple` `(alpha, F)`, where `alpha` is a
+          :class:`numbers.Complex` and `F` a variable, with the value defined
+          by the product of `alpha` and `F`.
+
+
+   .. py:method:: adjoint_jacobian_solve(adj_x, nl_deps, b)
+
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable (if the adjoint solution has a
+          single component) or :class:`Sequence` of variables (otherwise)
+          defining the initial guess for an iterative solve. May be modified
+          or returned. Subclasses may replace this argument with `adj_x` if
+          the adjoint solution has a single component.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable (if the adjoint solution has a
+          single component) or :class:`Sequence` of variables (otherwise)
+          storing the value of the right-hand-side. May be modified or
+          returned. Subclasses may replace this argument with `b` if the
+          adjoint solution has a single component.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+

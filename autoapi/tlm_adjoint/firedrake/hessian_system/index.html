@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.firedrake.hessian_system &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3b5de6fd" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.hessian_system</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/firedrake/hessian_system/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.firedrake.hessian_system">
+<span id="tlm-adjoint-firedrake-hessian-system"></span><h1><a class="reference internal" href="#module-tlm_adjoint.firedrake.hessian_system" title="tlm_adjoint.firedrake.hessian_system"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.hessian_system</span></code></a><a class="headerlink" href="#module-tlm_adjoint.firedrake.hessian_system" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.hessian_system.HessianSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.hessian_system.</span></span><span class="sig-name descname"><span class="pre">HessianSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nullspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.hessian_system.HessianSystem" title="Link to this definition"></a></dt>
+<dd><p>Defines a linear system involving a Hessian matrix,</p>
+<div class="math notranslate nohighlight">
+\[H u = b.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>H</strong> – A <a class="reference internal" href="../../hessian/index.html#tlm_adjoint.hessian.Hessian" title="tlm_adjoint.hessian.Hessian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hessian</span></code></a> defining <span class="math notranslate nohighlight">\(H\)</span>.</p></li>
+<li><p><strong>M</strong> – A <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>, or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> objects, defining the control.</p></li>
+<li><p><strong>nullspace</strong> – A <a class="reference internal" href="../block_system/index.html#tlm_adjoint.firedrake.block_system.Nullspace" title="tlm_adjoint.firedrake.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference internal" href="../block_system/index.html#tlm_adjoint.firedrake.block_system.Nullspace" title="tlm_adjoint.firedrake.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> objects defining the nullspace and left nullspace
+of the Hessian matrix. <cite>None</cite> indicates a <a class="reference internal" href="../block_system/index.html#tlm_adjoint.firedrake.block_system.NoneNullspace" title="tlm_adjoint.firedrake.block_system.NoneNullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneNullspace</span></code></a>.</p></li>
+<li><p><strong>comm</strong> – A communicator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.hessian_system.HessianSystem.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.hessian_system.HessianSystem.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve a linear system involving a Hessian matrix,</p>
+<div class="math notranslate nohighlight">
+\[H u = b.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – A <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>, or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> objects, defining the
+solution <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – A <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>, or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> objects, defining the
+conjugate of the right-hand-side <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are handed to the base class
+<a class="reference internal" href="../block_system/index.html#tlm_adjoint.firedrake.block_system.System.solve" title="tlm_adjoint.firedrake.block_system.System.solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">System.solve()</span></code></a> method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.hessian_system.hessian_eigendecompose">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.hessian_system.</span></span><span class="sig-name descname"><span class="pre">hessian_eigendecompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_inv_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_action</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nullspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">problem_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_eigenvectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.hessian_system.hessian_eigendecompose" title="Link to this definition"></a></dt>
+<dd><p>Interface with SLEPc via slepc4py, for the matrix free solution of
+generalized eigenproblems</p>
+<div class="math notranslate nohighlight">
+\[H v = \lambda B^{-1} v,\]</div>
+<p>where <span class="math notranslate nohighlight">\(H\)</span> is a Hessian matrix.</p>
+<p>Despite the notation <span class="math notranslate nohighlight">\(B^{-1}\)</span> may be singular, defining an inverse
+operator only on an appropriate subspace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>H</strong> – A <a class="reference internal" href="../../hessian/index.html#tlm_adjoint.hessian.Hessian" title="tlm_adjoint.hessian.Hessian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hessian</span></code></a>.</p></li>
+<li><p><strong>m</strong> – A <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> defining the control.</p></li>
+<li><p><strong>B_inv_action</strong> – A callable accepting a
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> defining <span class="math notranslate nohighlight">\(v\)</span> and
+computing the conjugate of the action of <span class="math notranslate nohighlight">\(B^{-1}\)</span> on <span class="math notranslate nohighlight">\(v\)</span>,
+returning the result as a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>.</p></li>
+<li><p><strong>B_action</strong> – A callable accepting a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a>
+or <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> defining <span class="math notranslate nohighlight">\(v\)</span> and
+computing the action of <span class="math notranslate nohighlight">\(B\)</span> on the conjugate of <span class="math notranslate nohighlight">\(v\)</span>,
+returning the result as a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>.</p></li>
+<li><p><strong>nullspace</strong> – A <a class="reference internal" href="../block_system/index.html#tlm_adjoint.firedrake.block_system.Nullspace" title="tlm_adjoint.firedrake.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> defining the nullspace and left
+nullspace of <span class="math notranslate nohighlight">\(H\)</span> and <span class="math notranslate nohighlight">\(B^{-1}\)</span>.</p></li>
+<li><p><strong>problem_type</strong> – The eigenproblem type – see
+<cite>slepc4py.SLEPc.EPS.ProblemType</cite>. Defaults to
+<cite>slepc4py.SLEPc.EPS.ProblemType.GHEP</cite> in the real case and
+<cite>slepc4py.SLEPc.EPS.ProblemType.GNHEP</cite> in the complex case.</p></li>
+<li><p><strong>pre_callback</strong> – A callable accepting a single <cite>slepc4py.SLEPc.EPS</cite>
+argument. Used for detailed manual configuration. Called after all
+other configuration options are set, but before the
+<cite>slepc4py.SLEPc.EPS.setUp</cite> method is called.</p></li>
+<li><p><strong>correct_eigenvectors</strong> – Whether to apply a nullspace correction to the
+eigenvectors.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining keyword arguments are passed to <a class="reference internal" href="../../eigendecomposition/index.html#tlm_adjoint.eigendecomposition.eigendecompose" title="tlm_adjoint.eigendecomposition.eigendecompose"><code class="xref py py-func docutils literal notranslate"><span class="pre">eigendecompose()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.hessian_system.B_inv_orthonormality_test">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.hessian_system.</span></span><span class="sig-name descname"><span class="pre">B_inv_orthonormality_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_inv_action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.hessian_system.B_inv_orthonormality_test" title="Link to this definition"></a></dt>
+<dd><p>Check for <span class="math notranslate nohighlight">\(B^{-1}\)</span>-orthonormality.</p>
+<p>Requires real spaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>B_inv_action</strong> – A callable accepting a
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> defining <span class="math notranslate nohighlight">\(v\)</span> and
+computing the action of <span class="math notranslate nohighlight">\(B^{-1}\)</span> on <span class="math notranslate nohighlight">\(v\)</span>, returning the
+result as a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>.</p></li>
+<li><p><strong>V</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> objects to test for
+<span class="math notranslate nohighlight">\(B^{-1}\)</span>-orthonormality.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(max_diagonal_error_norm,
+max_off_diagonal_error_norm)</cite> with</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>max_diagonal_error_norm</cite>: The maximum <span class="math notranslate nohighlight">\(B^{-1}\)</span>
+normalization error magnitude.</p></li>
+<li><p><cite>max_diagonal_error_norm</cite>: The maximum <span class="math notranslate nohighlight">\(B^{-1}\)</span>
+orthogonality error magnitude.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.hessian_system.hessian_eigendecomposition_pc">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.hessian_system.</span></span><span class="sig-name descname"><span class="pre">hessian_eigendecomposition_pc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">B_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.hessian_system.hessian_eigendecomposition_pc" title="Link to this definition"></a></dt>
+<dd><p>Construct a Hessian matrix preconditioner using a partial spectrum
+generalized eigendecomposition. Assumes that the Hessian matrix consists of
+two terms</p>
+<div class="math notranslate nohighlight">
+\[H = R^{-1} + B^{-1},\]</div>
+<p>where <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are symmetric.</p>
+<p>Assumes real spaces. Despite the notation <span class="math notranslate nohighlight">\(R^{-1}\)</span> and <span class="math notranslate nohighlight">\(B^{-1}\)</span>
+(and later <span class="math notranslate nohighlight">\(H^{-1}\)</span>) may be singular, defining inverse operators only
+on an appropriate subspace. <span class="math notranslate nohighlight">\(B\)</span> is assumed to define a symmetric
+positive definite operator on that subspace.</p>
+<p>The approximation is defined via</p>
+<div class="math notranslate nohighlight">
+\[H^{-1} \approx B + V \Lambda \left( I + \Lambda \right)^{-1} V^T\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[R^{-1} V = B^{-1} V \Lambda,\]</div>
+<p>and where <span class="math notranslate nohighlight">\(\Lambda\)</span> is a diagonal matrix and <span class="math notranslate nohighlight">\(V\)</span> has
+<span class="math notranslate nohighlight">\(B^{-1}\)</span>-orthonormal columns, <span class="math notranslate nohighlight">\(V^T B^{-1} V = I\)</span>.</p>
+<p>This low rank update approximation for the Hessian matrix inverse is
+described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Tobin Isaac, Noemi Petra, Georg Stadler, and Omar Ghattas, ‘Scalable
+and efficient algorithms for the propagation of uncertainty from data
+through inference to prediction for large-scale problems, with
+application to flow of the Antarctic ice sheet’, Journal of
+Computational Physics, 296, pp. 348–368, 2015, doi:
+10.1016/j.jcp.2015.04.047</p></li>
+</ul>
+</div></blockquote>
+<p>See in particular their equation (20).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>B_action</strong> – A callable accepting a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a>
+or <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> defining <span class="math notranslate nohighlight">\(v\)</span> and
+computing the action of <span class="math notranslate nohighlight">\(B\)</span> on <span class="math notranslate nohighlight">\(v\)</span>, returning the result as
+a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>.</p></li>
+<li><p><strong>Lam</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> defining the diagonal of <span class="math notranslate nohighlight">\(\Lambda\)</span>.</p></li>
+<li><p><strong>V</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> objects defining the columns
+of <span class="math notranslate nohighlight">\(V\)</span>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A callable suitable for use as the <cite>pc_fn</cite> argument to
+<a class="reference internal" href="#tlm_adjoint.firedrake.hessian_system.HessianSystem.solve" title="tlm_adjoint.firedrake.hessian_system.HessianSystem.solve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HessianSystem.solve()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

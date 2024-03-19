@@ -1,0 +1,101 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.cached_hessian`
+====================================
+
+.. py:module:: tlm_adjoint.cached_hessian
+
+
+Module Contents
+---------------
+
+.. py:class:: CachedHessian(J, *, manager=None, cache_adjoint=True)
+
+
+
+
+   Represents a Hessian associated with a given forward. Uses a cached
+   forward calculation.
+
+   :arg J: A variable defining the Hessian.
+   :arg manager: The :class:`.EquationManager` used to record the forward.
+       This must have used `'memory'` checkpointing with automatic dropping of
+       variable references disabled. `manager()` is used if not supplied.
+   :arg cache_adjoint: Whether to cache the first order adjoint calculation.
+
+   .. py:method:: compute_gradient(M, M0=None)
+
+      Compute the (conjugate of the) derivative of a functional with
+      respect to a control using an adjoint.
+
+      :arg M: A variable or a :class:`Sequence` of variables defining the
+          control.
+      :arg M0: A variable or a :class:`Sequence` of variables defining the
+          control value. `M` is used if not supplied.
+      :returns: The (conjugate of the) derivative. A variable or
+          :class:`Sequence` of variables, depending on the type of `M`.
+
+
+   .. py:method:: action(M, dM, M0=None)
+
+      Compute (the conjugate of) a Hessian action on some :math:`\zeta`
+      using an adjoint of a tangent-linear. i.e. considering derivatives to
+      be row vectors, compute
+
+      .. math::
+
+          \left( \frac{d}{dm} \left[
+              \frac{d \mathcal{J}}{d m} \zeta \right] \right)^{*,T}.
+
+      :arg M: A variable or a :class:`Sequence` of variables defining the
+          control.
+      :arg dM: A variable or a :class:`Sequence` of variables defining
+          :math:`\zeta`. The (conjugate of the) Hessian action on
+          :math:`\zeta` is computed.
+      :arg M0: A variable or a :class:`Sequence` of variables defining the
+          control value. `M` is used if not supplied.
+      :returns: A tuple `(J, dJ, ddJ)`. `J` is the value of the functional.
+          `dJ` is the value of :math:`\left( d \mathcal{J} / d m \right)
+          \zeta`. `ddJ` stores the (conjugate of the) result of the Hessian
+          action on :math:`\zeta`, and is a variable or a :class:`Sequence`
+          of variables depending on the type of `M`.
+
+
+
+.. py:class:: CachedGaussNewton(X, R_inv_action, B_inv_action=None, *, manager=None)
+
+
+
+
+   Represents a Gauss-Newton approximation to a Hessian associated with a
+   given forward. Uses a cached forward calculation.
+
+   :arg X: A variable or a :class:`Sequence` of variables defining the state.
+   :arg R_inv_action: See :class:`.GaussNewton`.
+   :arg B_inv_action: See :class:`.GaussNewton`.
+   :arg manager: The :class:`.EquationManager` used to record the forward.
+       This must have used `'memory'` checkpointing with automatic dropping of
+       variable references disabled. `manager()` is used if not supplied.
+
+   .. py:method:: action(M, dM, M0=None)
+
+      Compute (the conjugate of) a Hessian action on some :math:`\zeta`,
+      using the Gauss-Newton approximation for the Hessian. i.e. compute
+
+      .. math::
+
+          \left( H \zeta \right)^{*,T}.
+
+      :arg M: A variable or a :class:`Sequence` of variables defining the
+          control.
+      :arg dM: A variable or a :class:`Sequence` of variables defining
+          :math:`\zeta`. The (conjugate of the) approximated Hessian action
+          on :math:`\zeta` is computed.
+      :arg M0: A variable or a :class:`Sequence` of variables defining the
+          control value. `M` is used if not supplied.
+      :returns: The (conjugate of the) result of the approximated Hessian
+          action on :math:`\zeta`. A variable or a :class:`Sequence` of
+          variables depending on the type of `M`.
+
+
+
