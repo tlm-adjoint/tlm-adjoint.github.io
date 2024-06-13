@@ -1,0 +1,435 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.adjoint`
+=============================
+
+.. py:module:: tlm_adjoint.adjoint
+
+
+Module Contents
+---------------
+
+.. py:class:: AdjointRHS(x)
+
+
+   
+   The right-hand-side of an adjoint equation, for an adjoint variable
+   associated with an equation solving for a forward variable `x`.
+
+   :arg x: The forward variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: b(*, copy=False)
+
+      
+      Return the right-hand-side, as a variable.
+
+      :arg copy: If `True` then a copy of the internal variable storing the
+          right-hand-side value is returned. If `False` the internal variable
+          itself is returned.
+      :returns: A variable storing the right-hand-side value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: initialize()
+
+      
+      Allocate an internal variable to store the right-hand-side.
+      Typically need not be called manually.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: sub(b)
+
+      
+      Subtract a term from the right-hand-side.
+
+      :arg b: The term to subtract.
+          :func:`.subtract_adjoint_derivative_action` is used to subtract the
+          term.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_empty()
+
+      
+      Return whether the right-hand-side is 'empty', meaning that the
+      :meth:`.AdjointRHS.initialize` method has not been called.
+
+      :returns: `True` if the :meth:`.AdjointRHS.initialize` method has not
+          been called, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AdjointEquationRHS(eq)
+
+
+   
+   The right-hand-side of an adjoint equation, for adjoint variables
+   associated with an equation solving for multiple forward variables `X`.
+
+   Multiple :class:`.AdjointRHS` objects. The :class:`.AdjointRHS` objects may
+   be accessed by index, e.g.
+
+   .. code-block:: python
+
+       adj_eq_rhs = AdjointEquationRHS(eq)
+       adj_rhs = adj_eq_rhs[m]
+
+   :arg eq: An :class:`.Equation`. `eq.X()` defines the forward variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: b(*, copy=False)
+
+      
+      For the case where there is a single forward variable, return a
+      variable associated with the right-hand-side.
+
+      :arg copy: If `True` then a copy of the internal variable storing the
+          right-hand-side value is returned. If `False` the internal variable
+          itself is returned.
+      :returns: A variable storing the right-hand-side value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: B(*, copy=False)
+
+      
+      Return variables associated with the right-hand-sides.
+
+      :arg copy: If `True` then copies of the internal variables storing the
+          right-hand-side values are returned. If `False` the internal
+          variables themselves are returned.
+      :returns: A :class:`tuple` of variables storing the right-hand-side
+          values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_empty()
+
+      
+      Return whether all of the :class:`.AdjointRHS` objects are 'empty',
+      meaning that the :meth:`.AdjointRHS.initialize` method has not been
+      called for any :class:`.AdjointRHS`.
+
+      :returns: `True` if the :meth:`.AdjointRHS.initialize` method has not
+          been called for any :class:`.AdjointRHS`, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AdjointBlockRHS(block)
+
+
+   
+   The right-hand-side of multiple adjoint equations.
+
+   Multiple :class:`.AdjointEquationRHS` objects. The
+   :class:`.AdjointEquationRHS` objects may be accessed by index, e.g.
+
+   .. code-block:: python
+
+       adj_block_rhs = AdjointBlockRHS(block)
+       adj_eq_rhs = adj_block_rhs[k]
+
+   :arg block: A :class:`Sequence` of :class:`.Equation` objects.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: pop()
+
+      
+      Remove and return the last :class:`.AdjointEquationRHS` in the
+      :class:`.AdjointBlockRHS`.
+
+      :returns: A :class:`tuple` `(n, B)`. `B` is the removed
+          :class:`.AdjointEquationRHS`, associated with block `n`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_empty()
+
+      
+      Return whether there are no :class:`.AdjointEquationRHS` objects in
+      the :class:`.AdjointBlockRHS`.
+
+      :returns: `True` if there are no :class:`.AdjointEquationRHS` objects
+          in the :class:`.AdjointBlockRHS`, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AdjointModelRHS(blocks)
+
+
+   
+   The right-hand-side of multiple blocks of adjoint equations.
+
+   Multiple :class:`.AdjointBlockRHS` objects. The :class:`.AdjointBlockRHS`
+   objects may be accessed by index, e.g.
+
+   .. code-block:: python
+
+       adj_model_rhs = AdjointModelRHS(block)
+       adj_block_rhs = adj_block_rhs[p]
+
+   If the last block of adjoint equations contains no equations then it is
+   automatically removed from the :class:`.AdjointModelRHS`.
+
+   :arg blocks: A :class:`Sequence` of :class:`Sequence` objects each
+       containing :class:`.Equation` objects, or a :class:`Mapping` with items
+       `(index, block)` where `index` is an :class:`int` and `block` a
+       :class:`Sequence` of :class:`.Equation` objects. In the latter case
+       blocks are ordered by `index`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: pop()
+
+      
+      Remove and return the last :class:`.AdjointEquationRHS` in the last
+      :class:`.AdjointBlockRHS` in the :class:`.AdjointModelRHS`.
+
+      :returns: A :class:`tuple` `((n, i), B)`. `B` is the removed
+          :class:`.AdjointEquationRHS`, associated with equation `i` in block
+          `n`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_empty()
+
+      
+      Return whether there are no :class:`.AdjointBlockRHS` objects in the
+      :class:`.AdjointModelRHS`.
+
+      :returns: `True` if there are no :class:`.AdjointBlockRHS` objects in
+          the :class:`.AdjointModelRHS`, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

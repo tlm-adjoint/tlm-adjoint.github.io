@@ -1,0 +1,137 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.tangent_linear`
+====================================
+
+.. py:module:: tlm_adjoint.tangent_linear
+
+
+Module Contents
+---------------
+
+.. py:class:: TangentLinearMap(M, dM)
+
+
+   
+   Defines a map from forward variables to associated tangent-linear
+   variables.
+
+   The map is used via e.g.
+
+   .. code-block:: python
+
+       tau_x = tlm_map[x]
+
+   where `x` is a forward variable.
+
+       - If `x` defines a component of the control, then `tau_x` is a variable
+         defining the associated component of the direction.
+       - If `x` does not define a component of the control and is not
+         'static', then `tau_x` is a tangent-linear variable. A new variable
+         is instantiated if needed.
+       - Otherwise `tau_x` is `None`, indicating that the tangent-linear
+         variable is zero.
+
+   Containment can be tested
+
+   .. code-block:: python
+
+       if x in tlm_map:
+           [...]
+
+   and returns `True` if `x` defines a component of the control, or a
+   tangent-linear variable associated with `x` has been instantiated.
+
+   :arg M: A variable or :class:`Sequence` of variables defining the control.
+   :arg dM: A variable or :class:`Sequence` of variables defining the
+       derivative direction. The tangent-linear computes directional
+       derivatives with respect to the control defined by `M` and with
+       direction defined by `dM`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: id
+
+      
+      A unique :class:`int` ID associated with this
+      :class:`.TangentLinearMap`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: M
+
+      
+      A :class:`Sequence` of variables defining the control.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: dM
+
+      
+      A :class:`Sequence` of variables defining the derivative direction.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

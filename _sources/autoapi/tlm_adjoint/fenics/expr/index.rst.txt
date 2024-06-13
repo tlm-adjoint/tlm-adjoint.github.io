@@ -1,0 +1,94 @@
+:py:mod:`tlm_adjoint.fenics.expr`
+=================================
+
+.. py:module:: tlm_adjoint.fenics.expr
+
+.. autoapi-nested-parse::
+
+   Symbolic expression functionality.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: Zero
+
+
+   
+   Mixin for defining a zero-valued variable. Used for zero-valued
+   variables for which UFL zero elimination should not be applied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: eliminate_zeros(expr)
+
+   
+   Apply zero elimination for :class:`.Zero` objects in the supplied
+   :class:`ufl.core.expr.Expr` or :class:`ufl.Form`.
+
+   :arg expr: A :class:`ufl.core.expr.Expr` or :class:`ufl.Form`.
+   :returns: A :class:`ufl.core.expr.Expr` or :class:`ufl.Form` with zero
+       elimination applied. May return `expr`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: Replacement(x, count)
+
+
+
+
+   
+   Represents a symbolic variable but with no value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

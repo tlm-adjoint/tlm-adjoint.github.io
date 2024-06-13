@@ -1,0 +1,92 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.alias`
+===========================
+
+.. py:module:: tlm_adjoint.alias
+
+
+Module Contents
+---------------
+
+.. py:function:: gc_disabled(fn)
+
+   
+   Decorator to disable the Python garbage collector.
+
+   :arg fn: A callable for which the Python garbage collector should be
+       disabled.
+   :returns: A callable for which the Python garbage collector is disabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: Alias(obj)
+
+
+   
+   An alias to an object. Holds a reference to the original object.
+
+   :arg obj: Object to alias.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: WeakAlias(obj)
+
+
+   
+   An alias to an object. Does *not* hold a reference to the original
+   object.
+
+   Intended to be used in combination with `weakref.finalize`, so that object
+   attributes may be updated when the original object is destroyed, but object
+   methods may still be called after it is destroyed.
+
+   :arg obj: Object to alias.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

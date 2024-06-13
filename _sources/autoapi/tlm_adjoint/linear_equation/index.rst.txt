@@ -1,0 +1,805 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.linear_equation`
+=====================================
+
+.. py:module:: tlm_adjoint.linear_equation
+
+
+Module Contents
+---------------
+
+.. py:class:: LinearEquation(X, B, *, A=None, adj_type=None)
+
+
+
+
+   
+   Represents the solution of a linear equation
+
+   .. math::
+
+       A x = \sum_i b_i,
+
+   with left-hand-side matrix :math:`A` and right-hand-side terms :math:`b_i`.
+   The matrix and right-hand-side terms may depend on other forward variables
+   :math:`y_i`.
+
+   The forward residual is defined
+
+   .. math::
+
+       \mathcal{F} \left( x, y_1, y_2, \ldots \right) = A x - \sum_i b_i.
+
+   :arg X: A variable or a :class:`Sequence` of variables defining the forward
+       solution `x`.
+   :arg B: A :class:`.RHS` or a :class:`Sequence` of :class:`.RHS` objects
+       defining the right-hand-side terms.
+   :arg A: A :class:`tlm_adjoint.linear_equation.Matrix` defining the
+       left-hand-side matrix. Defaults to an identity matrix if not supplied.
+   :arg adj_type: The space type relative to `X` of adjoint variables.
+       `'primal'` or `'conjugate_dual'`, or a :class:`Sequence` of these.
+       Defaults to `'primal'` if `A` is supplied and `'conjugate_dual'`
+       otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: drop_references()
+
+      
+      Drop references to variables which store values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: forward_solve(X, deps=None)
+
+      
+      Compute the forward solution.
+
+      Can assume that the currently active :class:`.EquationManager` is
+      paused.
+
+      :arg X: A variable or a :class:`Sequence` of variables storing the
+          solution. May define an initial guess, and should be set by this
+          method.
+      :arg deps: A :class:`tuple` of variables, defining values for
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_jacobian_solve(adj_X, nl_deps, B)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_derivative_action(nl_deps, dep_index, adj_X)
+
+      
+      Return the action of the adjoint of a derivative of the forward
+      residual on the adjoint solution. This is the *negative* of an adjoint
+      right-hand-side term.
+
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg dep_index: An :class:`int`. The derivative is defined by
+          differentiation of the forward residual with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint solution. A variable or a :class:`Sequence` of
+          variables. Should not be modified.
+      :returns: The action of the adjoint of a derivative on the adjoint
+          solution. Will be passed to
+          :func:`.subtract_adjoint_derivative_action`, and valid types depend
+          upon the adjoint variable type. Typically this will be a variable,
+          or a two element :class:`tuple` `(alpha, F)`, where `alpha` is a
+          :class:`numbers.Complex` and `F` a variable, with the value defined
+          by the product of `alpha` and `F`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: Matrix(nl_deps=None, *, ic=True, adj_ic=True)
+
+
+
+
+   
+   Represents a matrix :math:`A`.
+
+   This is an abstract base class. Information required by forward, adjoint,
+   and tangent-linear calculations is provided by overloading abstract
+   methods. This class does *not* inherit from :class:`abc.ABC`, so that
+   methods may be implemented as needed.
+
+   :arg nl_deps: A :class:`Sequence` of variables, defining dependencies of
+       the matrix :math:`A`.
+   :arg ic: Whether solution of a linear equation :math:`A x = b` for
+       :math:`x` uses an initial guess. Defaults to `True`.
+   :arg adj_ic: Whether solution of an adjoint linear equation :math:`A^*
+       \lambda = b` for :math:`\lambda` uses an initial guess.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: drop_references()
+
+      
+      Drop references to variables which store values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: nonlinear_dependencies()
+
+      
+      Return dependencies of the
+      :class:`tlm_adjoint.linear_equation.Matrix`.
+
+      :returns: A :class:`Sequence` of variables defining dependencies.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: has_initial_condition()
+
+      
+      Return whether solution of a linear equation :math:`A x = b` for
+      :math:`x` uses an initial guess.
+
+      :returns: `True` if an initial guess is used, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_has_initial_condition()
+
+      
+      Return whether solution of an adjoint linear equation :math:`A^*
+      \lambda = b` for :math:`\lambda` uses an initial guess.
+
+      :returns: `True` if an initial guess is used, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: forward_action(nl_deps, X, B, *, method='assign')
+      :abstractmethod:
+
+      
+      Evaluate the action of the matrix on :math:`x`, :math:`A x`. Assigns
+      the result to `B`, or adds the result to or subtracts the result from
+      `B`.
+
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          dependencies. Should not be modified.
+      :arg X: Defines :math:`x`. A variable if it has a single component, and
+          a :class:`Sequence` of variables otherwise. Should not be modified.
+          Subclasses may replace this argument with `x` if there is a single
+          component.
+      :arg B: Stores the result. A variable if it has a single component, and
+          a :class:`Sequence` of variables otherwise. Subclasses may replace
+          this argument with `b` if there is a single component.
+      :arg method: If equal to `'assign'` then this method should set `B`
+          equal to the result. If equal to `'add'` then this method should
+          add the result to `B`. If equal to `'sub'` then this method should
+          subtract the result from `B`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_action(nl_deps, adj_X, b, b_index=0, *, method='assign')
+      :abstractmethod:
+
+      
+      Evaluate the action of the adjoint of the matrix on
+      :math:`\lambda`, :math:`A^* \lambda`. Assigns the `b_index` th
+      component to `b`, or adds the `b_index` th component to or subtracts
+      the `b_index` th component from `b`.
+
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          dependencies. Should not be modified.
+      :arg adj_X: Defines :math:`\lambda`. A variable if it has a single
+          component, and a :class:`Sequence` of variables otherwise. Should
+          not be modified. Subclasses may replace this argument with `adj_x`
+          if there is a single component.
+      :arg b: A variable storing the result. Should be updated by this
+          method.
+      :arg b_index: The component of the result which should be used to
+          update `b`.
+      :arg method: If equal to `'assign'` then this method should set `b`
+          equal to the `b_index` th component of the result. If equal to
+          `'add'` then this method should add the `b_index` th component of
+          the result to `b`. If equal to `'sub'` then this method should
+          subtract the `b_index` th component of the result from `b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: forward_solve(X, nl_deps, B)
+      :abstractmethod:
+
+      
+      Solve the linear system :math:`A x = b` for :math:`x`.
+
+      :arg X: The solution :math:`x`. A variable if it has a single
+          component, and a :class:`Sequence` of variables otherwise. May
+          define an initial guess. Subclasses may replace this argument with
+          `x` if there is a single component.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          dependencies. Should not be modified.
+      :arg B: The right-hand-side :math:`b`. A variable if it has a single
+          component, and a :class:`Sequence` of variables otherwise. Should
+          not be modified. Subclasses may replace this argument with `b` if
+          there is a single component.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_derivative_action(nl_deps, nl_dep_index, X, adj_X, b, *, method='assign')
+      :abstractmethod:
+
+      
+      Evaluate the action of the adjoint of a derivative of :math:`A x` on
+      an adjoint variable. Assigns the result to `b`, or adds the result to
+      or subtracts the result from `b`.
+
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          dependencies. Should not be modified.
+      :arg nl_deps_index: An :class:`int`. The derivative is defined by
+          differentiation of :math:`A x` with respect to
+          `self.nonlinear_dependencies()[nl_dep_index]`.
+      :arg X: Defines :math:`x`. A variable if it has a single component, and
+          a :class:`Sequence` of variables otherwise. Should not be modified.
+          Subclasses may replace this argument with `x` if there is a single
+          component.
+      :arg adj_X: The adjoint variable. A variable if it has a single
+          component, and :class:`Sequence` of variables otherwise. Should not
+          be modified. Subclasses may replace this argument with `adj_x` if
+          the adjoint variable has a single component.
+      :arg b: A variable storing the result. Should be updated by this
+          method.
+      :arg method: If equal to `'assign'` then this method should set `b`
+          equal to the result. If equal to `'add'` then this method should
+          add the result to `b`. If equal to `'sub'` then this method should
+          subtract the result from `b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_solve(adj_X, nl_deps, B)
+      :abstractmethod:
+
+      
+      Solve the linear system :math:`A^* \lambda = b` for
+      :math:`\lambda`.
+
+      :arg adj_X: The solution :math:`\lambda`. A variable if it has a single
+          component, and a :class:`Sequence` of variables otherwise. May
+          define an initial guess. Subclasses may replace this argument with
+          `adj_x` if there is a single component.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          dependencies. Should not be modified.
+      :arg B: The right-hand-side :math:`b`. A variable if it has a single
+          component, and a :class:`Sequence` of variables otherwise. Should
+          not be modified. Subclasses may replace this argument with `b` if
+          there is a single component.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear_rhs(tlm_map, X)
+      :abstractmethod:
+
+      
+      Construct tangent-linear right-hand-side terms obtained by
+      differentiation of
+
+      .. math::
+
+          \mathcal{G} \left( x, y_1, y_2, \ldots \right) = -A x
+
+      with respect to dependencies of the matrix :math:`A`. i.e. construct
+
+      .. math::
+
+          -\sum_i \frac{\partial \mathcal{G}}{\partial y_i} \tau_{y_i},
+
+      where :math:`\tau_{y_i}` is the tangent-linear variable associated with
+      the dependency :math:`y_i`. Note the *negative* sign. Does *not*
+      include the term :math:`-A \tau_x` where :math:`\tau_x` is the
+      tangent-linear variable associated with :math:`x`.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :arg X: Defines :math:`x`. A variable if it has a single component, and
+          a :class:`Sequence` of variables otherwise. Subclasses may replace
+          this argument with `x` if there is a single component.
+      :returns: A :class:`.RHS`, or a :class:`Sequence` of :class:`.RHS`
+          objects, defining the right-hand-side terms. Returning `None`
+          indicates that there are no terms.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: RHS(deps, nl_deps=None)
+
+
+
+
+   
+   Represents a right-hand-side term.
+
+   This is an abstract base class. Information required by forward, adjoint,
+   and tangent-linear calculations is provided by overloading abstract
+   methods. This class does *not* inherit from :class:`abc.ABC`, so that
+   methods may be implemented as needed.
+
+   :arg deps: A :class:`Sequence` of variables defining dependencies.
+   :arg nl_deps: A :class:`Sequence` of variables defining non-linear
+       dependencies.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: drop_references()
+
+      
+      Drop references to variables which store values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: dependencies()
+
+      
+      Return dependencies of the :class:`.RHS`.
+
+      :returns: A :class:`Sequence` of variables defining dependencies.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: nonlinear_dependencies()
+
+      
+      Return non-linear dependencies of the :class:`.RHS`.
+
+      :returns: A :class:`Sequence` of variables defining non-linear
+          dependencies.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: add_forward(B, deps)
+      :abstractmethod:
+
+      
+      Add the right-hand-side term to `B`.
+
+      :arg B: A variable if it has a single component, and a
+          :class:`Sequence` of variables otherwise. Should be updated by the
+          addition of this :class:`.RHS`. Subclasses may replace this
+          argument with `b` if there is a single component.
+      :arg deps: A :class:`Sequence` of variables defining values for
+          dependencies. Should not be modified.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: subtract_adjoint_derivative_action(nl_deps, dep_index, adj_X, b)
+      :abstractmethod:
+
+      
+      Subtract the action of the adjoint of a derivative of the
+      right-hand-side term, on an adjoint variable, from `b`.
+
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg deps_index: An :class:`int`. The derivative is defined by
+          differentiation of the right-hand-side term with respect to
+          `self.dependencies()[dep_index]`.
+      :arg adj_X: The adjoint variable. A variable if it has a single
+          component, and a :class:`Sequence` of variables otherwise. Should
+          not be modified. Subclasses may replace this argument with `adj_x`
+          if the adjoint variable has a single component.
+      :arg b: A variable storing the result. Should be updated by subtracting
+          the action of the adjoint of the right-hand-side term on the
+          adjoint variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear_rhs(tlm_map)
+      :abstractmethod:
+
+      
+      Construct tangent-linear right-hand-side terms obtained by
+      differentiation of this right-hand-side term. That is, construct
+
+      .. math::
+
+          \sum_i \frac{\partial b}{\partial y_i} \tau_{y_i},
+
+      where :math:`b` is this right-hand-side term, and :math:`\tau_{y_i}` is
+      the tangent-linear variable associated with a dependency :math:`y_i`.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: A :class:`.RHS`, or a :class:`Sequence` of :class:`.RHS`
+          objects, defining the right-hand-side terms. Returning `None`
+          indicates that there are no terms.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

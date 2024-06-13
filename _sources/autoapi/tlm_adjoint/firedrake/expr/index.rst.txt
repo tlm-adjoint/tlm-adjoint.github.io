@@ -1,0 +1,92 @@
+:py:mod:`tlm_adjoint.firedrake.expr`
+====================================
+
+.. py:module:: tlm_adjoint.firedrake.expr
+
+.. autoapi-nested-parse::
+
+   Symbolic expression functionality.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: Zero
+
+
+   
+   Mixin for defining a zero-valued variable. Used for zero-valued
+   variables for which UFL zero elimination should not be applied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: eliminate_zeros(expr)
+
+   
+   Apply zero elimination for :class:`.Zero` objects in the supplied
+   :class:`ufl.core.expr.Expr` or :class:`ufl.form.BaseForm`.
+
+   :arg expr: A :class:`ufl.core.expr.Expr` or :class:`ufl.form.BaseForm`.
+   :returns: A :class:`ufl.core.expr.Expr` or :class:`ufl.form.BaseForm` with
+       zero elimination applied. May return `expr`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: Replacement
+
+
+   
+   Represents a symbolic variable but with no value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

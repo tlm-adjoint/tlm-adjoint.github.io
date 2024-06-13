@@ -1,0 +1,87 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.functional`
+================================
+
+.. py:module:: tlm_adjoint.functional
+
+
+Module Contents
+---------------
+
+.. py:class:: Functional(*args, space=None, **kwargs)
+
+
+
+
+   
+   A convenience class for defining functionals.
+
+   Arguments are as for the :class:`.Float` class.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: assign(y)
+
+      
+      Assign to the :class:`.Functional`.
+
+      :arg y: The value.
+      :returns: The :class:`.Functional`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: addto(y)
+
+      
+      Add to the :class:`.Functional`.
+
+      :arg y: The value to add.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
