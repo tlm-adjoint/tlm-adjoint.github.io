@@ -1,0 +1,117 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.checkpoint_schedules.periodic`
+===================================================
+
+.. py:module:: tlm_adjoint.checkpoint_schedules.periodic
+
+
+Module Contents
+---------------
+
+.. py:class:: PeriodicDiskCheckpointSchedule(period)
+
+
+
+
+   
+   A checkpointing schedule where forward restart checkpoints are stored
+   periodically to disk. Non-linear dependency data is recomputed for use by
+   the adjoint by re-running the forward from these checkpoints. If the
+   storage period is greater than one then non-linear dependency data for
+   multiple steps is recomputed and stored when advancing the adjoint.
+
+   Online, unlimited adjoint calculations permitted.
+
+   :arg period: Forward restart checkpoints are stored to disk every `period`
+       forward steps in the initial forward calculation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: is_exhausted
+
+      
+      Whether the schedule has concluded. Note that some schedules permit
+      multiple adjoint calculation, and may never conclude.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: uses_disk_storage
+
+      
+      Whether the schedule may use disk storage. If `False` then no disk
+      storage is required.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: iter()
+
+      
+      A generator which should be overridden in derived classes in order
+      to define a checkpointing schedule.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

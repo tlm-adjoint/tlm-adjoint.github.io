@@ -1,0 +1,38 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.fenics.backend_interface`
+==============================================
+
+.. py:module:: tlm_adjoint.fenics.backend_interface
+
+
+Module Contents
+---------------
+
+.. py:function:: linear_solver(A, linear_solver_parameters, *, comm=None)
+
+   
+   Construct a DOLFIN `LUSolver` or `KrylovSolver`.
+
+   :arg A: A DOLFIN matrix.
+   :arg linear_solver_parameters: Linear solver parameters.
+   :arg comm: A communicator.
+   :returns: The DOLFIN `LUSolver` or `KrylovSolver`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

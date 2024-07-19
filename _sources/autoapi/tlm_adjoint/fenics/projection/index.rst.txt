@@ -1,0 +1,83 @@
+:py:mod:`tlm_adjoint.fenics.projection`
+=======================================
+
+.. py:module:: tlm_adjoint.fenics.projection
+
+.. autoapi-nested-parse::
+
+   Projection operations with FEniCS.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: Projection(x, rhs, *args, **kwargs)
+
+
+
+
+   
+   Represents the solution of a finite element variational problem
+   performing a projection onto the space for `x`.
+
+   :arg x: A DOLFIN `Function` defining the forward solution.
+   :arg rhs: A :class:`ufl.core.expr.Expr` defining the expression to project
+       onto the space for `x`. Should not depend on `x`.
+
+   Remaining arguments are passed to the
+   :class:`tlm_adjoint.fenics.solve.EquationSolver` constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: LocalProjection(x, rhs, *args, **kwargs)
+
+
+
+
+   
+   Represents the solution of a finite element variational problem
+   performing a projection onto the space for `x`, for the case where the mass
+   matrix is element-wise local block diagonal.
+
+   :arg x: A DOLFIN `Function` defining the forward solution.
+   :arg rhs: A :class:`ufl.core.expr.Expr` defining the expression to project
+       onto the space for `x`. Should not depend on `x`.
+
+   Remaining arguments are passed to the
+   :class:`tlm_adjoint.fenics.solve.LocalEquationSolver` constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

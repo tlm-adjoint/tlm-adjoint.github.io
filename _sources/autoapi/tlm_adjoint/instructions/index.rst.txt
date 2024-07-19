@@ -1,0 +1,197 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.instructions`
+==================================
+
+.. py:module:: tlm_adjoint.instructions
+
+
+Module Contents
+---------------
+
+.. py:class:: Instruction
+
+
+
+
+   
+   An adjoint tape record which defines instructions to be performed during
+   forward or adjoint calculations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: adjoint_jacobian_solve(adj_X, nl_deps, B)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: GarbageCollection(comm=None, *, generation=2, garbage_cleanup=True)
+
+
+
+
+   
+   An :class:`.Instruction` which indicates that garbage collection should
+   be performed during forward and adjoint calculations.
+
+   :arg comm: Communicator to use for PETSc garbage cleanup.
+   :arg generation: Python garbage collection generation. If a value of `None`
+       is provided then Python garbage collection is not performed.
+   :arg garbage_cleanup: Whether to perform PETSc garbage cleanup.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: forward_solve(X, deps=None)
+
+      
+      Compute the forward solution.
+
+      Can assume that the currently active :class:`.EquationManager` is
+      paused.
+
+      :arg X: A variable or a :class:`Sequence` of variables storing the
+          solution. May define an initial guess, and should be set by this
+          method.
+      :arg deps: A :class:`tuple` of variables, defining values for
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_jacobian_solve(adj_X, nl_deps, B)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

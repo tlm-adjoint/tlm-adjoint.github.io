@@ -1,0 +1,403 @@
+:py:mod:`tlm_adjoint.manager`
+=============================
+
+.. py:module:: tlm_adjoint.manager
+
+.. autoapi-nested-parse::
+
+   This module provides a simple :class:`.EquationManager` interface. Functions
+   defined here access and interact with the default manager.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:function:: manager()
+
+   
+   :returns: An :class:`.EquationManager`, the current default manager.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: set_manager(manager)
+
+   
+   Set the default manager.
+
+   :arg manager: An :class:`.EquationManager` to use as the default manager.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: restore_manager(fn)
+
+   
+   Decorator to revert the default manager to the manager used prior to
+   calling the decorated callable. A typical use is
+
+   .. code-block:: python
+
+       @restore_manager
+       def decorated(*M):
+           set_manager(manager().new())
+           forward(*M)
+
+   :arg fn: A decorated callable.
+   :returns: A callable, where the default manager on entry is restored on
+       exit.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: configure_checkpointing(cp_method, cp_parameters)
+
+   
+   See :meth:`.EquationManager.configure_checkpointing`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: manager_info(*, info=print)
+
+   
+   See :meth:`.EquationManager.info`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: reset_manager(cp_method=None, cp_parameters=None)
+
+   
+   See :meth:`.EquationManager.reset`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: annotation_enabled()
+
+   
+   See :meth:`.EquationManager.annotation_enabled`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: start_manager(*, annotate=True, tlm=True)
+
+   
+   See :meth:`.EquationManager.start`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: stop_manager(*, annotate=True, tlm=True)
+
+   
+   See :meth:`.EquationManager.stop`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: paused_manager(*, annotate=True, tlm=True)
+
+   
+   See :meth:`.EquationManager.paused`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: manager_disabled(*, annotate=True, tlm=True)
+
+   
+   Decorator which can be used to disable processing of equations and
+   derivation and solution of tangent-linear equations.
+
+   :arg annotate: Whether to disable processing of equations.
+   :arg tlm: Whether to disable derivation and solution of tangent-linear
+       equations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: configure_tlm(*args, annotate=None, tlm=True)
+
+   
+   See :meth:`.EquationManager.configure_tlm`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:function:: tlm_enabled()
+
+   
+   See :meth:`.EquationManager.tlm_enabled`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_tlm(x, *args)
+
+   
+   See :meth:`.EquationManager.var_tlm`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:function:: compute_gradient(Js, M, *, callback=None, prune_forward=True, prune_adjoint=True, prune_replay=True, cache_adjoint_degree=None, store_adjoint=False, adj_ics=None)
+
+   
+   See :meth:`.EquationManager.compute_gradient`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: new_block()
+
+   
+   See :meth:`.EquationManager.new_block`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
