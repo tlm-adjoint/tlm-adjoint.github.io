@@ -1,0 +1,374 @@
+:py:mod:`tlm_adjoint.firedrake.variables`
+=========================================
+
+.. py:module:: tlm_adjoint.firedrake.variables
+
+.. autoapi-nested-parse::
+
+   Firedrake variables.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: Constant(value=None, *args, name=None, domain=None, space=None, space_type='primal', shape=None, comm=None, static=False, cache=None, **kwargs)
+
+
+
+
+   
+   Extends the :class:`firedrake.constant.Constant` class.
+
+   :arg value: The initial value. `None` indicates a value of zero.
+   :arg name: A :class:`str` name.
+   :arg domain: The domain on which the :class:`.Constant` is defined.
+   :arg space: The space on which the :class:`.Constant` is defined.
+   :arg space_type: The space type for the :class:`.Constant`. `'primal'`,
+       `'dual'`, `'conjugate'`, or `'conjugate_dual'`.
+   :arg shape: A :class:`tuple` of :class:`int` objects defining the shape of
+       the value.
+   :arg comm: The communicator for the :class:`.Constant`.
+   :arg static: Defines whether the :class:`.Constant` is static, meaning that
+       it is stored by reference in checkpointing/replay, and an associated
+       tangent-linear variable is zero.
+   :arg cache: Defines whether results involving the :class:`.Constant` may be
+       cached. Default `static`.
+
+   Remaining arguments are passed to the :class:`firedrake.constant.Constant`
+   constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: Function(*args, space_type='primal', static=False, cache=None, **kwargs)
+
+
+
+
+   
+   Extends :class:`firedrake.function.Function`.
+
+   :arg space_type: The space type for the :class:`.Function`. `'primal'` or
+       `'conjugate'`.
+   :arg static: Defines whether the :class:`.Function` is static, meaning that
+       it is stored by reference in checkpointing/replay, and an associated
+       tangent-linear variable is zero.
+   :arg cache: Defines whether results involving the :class:`.Function` may
+       be cached. Default `static`.
+
+   Remaining arguments are passed to the :class:`firedrake.function.Function`
+   constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: Cofunction(*args, space_type='conjugate_dual', static=False, cache=None, **kwargs)
+
+
+
+
+   
+   Extends the :class:`firedrake.cofunction.Cofunction` class.
+
+   :arg space_type: The space type for the :class:`.Cofunction`. `'dual'` or
+       `'conjugate_dual'`.
+   :arg static: Defines whether the :class:`.Cofunction` is static, meaning
+       that it is stored by reference in checkpointing/replay, and an
+       associated tangent-linear variable is zero.
+   :arg cache: Defines whether results involving the :class:`.Cofunction` may
+       be cached. Default `static`.
+
+   Remaining arguments are passed to the
+   :class:`firedrake.cofunction.Cofunction` constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: equals(other)
+
+      
+      Check equality.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: ZeroConstant(*, name=None, domain=None, space=None, space_type='primal', shape=None, comm=None)
+
+
+
+
+   
+   A :class:`.Constant` which is flagged as having a value of zero.
+
+   Arguments are passed to the :class:`.Constant` constructor, together with
+   `static=True` and `cache=True`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: ZeroFunction(*args, **kwargs)
+
+
+
+
+   
+   A :class:`.Function` which is flagged as having a value of zero.
+
+   Arguments are passed to the :class:`.Function` constructor, together with
+   `static=True` and `cache=True`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: ReplacementConstant(x, count)
+
+
+
+
+   
+   Represents a symbolic :class:`firedrake.constant.Constant`, but has no
+   value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: ReplacementFunction(x, count)
+
+
+
+
+   
+   Represents a symbolic :class:`firedrake.function.Function`, but has no
+   value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: ReplacementCofunction(x, count)
+
+
+
+
+   
+   Represents a symbolic :class:`firedrake.cofunction.Cofunction`, but has
+   no value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: ReplacementZeroConstant(*args, **kwargs)
+
+
+
+
+   
+   Represents a symbolic :class:`firedrake.constant.Constant` which is
+   zero, but has no value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: ReplacementZeroFunction(*args, **kwargs)
+
+
+
+
+   
+   Represents a symbolic :class:`firedrake.function.Function` which is
+   zero, but has no value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: to_firedrake(y, space, *, name=None)
+
+   
+   Convert a variable to a :class:`firedrake.function.Function` or
+   :class:`firedrake.cofunction.Cofunction`.
+
+   :arg y: A variable.
+   :arg space: The space for the return value.
+   :arg name: A :class:`str` name.
+   :returns: The :class:`firedrake.function.Function` or
+       :class:`firedrake.cofunction.Cofunction`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

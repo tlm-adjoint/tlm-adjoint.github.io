@@ -1,0 +1,734 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.tlm_adjoint`
+=================================
+
+.. py:module:: tlm_adjoint.tlm_adjoint
+
+
+Module Contents
+---------------
+
+.. py:class:: EquationManager(*, comm=None, cp_method='memory', cp_parameters=None)
+
+
+   
+   Core manager class.
+
+       - Plays the role of an adjoint 'tape'. Records forward equations as
+         they are solved.
+       - Interacts with checkpointing schedules for adjoint checkpointing and
+         forward replay.
+       - Derives and manages tangent-linear equations. Tangent-linear
+         equations are processed as new forward equations, allowing higher
+         order adjoint calculations.
+       - Handles variable reference dropping, e.g. handles the dropping of
+         references to variables which store values, and their replacement
+         with symbolic equivalents, after :class:`.Equation` objects holding
+         those references have been destroyed. Internally the manager retains
+         a reference to a :class:`.WeakAlias` subclass so that the
+         :class:`.Equation` methods may be called after the original
+         :class:`.Equation` is destroyed.
+
+   The manager processes forward equations (and tangent-linear equations) as
+   they are solved. Equations are collected into 'blocks' of equations,
+   corresponding to 'steps' in step-based checkpointing schedules. For
+   checkpointing schedule configuration details see
+   :meth:`.EquationManager.configure_checkpointing`.
+
+   The configuration of tangent-linears is defined by a tangent-linear tree.
+   The root node of this tree corresponds to the forward. Following :math:`n`
+   edges from the root node leads to a node associated with an :math:`n` th
+   order tangent-linear. For tangent-linear configuration details see
+   :meth:`.EquationManager.configure_tlm`.
+
+   On instantiation both equation annotation and tangent-linear derivation and
+   solution are *disabled*.
+
+   :arg comm: The communicator associated with the manager.
+   :arg cp_method: See :meth:`.EquationManager.configure_checkpointing`.
+   :arg cp_parameters: See :meth:`.EquationManager.configure_checkpointing`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: comm
+
+      
+      The communicator associated with the manager.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: info(*, info=print)
+
+      
+      Print manager state information.
+
+      :arg info: A callable which accepts and prints a :class:`str`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: new(cp_method=None, cp_parameters=None)
+
+      
+      Construct a new :class:`.EquationManager` sharing the communicator
+      with this :class:`.EquationManager`. By default the new
+      :class:`.EquationManager` also shares the checkpointing schedule
+      configuration with this :class:`.EquationManager`, but this may be
+      overridden with the arguments `cp_method` and `cp_parameters`.
+
+      Both equation annotation and tangent-linear derivation and solution are
+      *disabled* for the new :class:`.EquationManager`.
+
+      :arg cp_method: See :meth:`.EquationManager.configure_checkpointing`.
+      :arg cp_parameters: See
+          :meth:`.EquationManager.configure_checkpointing`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: reset(cp_method=None, cp_parameters=None)
+
+      
+      Reset the :class:`.EquationManager`. Clears all recorded equations,
+      and all configured tangent-linears.
+
+      By default the :class:`.EquationManager` *retains* its previous
+      checkpointing schedule configuration, but this may be overridden with
+      the arguments `cp_method` and `cp_parameters`.
+
+      Both equation annotation and tangent-linear derivation and solution are
+      *disabled* after calling this method.
+
+      :arg cp_method: See :meth:`.EquationManager.configure_checkpointing`.
+      :arg cp_parameters: See
+          :meth:`.EquationManager.configure_checkpointing`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: configure_checkpointing(cp_method, cp_parameters)
+
+      
+      Provide a new checkpointing schedule configuration.
+
+      The checkpointing schedule type is defined by the argument `cp_method`,
+      and detailed configuration options are provided by the :class:`Mapping`
+      argument `cp_parameters`.
+
+      `cp_method` values:
+
+          - `'none'`: No checkpointing. Can be used for tangent-linear only
+            calculations. Options defined by `cp_parameters`:
+
+              - `'drop_references'`: Whether to automatically drop references
+                to variables which store values. :class:`bool`, optional,
+                default `False`.
+
+          - `'memory'`: Store all forward restart data and non-linear
+            dependency data in memory. Options defined by `cp_parameters`:
+
+              - `'drop_references'`: Whether to automatically drop references
+                to variables which store values. :class:`bool`, optional,
+                default `False`.
+
+          - `'periodic_disk`: Periodically store forward restart data on
+            disk. Options defined by `cp_parameters`:
+
+              - `'path'`: Directory in which disk checkpoint data should be
+                stored. :class:`str`, optional, default `'checkpoints~'`.
+              - `'format'`: Disk storage format. Either `'pickle'`, for
+                data storage using the pickle module, or `'hdf5'`, for data
+                storage using the h5py library.
+              - `'period'`: Interval, in blocks, between storage of forward
+                restart data. :class:`int`, required.
+
+          - `'multistage'`: Forward restart checkpointing with checkpoint
+            distribution as described in:
+
+                - Andreas Griewank and Andrea Walther, 'Algorithm 799:
+                  revolve: an implementation of checkpointing for the reverse
+                  or adjoint mode of computational differentiation', ACM
+                  Transactions on Mathematical Software, 26(1), pp. 19--45,
+                  2000, doi: 10.1145/347837.347846
+
+            The memory/disk storage distribution is determined by an
+            initial run of the checkpointing schedule, leading to a
+            distribution equivalent to that in:
+
+                - Philipp Stumm and Andrea Walther, 'MultiStage approaches
+                  for optimal offline checkpointing', SIAM Journal on
+                  Scientific Computing, 31(3), pp. 1946--1967, 2009, doi:
+                  10.1137/080718036
+
+            Options defined by `cp_parameters`:
+
+              - `'path'`: Directory in which disk checkpoint data should be
+                stored. :class:`str`, optional, default `'checkpoints~'`.
+              - `'format'`: Disk storage format. Either `'pickle'`, for
+                data storage using the pickle module, or `'hdf5'`, for data
+                storage using the h5py library.
+              - `'blocks'`: The total number of blocks. :class:`int`,
+                required.
+              - `'snaps_in_ram'`: Maximum number of memory checkpoints.
+                :class:`int`, optional, default 0.
+              - `'snaps_on_disk'`: Maximum number of disk checkpoints.
+                :class:`int`, optional, default 0.
+
+            The name 'multistage' originates from the corresponding
+            `strategy` argument value for the
+            `dolfin_adjoint.solving.adj_checkpointing` function in
+            dolfin-adjoint (see e.g. version 2017.1.0). The parameter names
+            `snaps_in_ram` and `snaps_on_disk` originate from the
+            corresponding arguments for the
+            `dolfin_adjoint.solving.adj_checkpointing` function in
+            dolfin-adjoint (see e.g. version 2017.1.0).
+
+          - A callable: A callable returning a :class:`.CheckpointSchedule`.
+            Options defined by `cp_parameters`:
+
+              - `'path'`: Directory in which disk checkpoint data should be
+                stored. :class:`str`, optional, default `'checkpoints~'`.
+              - `'format'`: Disk storage format. Either `'pickle'`, for
+                data storage using the pickle module, or `'hdf5'`, for data
+                storage using the h5py library.
+              - Other parameters are passed as keyword arguments to the
+                callable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: configure_tlm(*args, annotate=None, tlm=True)
+
+      
+      Configure the tangent-linear tree.
+
+      :arg args: A :class:`tuple` of `(M_i, dM_i)` pairs. `M_i` is a variable
+          or a :class:`Sequence` of variables defining a control. `dM_i` is a
+          variable or a :class:`Sequence` of variables defining a derivative
+          direction. Identifies a node in the tree (and hence identifies a
+          tangent-linear) corresponding to differentation, in order, with
+          respect to the each control defined by `M_i` and with each
+          direction defined by `dM_i`.
+      :arg annotate: If `True` then enable annotation for the identified
+          tangent-linear, and enable annotation for all tangent-linears on
+          which it depends. If `False` then disable annotation for the
+          identified tangent-linear, all tangent-linears which depend on it,
+          and any newly added tangent-linears. Defaults to `tlm`.
+      :arg tlm: If `True` then add (or retain) the identified tangent-linear,
+          and add all tangent-linears on which it depends. If `False` then
+          remove the identified tangent-linear, and remove all
+          tangent-linears which depend on it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tlm_enabled()
+
+      
+      :returns: Whether derivation and solution of tangent-linear equations
+          is enabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: var_tlm(x, *args)
+
+      
+      Return a tangent-linear variable.
+
+      :arg x: A variable whose tangent-linear variable should be returned.
+          Cannot not be a replacement.
+      :arg args: Identifies the tangent-linear. See
+          :meth:`.EquationManager.configure_tlm`.
+      :returns: The tangent-linear variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: function_tlm(x, *args)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: annotation_enabled()
+
+      
+      :returns: Whether recording of equations is enabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: start(*, annotate=True, tlm=True)
+
+      
+      Start recording of equations and derivation and solution of
+      tangent-linear equations.
+
+      :arg annotate: Whether recording of equations should be enabled.
+      :arg tlm: Whether derivation and solution of tangent-linear equations
+          should be enabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: stop(*, annotate=True, tlm=True)
+
+      
+      Stop recording of equations and derivation and solution of
+      tangent-linear equations.
+
+      :arg annotate: Whether recording of equations should be disabled.
+      :arg tlm: Whether derivation and solution of tangent-linear equations
+          should be disabled.
+      :returns: A :class:`tuple` `(annotation_state, tlm_state)`.
+          `annotation_state` is a :class:`bool` indicating whether recording
+          of equations was enabled prior to the call to
+          :meth:`.EquationManager.stop`. `tlm_state` is a :class:`bool`
+          indicating whether derivation and solution of tangent-linear
+          equations was enabled prior to the call to
+          :meth:`.EquationManager.stop`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: paused(*, annotate=True, tlm=True)
+
+      
+      Construct a context manager which can be used to temporarily disable
+      recording of equations and derivation and solution of tangent-linear
+      equations.
+
+      :arg annotate: Whether recording of equations should be temporarily
+          disabled.
+      :arg tlm: Whether derivation and solution of tangent-linear equations
+          should be temporarily disabled.
+      :returns: A context manager which can be used to temporarily disable
+          recording of equations and derivation and solution of
+          tangent-linear equations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: add_initial_condition(x)
+
+      
+      Process an 'initial condition' -- a variable whose associated value
+      is needed prior to solving an equation.
+
+      :arg x: A variable defining the initial condition.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: add_equation(eq)
+
+      
+      Process an :class:`.Equation` after it has been solved.
+
+      :arg eq: The :class:`.Equation`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: drop_references()
+
+      
+      Drop references to variables which store values, referenced by
+      objects which have been destroyed, and replace them symbolic
+      equivalents.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: new_block()
+
+      
+      End the current block of equations, and begin a new block. The
+      blocks of equations correspond to the 'steps' in step-based
+      checkpointing schedules.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: finalize()
+
+      
+      End the final block of equations. Equations cannot be recorded, and
+      new tangent-linear equations cannot be derived and solved, after a call
+      to this method.
+
+      Called by :meth:`.EquationManager.compute_gradient`, and typically need
+      not be called manually.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: compute_gradient(Js, M, *, callback=None, prune_forward=True, prune_adjoint=True, prune_replay=True, cache_adjoint_degree=None, store_adjoint=False, adj_ics=None)
+
+      
+      Core adjoint driver method.
+
+      Compute the derivative of one or more functionals with respect to one
+      or more controls, using an adjoint approach.
+
+      :arg Js: A variable or a sequence of variables defining the functionals
+          to differentiate.
+      :arg M: A variable or a :class:`Sequence` of variables defining the
+          controls. Derivatives with respect to the controls are computed.
+      :arg callback: Diagnostic callback. A callable of the form
+
+          .. code-block:: python
+
+              def callback(J_i, n, i, eq, adj_X):
+
+          with
+
+              - `J_i`: An :class:`int` defining the index of the functional.
+              - `n`: An :class:`int` definining the index of the block of
+                equations.
+              - `i`: An :class:`int` defining the index of the considered
+                equation in block `n`.
+              - `eq`: The :class:`.Equation`, equation `i` in block `n`.
+              - `adj_X`: The adjoint solution associated with equation `i` in
+                block `n` for the `J_i` th functional. `None` indicates that
+                the solution is zero or is not computed (due to an activity
+                analysis). Otherwise a variable if `eq` has a single solution
+                component, and a :class:`Sequence` of variables otherwise.
+
+      :arg prune_forward: Controls the activity analysis. Whether a forward
+          traversal of the computational graph, tracing variables which
+          depend on the controls, should be applied.
+      :arg prune_adjoint: Controls the activity analysis. Whether a reverse
+          traversal of the computational graph, tracing variables on which
+          the functionals depend, should be applied.
+      :arg prune_replay: Controls the activity analysis. Whether an activity
+          analysis should be applied when solving forward equations during
+          checkpointing/replay.
+      :arg cache_adjoint_degree: Adjoint solutions can be cached and reused
+          across adjoints where the solution is the same -- e.g. first order
+          adjoint solutions associated with the same functional and same
+          block and equation indices are equal. A value of `None` indicates
+          that caching should be applied at all degrees, a value of 0
+          indicates that no caching should be applied, and any positive
+          :class:`int` indicates that caching should be applied for adjoints
+          up to and including degree `cache_adjoint_degree`.
+      :arg store_adjoint: Whether cached adjoint solutions should be retained
+          after the call to this method. Can be used to cache and reuse first
+          order adjoint solutions in multiple calls to this method.
+      :arg adj_ics: A :class:`Mapping`. Items are `(x, value)` where `x` is a
+          variable or variable ID identifying a forward variable. The adjoint
+          variable associated with the final equation solving for `x` is
+          initialized to the value stored by the variable `value`.
+      :returns: The conjugate of the derivatives. The return type depends on
+          the type of `Js` and `M`.
+
+            - If `Js` is a variable and `M` is a variable, returns a variable
+              storing the conjugate of the derivative.
+            - If `Js` is a :class:`Sequence`, and `M` is a variable, returns
+              a variable whose :math:`i` th component stores the conjugate of
+              the derivative of the :math:`i` th functional.
+            - If `Js` is a variable and `M` is a :class:`Sequence`, returns a
+              :class:`Sequence` of variables whose :math:`j` th component
+              stores the conjugate of the derivative with respect to the
+              :math:`j` th control.
+            - If both `Js` and `M` are :class:`Sequence` objects, returns a
+              :class:`Sequence` whose :math:`i` th component stores the
+              conjugate of the derivatives of the :math:`i` th functional.
+              Each of these is a :class:`Sequence` of variables whose
+              :math:`j` th component stores the conjugate of the derivative
+              with respect to the :math:`j` th control.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

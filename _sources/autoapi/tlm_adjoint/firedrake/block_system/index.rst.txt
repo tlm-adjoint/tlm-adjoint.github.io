@@ -1,0 +1,812 @@
+:py:mod:`tlm_adjoint.firedrake.block_system`
+============================================
+
+.. py:module:: tlm_adjoint.firedrake.block_system
+
+.. autoapi-nested-parse::
+
+   Firedrake specific extensions to :mod:`tlm_adjoint.block_system`.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+
+
+
+
+
+
+
+
+.. py:class:: ConstantNullspace(*, alpha=1.0)
+
+
+
+
+   
+   Nullspace and left nullspace spanned by the vector of ones.
+
+   Here :math:`V = U`, :math:`U` is a single column matrix whose elements are
+   ones, :math:`C = M`, and :math:`M` is an identity matrix.
+
+   :Parameters:
+
+       **alpha** : scalar
+           Defines the linear constraint matrix :math:`S = \left( \alpha / N
+           \right)` where :math:`N` is the length of the vector of ones.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_nullspace_transformation_lhs_right(x)
+
+      
+      Apply the nullspace transformation associated with a matrix action
+      on :math:`x`,
+
+      .. math::
+
+          x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.
+
+      :arg x: Defines :math:`x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_nullspace_transformation_lhs_left(y)
+
+      
+      Apply the left nullspace transformation associated with a matrix
+      action,
+
+      .. math::
+
+          y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.
+
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: constraint_correct_lhs(x, y)
+
+      
+      Add the linear constraint term to :math:`y`,
+
+      .. math::
+
+          y \rightarrow y + M U S V^* C x.
+
+      :arg x: Defines :math:`x`.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_constraint_correct_soln(u, b)
+
+      
+      Add the preconditioner linear constraint term to :math:`u`,
+
+      .. math::
+
+          u \rightarrow u + V \tilde{S}^{-1} U^* b,
+
+      with
+
+      .. math::
+
+          \tilde{S}^{-1} =
+              \left( V^* C V \right)^{-1}
+              S^{-1}
+              \left( U^* M U \right)^{-1}.
+
+      :arg u: Defines :math:`u`.
+      :arg b: Defines :math:`b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: UnityNullspace(space, *, alpha=1.0)
+
+
+
+
+   
+   Nullspace and left nullspace spanned by the unity-valued function.
+
+   Here :math:`V = U`, :math:`U` is a single column matrix containing the
+   degree-of-freedom vector for the unity-valued function, :math:`C = M`,
+   and :math:`M` is the mass matrix.
+
+   :Parameters:
+
+       **space** : :class:`firedrake.functionspaceimpl.WithGeometry`
+           A scalar-valued function space containing the unity-valued function.
+
+       **alpha** : scalar
+           Defines the linear constraint matrix :math:`S = \alpha \left( U^* M U
+           \right)^{-1}`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_nullspace_transformation_lhs_right(x)
+
+      
+      Apply the nullspace transformation associated with a matrix action
+      on :math:`x`,
+
+      .. math::
+
+          x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.
+
+      :arg x: Defines :math:`x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_nullspace_transformation_lhs_left(y)
+
+      
+      Apply the left nullspace transformation associated with a matrix
+      action,
+
+      .. math::
+
+          y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.
+
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: constraint_correct_lhs(x, y)
+
+      
+      Add the linear constraint term to :math:`y`,
+
+      .. math::
+
+          y \rightarrow y + M U S V^* C x.
+
+      :arg x: Defines :math:`x`.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_constraint_correct_soln(u, b)
+
+      
+      Add the preconditioner linear constraint term to :math:`u`,
+
+      .. math::
+
+          u \rightarrow u + V \tilde{S}^{-1} U^* b,
+
+      with
+
+      .. math::
+
+          \tilde{S}^{-1} =
+              \left( V^* C V \right)^{-1}
+              S^{-1}
+              \left( U^* M U \right)^{-1}.
+
+      :arg u: Defines :math:`u`.
+      :arg b: Defines :math:`b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: DirichletBCNullspace(bcs, *, alpha=1.0)
+
+
+
+
+   
+   Nullspace and left nullspace associated with homogeneous Dirichlet
+   boundary conditions.
+
+   Here :math:`V = U`, :math:`U` is a zero-one matrix with exactly one
+   non-zero per column corresponding to one boundary condition
+   degree-of-freedom, :math:`C = M`, and :math:`M` is an identity matrix.
+
+   :Parameters:
+
+       **bcs** : :class:`firedrake.bcs.DirichletBC` or             Sequence[:class:`firedrake.bcs.DirichletBC`, ...]
+           Homogeneous Dirichlet boundary conditions.
+
+       **alpha** : scalar
+           Defines the linear constraint matrix :math:`S = \alpha M`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_nullspace_transformation_lhs_right(x)
+
+      
+      Apply the nullspace transformation associated with a matrix action
+      on :math:`x`,
+
+      .. math::
+
+          x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.
+
+      :arg x: Defines :math:`x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_nullspace_transformation_lhs_left(y)
+
+      
+      Apply the left nullspace transformation associated with a matrix
+      action,
+
+      .. math::
+
+          y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.
+
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: constraint_correct_lhs(x, y)
+
+      
+      Add the linear constraint term to :math:`y`,
+
+      .. math::
+
+          y \rightarrow y + M U S V^* C x.
+
+      :arg x: Defines :math:`x`.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_constraint_correct_soln(u, b)
+
+      
+      Add the preconditioner linear constraint term to :math:`u`,
+
+      .. math::
+
+          u \rightarrow u + V \tilde{S}^{-1} U^* b,
+
+      with
+
+      .. math::
+
+          \tilde{S}^{-1} =
+              \left( V^* C V \right)^{-1}
+              S^{-1}
+              \left( U^* M U \right)^{-1}.
+
+      :arg u: Defines :math:`u`.
+      :arg b: Defines :math:`b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: PETScMatrix(A)
+
+
+
+
+   
+   A :class:`tlm_adjoint.block_system.Matrix` associated with a
+   :class:`firedrake.matrix.Matrix` :math:`A` defining a mapping
+   :math:`V \rightarrow W`.
+
+
+   :Parameters:
+
+       **A** : :class:`firedrake.matrix.Matrix`
+           ..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: mult_add(x, y)
+
+      
+      Add :math:`A x` to :math:`y`.
+
+      :arg x: Defines :math:`x`. Should not be modified.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: form_matrix(a, *args, **kwargs)
+
+   
+   Construct a :class:`.PETScMatrix` associated with a given sesquilinear
+   form.
+
+
+   :Parameters:
+
+       **a** : :class:`ufl.Form`
+           Defines the sesquilinear form.
+
+       **args, kwargs**
+           Passed to the :func:`firedrake.assemble.assemble` function.
+
+
+
+   :Returns:
+
+       :class:`.PETScMatrix`.
+           :class:`.PETScMatrix` defined by the assembled sesquilinear form.
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: BlockMatrix(arg_space, action_space, blocks=None)
+
+
+
+
+   
+   A matrix defining a mapping :math:`A` mapping :math:`V \rightarrow W`,
+   where :math:`V` and :math:`W` are defined by mixed spaces.
+
+   :arg arg_space: Defines the space :math:`V`.
+   :arg action_space: Defines the space :math:`W`.
+   :arg block: A :class:`Mapping` defining the blocks of the matrix. Items are
+       `((i, j), block)` where the block in the `i` th and `j` th column is
+       defined by `block`. Each `block` is a
+       :class:`tlm_adjoint.block_system.Matrix`, or `None` to indicate a zero
+       block.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: LinearSolver(A, *args, **kwargs)
+
+
+
+
+   
+   Solver for a linear system
+
+   .. math::
+
+       A u = b,
+
+   using PETSc.
+
+   :arg A: A :class:`tlm_adjoint.block_system.Matrix` defining :math:`A`.
+   :arg nullspace: A :class:`.Nullspace` or a :class:`Sequence` of
+       :class:`.Nullspace` objects defining the nullspace and left nullspace
+       of :math:`A`. `None` indicates a :class:`.NoneNullspace`.
+   :arg solver_parameters: A :class:`Mapping` defining Krylov solver
+       parameters.
+   :arg pc_fn: Defines the application of a preconditioner. A callable
+
+       .. code-block:: python
+
+           def pc_fn(u, b):
+
+       The preconditioner is applied to `b`, and the result stored in `u`.
+       Defaults to an identity.
+   :arg comm: Communicator.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: WhiteNoiseSampler(space, rng, *, precondition=True, M=None, mfn_solver_parameters=None, ksp_solver_parameters=None)
+
+
+   
+   White noise sampling.
+
+   Utility class for drawing independent spatial white noise samples.
+   Generates a sample using
+
+   .. math::
+
+       X = M^{-1} \Xi^{-T} \sqrt{ \Xi^T M \Xi } Z,
+
+   where
+
+       - :math:`M` is the mass matrix.
+       - :math:`\Xi` is a preconditioner.
+       - :math:`Z` is a vector whose elements are independent standard
+         Gaussian samples.
+
+   The matrix square root is computed using SLEPc.
+
+   :Parameters:
+
+       **space** : :class:`firedrake.functionspaceimpl.WithGeometry`
+           The function space.
+
+       **rng** : :class:`numpy.random.Generator`
+           Pseudorandom number generator.
+
+       **precondition** : :class:`bool`
+           If `True` then :math:`\Xi` is set equal to the inverse of the
+           (principal) square root of the diagonal of :math:`M`. Otherwise it is
+           set equal to the identity.
+
+       **M** : :class:`firedrake.matrix.Matrix`
+           Mass matrix. Constructed by finite element assembly if not supplied.
+
+       **mfn_solver_parameters** : :class:`Mapping`
+           :class:`slepc4py.SLEPc.MFN` solver parameters, used for the matrix
+           square root action.
+
+       **ksp_solver_parameters** : :class:`Mapping`
+           Solver parameters, used for :math:`M^{-1}`.
+
+   :Attributes:
+
+       **space** : :class:`firedrake.functionspaceimpl.WithGeometry`
+           The function space.
+
+       **rng** : :class:`numpy.random.Generator`
+           Pseudorandom number generator.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: dual_sample()
+
+      
+      Generate a new sample in the dual space.
+
+      The result is given by
+
+      .. math::
+
+          X = \Xi^{-T} \sqrt{ \Xi^T M \Xi } Z.
+
+
+
+
+      :Returns:
+
+          :class:`firedrake.cofunction.Cofunction`
+              The sample.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: sample()
+
+      
+      Generate a new sample.
+
+      The result is given by
+
+      .. math::
+
+          X = M^{-1} \Xi^{-T} \sqrt{ \Xi^T M \Xi } Z.
+
+
+
+
+      :Returns:
+
+          :class:`firedrake.function.Function`
+              The sample.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
