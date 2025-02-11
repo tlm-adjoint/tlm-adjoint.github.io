@@ -1,0 +1,23 @@
+:orphan:
+
+:py:mod:`tlm_adjoint`
+=====================
+
+.. py:module:: tlm_adjoint
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   block_system/index.rst
+   hessian_system/index.rst
+   interface/index.rst
+   manager/index.rst
+   overloaded_float/index.rst
+   torch/index.rst
+   verification/index.rst
+
+

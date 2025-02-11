@@ -1,0 +1,719 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defining custom operations &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Defining custom operations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/6_custom_operations.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Defining-custom-operations">
+<h1>Defining custom operations<a class="headerlink" href="#Defining-custom-operations" title="Link to this heading"></a></h1>
+<p>This notebook describes the tlm_adjoint ‘escape hatch’ mechanism, which allows custom operations to be defined, recorded by the internal manager, and used in higher order derivative calculations.</p>
+<p>The approach used by tlm_adjoint to define custom operations is described in</p>
+<ul class="simple">
+<li><p>James R. Maddison, Daniel N. Goldberg, and Benjamin D. Goddard, ‘Automated calculation of higher order partial differential equation constrained derivative information’, SIAM Journal on Scientific Computing, 41(5), pp. C417–C445, 2019, doi: 10.1137/18M1209465</p></li>
+</ul>
+<p>We assume real spaces and a real build of Firedrake throughout.</p>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We consider the Poisson equation in the unit square domain</p>
+<div class="math notranslate nohighlight">
+\[\nabla^2 u = m \quad \text{on} ~ \Omega = \left( 0, 1 \right)^2,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\int_\Omega m = 0,\]</div>
+<p>subject to boundary conditions</p>
+<div class="math notranslate nohighlight">
+\[\nabla u \cdot \hat{n} = 0,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{n}\)</span> is an outward unit normal on the boundary <span class="math notranslate nohighlight">\(\partial \Omega\)</span> of the domain <span class="math notranslate nohighlight">\(\Omega\)</span>.</p>
+<p>We consider a continuous Galerkin discretization, now seeking <span class="math notranslate nohighlight">\(u \in V\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V \qquad \int_\Omega \nabla \zeta \cdot \nabla u = -\int_\Omega \zeta m,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is a real <span class="math notranslate nohighlight">\(P_1\)</span> continuous finite element space defining functions on the domain <span class="math notranslate nohighlight">\(\Omega = \left( 0, 1 \right)^2\)</span>. <span class="math notranslate nohighlight">\(m \in V\)</span> is now defined via</p>
+<div class="math notranslate nohighlight">
+\[m = \mathcal{I} \left[ \cos \left( \pi x \right) \cos \left( \pi y \right) \right] - k,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{I}\)</span> maps to an element of <span class="math notranslate nohighlight">\(V\)</span> through interpolation at mesh vertices, and where <span class="math notranslate nohighlight">\(k\)</span> is defined so that <span class="math notranslate nohighlight">\(\int_\Omega m = 0\)</span>.</p>
+<p>As stated the discrete problem does not have a unique solution – given any solution <span class="math notranslate nohighlight">\(u_0\)</span> to the problem we can define a new solution <span class="math notranslate nohighlight">\(u_1 = u_0 + c_1\)</span> for any scalar <span class="math notranslate nohighlight">\(c_1\)</span>. We need to identify a solution by supplying an appropriate constraint. We will use the constraint</p>
+<div class="math notranslate nohighlight">
+\[\sum_i \tilde{u}_i = 0,\]</div>
+<p>where the <span class="math notranslate nohighlight">\(\tilde{u}_i\)</span> are the degrees of freedom associated with <span class="math notranslate nohighlight">\(u \in V\)</span>.</p>
+<p>An implementation using Firedrake, solving for <span class="math notranslate nohighlight">\(u\)</span> and then computing <span class="math notranslate nohighlight">\(\frac{1}{2} \int_\Omega u^2\)</span>, takes the form</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">tricontourf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span><span class="p">,</span> <span class="n">trial</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span> <span class="o">/</span> <span class="n">assemble</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">(</span><span class="n">mesh</span><span class="p">)))</span>
+    <span class="n">m_tilde</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">function_space</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_tilde&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">nullspace</span> <span class="o">=</span> <span class="n">VectorSpaceBasis</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="n">constant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="o">-</span><span class="n">inner</span><span class="p">(</span><span class="n">m_tilde</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">nullspace</span><span class="o">=</span><span class="n">nullspace</span><span class="p">,</span> <span class="n">transpose_nullspace</span><span class="o">=</span><span class="n">nullspace</span><span class="p">,</span>
+          <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span> <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;hypre&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;pc_hypre_type&quot;</span><span class="p">:</span> <span class="s2">&quot;boomeramg&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-10</span><span class="p">,</span> <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">1.0e-16</span><span class="p">})</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span>
+
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.0e-12</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">tricontourf</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_6_custom_operations_1_0.png" src="../_images/examples_6_custom_operations_1_0.png" />
+</div>
+</div>
+</section>
+<section id="Adding-tlm_adjoint">
+<h2>Adding tlm_adjoint<a class="headerlink" href="#Adding-tlm_adjoint" title="Link to this heading"></a></h2>
+<p>Next we add the use of tlm_adjoint, which requires some minor modification of the forward code.</p>
+<p><code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> is used to compute the derivative of <span class="math notranslate nohighlight">\(\frac{1}{2} \int_\Omega u^2\)</span> with respect to <span class="math notranslate nohighlight">\(m\)</span>, subject to the contraint that the forward problem is solved. The derivative is visualized using a Riesz map defined by the <span class="math notranslate nohighlight">\(L^2\)</span> inner product. A Taylor remainder convergence test is used to verify the derivative.</p>
+<p>Note that, given an arbitrary <span class="math notranslate nohighlight">\(m \in V\)</span>, we define</p>
+<div class="math notranslate nohighlight">
+\[\tilde{m} = m - \frac{\int_\Omega m}{\int_\Omega 1},\]</div>
+<p>so that <span class="math notranslate nohighlight">\(\int_\Omega \tilde{m} = 0\)</span>, and use <span class="math notranslate nohighlight">\(\tilde{m}\)</span> in place of <span class="math notranslate nohighlight">\(m\)</span> when solving the discrete Poisson problem.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">tricontourf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">54151610</span><span class="p">)</span>
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span><span class="p">,</span> <span class="n">trial</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+    <span class="n">Assembly</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="n">Assembly</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+    <span class="n">m_tilde</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">function_space</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_tilde&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">nullspace</span> <span class="o">=</span> <span class="n">VectorSpaceBasis</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="n">constant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="o">-</span><span class="n">inner</span><span class="p">(</span><span class="n">m_tilde</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">nullspace</span><span class="o">=</span><span class="n">nullspace</span><span class="p">,</span> <span class="n">transpose_nullspace</span><span class="o">=</span><span class="n">nullspace</span><span class="p">,</span>
+          <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span> <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;hypre&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;pc_hypre_type&quot;</span><span class="p">:</span> <span class="s2">&quot;boomeramg&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-10</span><span class="p">,</span> <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">1.0e-16</span><span class="p">})</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span>
+
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.0e-12</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">tricontourf</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">dJ</span><span class="o">.</span><span class="n">riesz_representation</span><span class="p">(</span><span class="s2">&quot;L2&quot;</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$g^\sharp$&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_J</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">J_val</span><span class="o">=</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dJ</span><span class="o">=</span><span class="n">dJ</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no adjoint   = [6.16667546e-08 3.06309860e-08 1.52648952e-08 7.61979814e-09
+ 3.80673670e-09]
+Orders,      no adjoint   = [1.00950111 1.00477412 1.002393   1.00119799]
+Error norms, with adjoint = [8.09565062e-10 2.02391252e-10 5.05978057e-11 1.26494478e-11
+ 3.16236024e-12]
+Orders,      with adjoint = [2.0000001  2.00000021 2.00000041 2.00000078]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_6_custom_operations_3_1.png" src="../_images/examples_6_custom_operations_3_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_6_custom_operations_3_2.png" src="../_images/examples_6_custom_operations_3_2.png" />
+</div>
+</div>
+</section>
+<section id="Defining-a-custom-Equation">
+<h2>Defining a custom <code class="docutils literal notranslate"><span class="pre">Equation</span></code><a class="headerlink" href="#Defining-a-custom-Equation" title="Link to this heading"></a></h2>
+<p>Since the <span class="math notranslate nohighlight">\(u\)</span> we have computed should satisfy</p>
+<div class="math notranslate nohighlight">
+\[\sum_i \tilde{u}_i = 0,\]</div>
+<p>we should have that the derivative of this quantity with respect to <span class="math notranslate nohighlight">\(m\)</span>, subject to the forward problem being solved, is zero. We will compute this derivative by defining a custom operation which sums the degrees of freedom of a finite element discretized function. We can do this by inheriting from the <code class="docutils literal notranslate"><span class="pre">Equation</span></code> class and implementing appropriate methods.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint</span><span class="w"> </span><span class="kn">import</span> <span class="n">Equation</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Sum</span><span class="p">(</span><span class="n">Equation</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">deps</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">nl_deps</span><span class="o">=</span><span class="p">(),</span> <span class="n">ic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">adj_ic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">adj_type</span><span class="o">=</span><span class="s2">&quot;conjugate_dual&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">deps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">deps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">deps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">()</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">deps</span>
+        <span class="k">with</span> <span class="n">y</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">vec_ro</span> <span class="k">as</span> <span class="n">y_v</span><span class="p">:</span>
+            <span class="n">y_sum</span> <span class="o">=</span> <span class="n">y_v</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">y_sum</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjoint_jacobian_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adj_x</span><span class="p">,</span> <span class="n">nl_deps</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+       <span class="k">return</span> <span class="n">b</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjoint_derivative_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nl_deps</span><span class="p">,</span> <span class="n">dep_index</span><span class="p">,</span> <span class="n">adj_x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dep_index</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected dep_index&quot;</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">()</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">Cofunction</span><span class="p">(</span><span class="n">var_space</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">dual</span><span class="p">())</span>
+        <span class="n">adj_x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">adj_x</span><span class="p">)</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">adj_x</span>
+        <span class="k">return</span> <span class="n">b</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">tangent_linear</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tlm_map</span><span class="p">):</span>
+        <span class="n">tau_x</span><span class="p">,</span> <span class="n">tau_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">tlm_map</span><span class="p">[</span><span class="n">dep</span><span class="p">]</span> <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependencies</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">tau_y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ZeroAssignment</span><span class="p">(</span><span class="n">tau_x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Sum</span><span class="p">(</span><span class="n">tau_x</span><span class="p">,</span> <span class="n">tau_y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We’ll investgate how this is put together shortly.</p>
+<p>First, we check that the <code class="docutils literal notranslate"><span class="pre">Sum</span></code> class works. In the following we check that we can compute the sum of the degrees of freedom of a function, and then use Taylor remainder convergence tests to verify a first order tangent-linear calculation, a first order adjoint calculation, and a reverse-over-forward adjoint calculation of a Hessian action.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">13561700</span><span class="p">)</span>
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">m_sum</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_sum&quot;</span><span class="p">)</span>
+    <span class="n">Sum</span><span class="p">(</span><span class="n">m_sum</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">m_sum</span> <span class="o">**</span> <span class="mi">3</span>
+
+    <span class="k">return</span> <span class="n">m_sum</span><span class="p">,</span> <span class="n">J</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_J</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitIntervalMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Discontinuous Lagrange&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">))</span>
+<span class="k">with</span> <span class="n">m</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">vec_ro</span> <span class="k">as</span> <span class="n">m_v</span><span class="p">:</span>
+    <span class="n">m_sum_ref</span> <span class="o">=</span> <span class="n">m_v</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">m_sum</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="c1"># Verify the forward calculation</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">m_sum</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m_sum_ref</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m_sum</span><span class="p">)</span> <span class="o">-</span> <span class="n">m_sum_ref</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span>
+
+<span class="c1"># Verify tangent-linear and adjoint calculations</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">tlm_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">adjoint_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">adjoint_order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(m_sum)=3.97146153200585
+m_sum_ref=3.97146153200585
+Error norms, no tangent-linear   = [1.4597981  0.72709661 0.36284904 0.18124987 0.09058129]
+Orders,      no tangent-linear   = [1.00554988 1.00277762 1.00138948 1.00069491]
+Error norms, with tangent-linear = [1.11954288e-02 2.79527053e-03 6.98369299e-04 1.74536283e-04
+ 4.36270656e-05]
+Orders,      with tangent-linear = [2.00184997 2.00092587 2.00046316 2.00023164]
+Error norms, no adjoint   = [1.68516173 0.83885294 0.41849655 0.20901605 0.10445   ]
+Orders,      no adjoint   = [1.00639725 1.00320219 1.00160198 1.00080121]
+Error norms, with adjoint = [1.48897315e-02 3.71693487e-03 9.28546465e-04 2.32050710e-04
+ 5.80019391e-05]
+Orders,      with adjoint = [2.00213243 2.0010674  2.00053399 2.00026707]
+Error norms, no adjoint   = [3.70748562 1.85093251 0.92476368 0.46220619 0.23105919]
+Orders,      no adjoint   = [1.00218881 1.00109565 1.00054814 1.00027415]
+Error norms, with adjoint = [1.12412164e-02 2.81030409e-03 7.02576023e-04 1.75644006e-04
+ 4.39110014e-05]
+Orders,      with adjoint = [2. 2. 2. 2.]
+</pre></div></div>
+</div>
+<p>We can now use <code class="docutils literal notranslate"><span class="pre">Sum</span></code> with the Poisson solver. We find, as expected, that the derivative of the sum of the degrees of freedom for <span class="math notranslate nohighlight">\(u\)</span> with respect to <span class="math notranslate nohighlight">\(m\)</span>, subject to the forward problem being solved, is zero.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span><span class="p">,</span> <span class="n">trial</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;v&quot;</span><span class="p">)</span>
+    <span class="n">Assembly</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">(</span><span class="n">mesh</span><span class="p">))</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="n">Assembly</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+    <span class="n">m_tilde</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">function_space</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_tilde&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">nullspace</span> <span class="o">=</span> <span class="n">VectorSpaceBasis</span><span class="p">(</span><span class="n">comm</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="n">constant</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="o">-</span><span class="n">inner</span><span class="p">(</span><span class="n">m_tilde</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">nullspace</span><span class="o">=</span><span class="n">nullspace</span><span class="p">,</span> <span class="n">transpose_nullspace</span><span class="o">=</span><span class="n">nullspace</span><span class="p">,</span>
+          <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span> <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;hypre&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;pc_hypre_type&quot;</span><span class="p">:</span> <span class="s2">&quot;boomeramg&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-10</span><span class="p">,</span> <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">1.0e-16</span><span class="p">})</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+
+    <span class="n">u_sum</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_sum&quot;</span><span class="p">)</span>
+    <span class="n">Sum</span><span class="p">(</span><span class="n">u_sum</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+    <span class="n">K</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;K&quot;</span><span class="p">)</span>
+    <span class="n">K</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_sum</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span>
+
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ</span><span class="p">,</span> <span class="n">dK</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">((</span><span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="n">dK_norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dK</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dK_norm</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">dK_norm</span> <span class="o">==</span> <span class="mf">0.0</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dK_norm=np.float64(0.0)
+</pre></div></div>
+</div>
+</section>
+<section id="Equation-methods">
+<h2><code class="docutils literal notranslate"><span class="pre">Equation</span></code> methods<a class="headerlink" href="#Equation-methods" title="Link to this heading"></a></h2>
+<p>We now return to the definition of the <code class="docutils literal notranslate"><span class="pre">Sum</span></code> class, and consider each method in turn.</p>
+<section id="__init__">
+<h3><code class="docutils literal notranslate"><span class="pre">__init__</span></code><a class="headerlink" href="#__init__" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def __init__(self, x, y):
+    super().__init__(x, deps=(x, y), nl_deps=(), ic=False, adj_ic=False,
+                     adj_type=&quot;conjugate_dual&quot;)
+</pre></div>
+</div>
+<p>The arguments passed to the base class constructor are:</p>
+<ul class="simple">
+<li><p>The output of the forward operation, <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">deps</span></code>: Defines all inputs and outputs of the forward operation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nl_deps</span></code>: Defines elements of <code class="docutils literal notranslate"><span class="pre">deps</span></code> on which the associated adjoint calculations can depend.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ic</span></code>: Whether the forward operation accepts a non-zero ‘initial guess’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adj_ic</span></code>: Whether an adjoint solve accepts a non-zero ‘initial guess’.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adj_type</span></code>: Either <code class="docutils literal notranslate"><span class="pre">&quot;primal&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;conjugate_dual&quot;</span></code> defining the space for an associated adjoint variable.</p></li>
+</ul>
+<p>For this operation there is one output <code class="docutils literal notranslate"><span class="pre">x</span></code> and one input <code class="docutils literal notranslate"><span class="pre">y</span></code>. The operation is defined by the forward residual function</p>
+<div class="math notranslate nohighlight">
+\[F \left( x, y \right) = x - \sum_i \tilde{u}_i.\]</div>
+<p>Given a value for <span class="math notranslate nohighlight">\(y\)</span> the output of the operation is defined to be the <span class="math notranslate nohighlight">\(x\)</span> for which <span class="math notranslate nohighlight">\(F \left( x, y \right) = 0\)</span>. <span class="math notranslate nohighlight">\(F\)</span> depends linearly on both <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>, and so associated adjoint calculations are independent of both <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>. Hence we set <code class="docutils literal notranslate"><span class="pre">deps=(x,</span> <span class="pre">y)</span></code> and <code class="docutils literal notranslate"><span class="pre">nl_deps=()</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ic</span></code> and <code class="docutils literal notranslate"><span class="pre">adj_ic</span></code> are used to indicate whether non-zero initial guesses should be supplied to forward and adjoint iterative solvers respectively. Here we do not use iterative solvers, and so no non-zero initial guesses are needed. Hence we set <code class="docutils literal notranslate"><span class="pre">ic=False</span></code> and <code class="docutils literal notranslate"><span class="pre">adj_ic=False</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">adj_type</span></code> indicates whether an adjoint variable associated with the operation is:</p>
+<ul class="simple">
+<li><p>In the same space as <code class="docutils literal notranslate"><span class="pre">x</span></code>. This is the case where <span class="math notranslate nohighlight">\(F\)</span> maps to an element in the antidual space associated with <span class="math notranslate nohighlight">\(x\)</span>, and is indicated with <code class="docutils literal notranslate"><span class="pre">adj_x_type=&quot;primal&quot;</span></code>. A typical example of this case is an operation defined via the solution of a finite element variational problem.</p></li>
+<li><p>In the antidual space associated with the space for <code class="docutils literal notranslate"><span class="pre">x</span></code>. This is the case where <span class="math notranslate nohighlight">\(F\)</span> maps to an element in same space as <span class="math notranslate nohighlight">\(x\)</span>, and is indiciated with <code class="docutils literal notranslate"><span class="pre">adj_x_type=&quot;conjugate_dual&quot;</span></code>.</p></li>
+</ul>
+</section>
+<section id="forward_solve">
+<h3><code class="docutils literal notranslate"><span class="pre">forward_solve</span></code><a class="headerlink" href="#forward_solve" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def forward_solve(self, x, deps=None):
+    if deps is None:
+        deps = self.dependencies()
+    _, y = deps
+    with y.dat.vec_ro as y_v:
+        y_sum = y_v.sum()
+    x.assign(y_sum)
+</pre></div>
+</div>
+<p>This method computes the output of the forward operation, storing the result in <code class="docutils literal notranslate"><span class="pre">x</span></code>. <code class="docutils literal notranslate"><span class="pre">deps</span></code> is used in rerunning the forward calculation when making use of a checkpointing schedule. If supplied, <code class="docutils literal notranslate"><span class="pre">deps</span></code> contains values associated with the dependencies as defined in the constructor (defined by the <code class="docutils literal notranslate"><span class="pre">deps</span></code> argument passed to the base class constructor). Otherwise the values contained in <code class="docutils literal notranslate"><span class="pre">self.dependencies()</span></code> are used.</p>
+</section>
+<section id="adjoint_jacobian_solve">
+<h3><code class="docutils literal notranslate"><span class="pre">adjoint_jacobian_solve</span></code><a class="headerlink" href="#adjoint_jacobian_solve" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def adjoint_jacobian_solve(self, adj_x, nl_deps, b):
+   return b
+</pre></div>
+</div>
+<p>Solves a linear problem</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial F}{\partial x}^T \lambda = b,\]</div>
+<p>for the adjoint solution <span class="math notranslate nohighlight">\(\lambda\)</span>, returning the result. The right-hand-side <span class="math notranslate nohighlight">\(b\)</span> is defined by the argument <code class="docutils literal notranslate"><span class="pre">b</span></code>. In this example <span class="math notranslate nohighlight">\(\partial F / \partial x\)</span> is simply the identity, and so <span class="math notranslate nohighlight">\(\lambda = b\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">adj_x</span></code> can contain an initial guess for an iterative solver used to compute <span class="math notranslate nohighlight">\(\lambda\)</span>. <code class="docutils literal notranslate"><span class="pre">nl_deps</span></code> contains values associated with the forward dependencies of the adjoint, as defined in the constructor (defined by the <code class="docutils literal notranslate"><span class="pre">nl_deps</span></code> argument passed to the base class constructor).</p>
+</section>
+<section id="adjoint_derivative_action">
+<h3><code class="docutils literal notranslate"><span class="pre">adjoint_derivative_action</span></code><a class="headerlink" href="#adjoint_derivative_action" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def adjoint_derivative_action(self, nl_deps, dep_index, adj_x):
+    if dep_index != 1:
+        raise ValueError(&quot;Unexpected dep_index&quot;)
+
+    _, y = self.dependencies()
+    b = Cofunction(var_space(y).dual())
+    adj_x = float(adj_x)
+    b.dat.data[:] = -adj_x
+    return b
+</pre></div>
+</div>
+<p>Computes</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial F}{\partial v}^T \lambda,\]</div>
+<p>where <span class="math notranslate nohighlight">\(v\)</span> is the <code class="docutils literal notranslate"><span class="pre">dep_index</span></code>th dependency (for the dependencies defined by the <code class="docutils literal notranslate"><span class="pre">deps</span></code> argument passed to the base class constructor). Again <code class="docutils literal notranslate"><span class="pre">nl_deps</span></code> contains values associated with the forward dependencies of the adjoint, as defined in the constructor.</p>
+</section>
+<section id="tangent_linear">
+<h3><code class="docutils literal notranslate"><span class="pre">tangent_linear</span></code><a class="headerlink" href="#tangent_linear" title="Link to this heading"></a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def tangent_linear(self, tlm_map):
+    tau_x, tau_y = (tlm_map[dep] for dep in self.dependencies())
+    if tau_y is None:
+        return ZeroAssignment(tau_x)
+    else:
+        return Sum(tau_x, tau_y)
+</pre></div>
+</div>
+<p>Constructs a tangent-linear operation, for a tangent-linear computing directional derivatives with respect to the control defined by <code class="docutils literal notranslate"><span class="pre">M</span></code> with direction defined by <code class="docutils literal notranslate"><span class="pre">dM</span></code>. <code class="docutils literal notranslate"><span class="pre">tlm_map</span></code> is used to access tangent-linear variables.</p>
+<p>The new operation is defined by the residual function</p>
+<div class="math notranslate nohighlight">
+\[F_\tau \left( \tau_x, \tau_y \right) = \frac{\partial F}{\partial x} \tau_x + \frac{\partial F}{\partial y} \tau_y,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tau_x\)</span> and <span class="math notranslate nohighlight">\(\tau_y\)</span> are the tangent-linear variables associated with <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> respectively. Given a value for <span class="math notranslate nohighlight">\(\tau_y\)</span> the output of the operation is defined to be the <span class="math notranslate nohighlight">\(\tau_x\)</span> for which <span class="math notranslate nohighlight">\(F_\tau \left( \tau_x, \tau_y \right) = 0\)</span>.</p>
+<p>Note that this method returns an <code class="docutils literal notranslate"><span class="pre">Equation</span></code> instance – here either a <code class="docutils literal notranslate"><span class="pre">ZeroAssignment</span></code>, for the case where the tangent-linear operation sets a tangent-linear variable equal to zero, or another <code class="docutils literal notranslate"><span class="pre">Sum</span></code>. This new operation can then be recorded by the internal manager, so that reverse-over-forward algorithmic differentiation can be applied.</p>
+</section>
+<section id="Reference-dropping">
+<h3>Reference dropping<a class="headerlink" href="#Reference-dropping" title="Link to this heading"></a></h3>
+<p>An important method, not defined in this example, is the <code class="docutils literal notranslate"><span class="pre">drop_references</span></code> method. This method is used to drop references to forward data. For example if an <code class="docutils literal notranslate"><span class="pre">Equation</span></code> subclass defines a <code class="docutils literal notranslate"><span class="pre">Function</span></code> attribute <code class="docutils literal notranslate"><span class="pre">_function</span></code>, then the <code class="docutils literal notranslate"><span class="pre">drop_references</span></code> method might look like</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>def drop_references(self):
+    super().drop_references()
+    self._function = var_replacement(self._function)
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">var_replacement</span></code> returns a ‘symbolic only’ version of <code class="docutils literal notranslate"><span class="pre">self._function</span></code>, which can for example be used in UFL expressions, but which has no associated value.</p>
+</section>
+</section>
+<section id="Defining-custom-operations-using-JAX">
+<h2>Defining custom operations using JAX<a class="headerlink" href="#Defining-custom-operations-using-JAX" title="Link to this heading"></a></h2>
+<p>In some cases it may be more convenient to directly implement an operation using lower level code. tlm_adjoint integrates with <a class="reference external" href="https://jax.readthedocs.io">JAX</a> to allow this. For example a Firedrake <code class="docutils literal notranslate"><span class="pre">Function</span></code> can be converted to a JAX array using</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>v = to_jax(x)
+</pre></div>
+</div>
+<p>and the result converted back to a Firedrake <code class="docutils literal notranslate"><span class="pre">Function</span></code> using</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>x = to_firedrake(v, space)
+</pre></div>
+</div>
+<p>Here we use JAX to compute the sum of the degrees of freedom for a Firedrake function (assuming a serial calculation).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">81976463</span><span class="p">)</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s2">&quot;jax_enable_x64&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">m_sum</span> <span class="o">=</span> <span class="n">new_jax_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_sum&quot;</span><span class="p">)</span>
+    <span class="n">call_jax</span><span class="p">(</span><span class="n">m_sum</span><span class="p">,</span> <span class="n">to_jax</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">m_sum</span> <span class="o">**</span> <span class="mi">3</span>
+
+    <span class="k">return</span> <span class="n">m_sum</span><span class="p">,</span> <span class="n">J</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_J</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitIntervalMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Discontinuous Lagrange&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">))</span>
+<span class="k">with</span> <span class="n">m</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">vec_ro</span> <span class="k">as</span> <span class="n">m_v</span><span class="p">:</span>
+    <span class="n">m_sum_ref</span> <span class="o">=</span> <span class="n">m_v</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">m_sum</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="c1"># Verify the forward calculation</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">m_sum</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m_sum_ref</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">m_sum</span><span class="p">)</span> <span class="o">-</span> <span class="n">m_sum_ref</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-15</span>
+
+<span class="c1"># Verify tangent-linear and adjoint calculations</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">tlm_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">adjoint_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">adjoint_order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(m_sum)=3.9714615320058506
+m_sum_ref=3.97146153200585
+Error norms, no tangent-linear   = [1.90883165 0.94964096 0.47362975 0.23651757 0.1181845 ]
+Orders,      no tangent-linear   = [1.0072358  1.00362246 1.00181237 1.00090647]
+Error norms, with tangent-linear = [1.90676066e-02 4.75893883e-03 1.18873935e-03 2.97060420e-04
+ 7.42495525e-05]
+Orders,      with tangent-linear = [2.00241195 2.00120749 2.00060412 2.00030216]
+Error norms, no adjoint   = [1.34856474 0.67188864 0.33534695 0.16752427 0.08372485]
+Orders,      no adjoint   = [1.00513073 1.00256765 1.0012844  1.00064234]
+Error norms, with adjoint = [9.56356602e-03 2.38805889e-03 5.96660647e-04 1.49120902e-04
+ 3.72746931e-05]
+Orders,      with adjoint = [2.00171025 2.00085588 2.00042813 2.00021411]
+Error norms, no adjoint   = [4.47108561 2.23061531 1.11407578 0.55672992 0.27828797]
+Orders,      no adjoint   = [1.00318344 1.00159436 1.00079784 1.00039909]
+Error norms, with adjoint = [1.97099742e-02 4.92749355e-03 1.23187339e-03 3.07968347e-04
+ 7.69920868e-05]
+Orders,      with adjoint = [2. 2. 2. 2.]
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

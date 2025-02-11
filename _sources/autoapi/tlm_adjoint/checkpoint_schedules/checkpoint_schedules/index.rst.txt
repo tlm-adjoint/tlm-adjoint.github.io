@@ -1,0 +1,28 @@
+:py:mod:`tlm_adjoint.checkpoint_schedules.checkpoint_schedules`
+===============================================================
+
+.. py:module:: tlm_adjoint.checkpoint_schedules.checkpoint_schedules
+
+.. autoapi-nested-parse::
+
+   Translation between checkpointing schedules provided by the
+   checkpoint_schedules library and a tlm_adjoint :class:`.CheckpointSchedule`.
+
+   Wrapped :class:`checkpoint_schedules.schedule.CheckpointSchedule` classes can
+   be imported from this module and then passed to
+   :func:`.configure_checkpointing`, e.g.
+
+   .. code-block:: python
+
+       from tlm_adjoint import configure_checkpointing
+       from tlm_adjoint.checkpoint_schedules.checkpoint_schedules \
+           import MultistageCheckpointSchedule
+
+       configure_checkpointing(
+           MultistageCheckpointSchedule,
+           {"max_n": 30, "snapshots_in_ram": 0, "snapshots_on_disk": 3})
+
+   ..
+       !! processed by numpydoc !!
+
+

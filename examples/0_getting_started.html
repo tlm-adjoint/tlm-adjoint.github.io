@@ -1,0 +1,688 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started with tlm_adjoint &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting started with tlm_adjoint</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/0_getting_started.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Getting-started-with-tlm_adjoint">
+<h1>Getting started with tlm_adjoint<a class="headerlink" href="#Getting-started-with-tlm_adjoint" title="Link to this heading"></a></h1>
+<p>This notebook introduces derivative calculations using tlm_adjoint.</p>
+<p>tlm_adjoint is primarily intended for first derivative calculations using the adjoint method, and Hessian information calculations using the adjoint method applied to tangent-linear and forward calculations. However the approach used by tlm_adjoint generalizes to higher order.</p>
+<p>The approach used by tlm_adjoint for higher order differentiation is described in:</p>
+<ul class="simple">
+<li><p>James R. Maddison, Daniel N. Goldberg, and Benjamin D. Goddard, ‘Automated calculation of higher order partial differential equation constrained derivative information’, SIAM Journal on Scientific Computing, 41(5), pp. C417–C445, 2019, doi: 10.1137/18M1209465</p></li>
+</ul>
+<section id="A-floating-point-example">
+<h2>A floating point example<a class="headerlink" href="#A-floating-point-example" title="Link to this heading"></a></h2>
+<p>We consider a simple floating point calculation:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>tlm_adjoint is designed for high-level algorithmic differentiation, and not this type of low-level floating point calculation. However it <em>can</em> still process simple floating point calculations, so to introduce the key ideas we do that here. We consider differentiating <code class="docutils literal notranslate"><span class="pre">z</span></code> with respect to <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> – being precise, we mean computing the derivative of the function used to compute <code class="docutils literal notranslate"><span class="pre">z</span></code> with respect to the variables defined by <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
+</section>
+<section id="Adding-tlm_adjoint">
+<h2>Adding tlm_adjoint<a class="headerlink" href="#Adding-tlm_adjoint" title="Link to this heading"></a></h2>
+<p>We first modify the code so that tlm_adjoint processes the calculations:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(True, True)
+</pre></div></div>
+</div>
+<p>The key changes here are:</p>
+<ul class="simple">
+<li><p>To import tlm_adjoint.</p></li>
+<li><p>Controlling the ‘manager’ – an object tlm_adjoint uses to process equations. The manager is first reset using <code class="docutils literal notranslate"><span class="pre">reset_manager</span></code>. This clears any previous processing, and disables the manager. <code class="docutils literal notranslate"><span class="pre">start_manager</span></code> and <code class="docutils literal notranslate"><span class="pre">stop_manager</span></code> are then used to enable the manager just when it is needed.</p></li>
+<li><p>Defining <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> to be of type <code class="docutils literal notranslate"><span class="pre">Float</span></code>. Calculations involving <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> are recorded by the manager. The result of the calculations – here <code class="docutils literal notranslate"><span class="pre">z</span></code> – will have the same type, and we can access its value with <code class="docutils literal notranslate"><span class="pre">float(z)</span></code>.</p></li>
+</ul>
+<p>Let’s display the information recorded by tlm_adjoint:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">manager_info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Equation manager status:
+Annotation state: AnnotationState.STOPPED
+Tangent-linear state: TangentLinearState.STOPPED
+Equations:
+  Block 0
+    Equation 0, FloatEquation solving for f_2 (id 2)
+      Dependency 0, f_2 (id 2), linear
+      Dependency 1, y (id 1), non-linear
+    Equation 1, FloatEquation solving for f_4 (id 4)
+      Dependency 0, f_4 (id 4), linear
+      Dependency 1, y (id 1), non-linear
+      Dependency 2, f_2 (id 2), non-linear
+    Equation 2, FloatEquation solving for f_6 (id 6)
+      Dependency 0, f_6 (id 6), linear
+      Dependency 1, f_4 (id 4), non-linear
+    Equation 3, FloatEquation solving for f_8 (id 8)
+      Dependency 0, f_8 (id 8), linear
+      Dependency 1, x (id 0), non-linear
+      Dependency 2, f_6 (id 6), non-linear
+Storage:
+  Storing initial conditions: yes
+  Storing equation non-linear dependencies: yes
+  Initial conditions stored: 2
+  Initial conditions referenced: 0
+Checkpointing:
+  Method: memory
+</pre></div></div>
+</div>
+<p>The key feature here is that there are four <code class="docutils literal notranslate"><span class="pre">FloatEquation</span></code> records, corresponding to the four floating point calculations – evaluation using <code class="docutils literal notranslate"><span class="pre">np.exp</span></code> and <code class="docutils literal notranslate"><span class="pre">np.sin</span></code>, and two multiplications.</p>
+</section>
+<section id="Computing-derivatives-using-an-adjoint">
+<h2>Computing derivatives using an adjoint<a class="headerlink" href="#Computing-derivatives-using-an-adjoint" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> function can be used to differentiate <code class="docutils literal notranslate"><span class="pre">z</span></code> with respect to <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> using the adjoint method:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dz_dx</span><span class="p">,</span> <span class="n">dz_dy</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dy</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(dz_dx)=0.9885002159138745
+float(dz_dy)=-0.592156957782821
+</pre></div></div>
+</div>
+<p>For a simple check of the result, we can compare with the result from finite differencing, here using second order centered finite differencing:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">dJ_dm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1.0e-7</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">J</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span> <span class="o">-</span> <span class="n">J</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">eps</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dz_dx approximation = </span><span class="si">{</span><span class="n">dJ_dm</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span><span class="w"> </span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dz_dy approximation = </span><span class="si">{</span><span class="n">dJ_dm</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">y</span><span class="p">:</span><span class="w"> </span><span class="n">forward</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dz_dx approximation = 0.9885002155707312
+dz_dy approximation = -0.5921569579125929
+</pre></div></div>
+</div>
+</section>
+<section id="Computing-derivatives-using-a-tangent-linear">
+<h2>Computing derivatives using a tangent-linear<a class="headerlink" href="#Computing-derivatives-using-a-tangent-linear" title="Link to this heading"></a></h2>
+<p>A tangent-linear computes directional derivatives with respect to a given control and with a given direction.</p>
+<p>Here we consider the forward to be a function of <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, computing a value of <code class="docutils literal notranslate"><span class="pre">z</span></code>, denoted <span class="math notranslate nohighlight">\(z \left( x, y \right)\)</span>. We consider the control <span class="math notranslate nohighlight">\(m = \left( x, y \right)^T\)</span>, and a direction <span class="math notranslate nohighlight">\(\zeta = \left( 2, 3 \right)^T\)</span>. We can then use a tangent-linear to compute the directional derivative</p>
+<div class="math notranslate nohighlight">
+\[\frac{dz}{dm} \zeta = 2 \frac{dz}{dx} + 3 \frac{dz}{dy},\]</div>
+<p>where vector derivatives are notated using row vectors.</p>
+<p>In most cases tlm_adjoint needs to be told what tangent-linear calculations to perform <em>ahead</em> of the forward calculations. <code class="docutils literal notranslate"><span class="pre">configure_tlm</span></code> provides this information to tlm_adjoint:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_x&quot;</span><span class="p">),</span> <span class="n">Float</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_y&quot;</span><span class="p">))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dz_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dm_zeta</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(dz_dm_zeta)=0.2005295584792861
+</pre></div></div>
+</div>
+<p>There are three new changes:</p>
+<ul class="simple">
+<li><p>The control <span class="math notranslate nohighlight">\(m\)</span> and direction <span class="math notranslate nohighlight">\(\zeta\)</span> are defined using <code class="docutils literal notranslate"><span class="pre">m</span></code> and <code class="docutils literal notranslate"><span class="pre">zeta</span></code> respectively.</p></li>
+<li><p>Tangent-linear calculations are configured <em>before</em> the forward calculations are performed, using <code class="docutils literal notranslate"><span class="pre">configure_tlm</span></code>. Note that here, for this first derivative calculation, the argument is a single control-direction pair.</p></li>
+<li><p>We access the tangent-linear variable, containing the value of <span class="math notranslate nohighlight">\(\left( dz/dm \right) \zeta\)</span>, using <code class="docutils literal notranslate"><span class="pre">var_tlm</span></code>, and using the same control-direction pair.</p></li>
+</ul>
+<p>In fact more has happened here – if we now display the information recorded by tlm_adjoint:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">manager_info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Equation manager status:
+Annotation state: AnnotationState.STOPPED
+Tangent-linear state: TangentLinearState.STOPPED
+Equations:
+  Block 0
+    Equation 0, FloatEquation solving for f_31 (id 31)
+      Dependency 0, f_31 (id 31), linear
+      Dependency 1, y (id 28), non-linear
+    Equation 1, FloatEquation solving for f_31_tlm((x,y),(zeta_x,zeta_y)) (id 33)
+      Dependency 0, f_31_tlm((x,y),(zeta_x,zeta_y)) (id 33), linear
+      Dependency 1, y (id 28), non-linear
+      Dependency 2, zeta_y (id 30), non-linear
+    Equation 2, FloatEquation solving for f_35 (id 35)
+      Dependency 0, f_35 (id 35), linear
+      Dependency 1, y (id 28), non-linear
+      Dependency 2, f_31 (id 31), non-linear
+    Equation 3, FloatEquation solving for f_35_tlm((x,y),(zeta_x,zeta_y)) (id 37)
+      Dependency 0, f_35_tlm((x,y),(zeta_x,zeta_y)) (id 37), linear
+      Dependency 1, y (id 28), non-linear
+      Dependency 2, zeta_y (id 30), non-linear
+      Dependency 3, f_31 (id 31), non-linear
+      Dependency 4, f_31_tlm((x,y),(zeta_x,zeta_y)) (id 33), non-linear
+    Equation 4, FloatEquation solving for f_39 (id 39)
+      Dependency 0, f_39 (id 39), linear
+      Dependency 1, f_35 (id 35), non-linear
+    Equation 5, FloatEquation solving for f_39_tlm((x,y),(zeta_x,zeta_y)) (id 41)
+      Dependency 0, f_39_tlm((x,y),(zeta_x,zeta_y)) (id 41), linear
+      Dependency 1, f_35 (id 35), non-linear
+      Dependency 2, f_35_tlm((x,y),(zeta_x,zeta_y)) (id 37), non-linear
+    Equation 6, FloatEquation solving for f_43 (id 43)
+      Dependency 0, f_43 (id 43), linear
+      Dependency 1, x (id 27), non-linear
+      Dependency 2, f_39 (id 39), non-linear
+    Equation 7, FloatEquation solving for f_43_tlm((x,y),(zeta_x,zeta_y)) (id 46)
+      Dependency 0, f_43_tlm((x,y),(zeta_x,zeta_y)) (id 46), linear
+      Dependency 1, x (id 27), non-linear
+      Dependency 2, zeta_x (id 29), non-linear
+      Dependency 3, f_39 (id 39), non-linear
+      Dependency 4, f_39_tlm((x,y),(zeta_x,zeta_y)) (id 41), non-linear
+Storage:
+  Storing initial conditions: yes
+  Storing equation non-linear dependencies: yes
+  Initial conditions stored: 4
+  Initial conditions referenced: 0
+Checkpointing:
+  Method: memory
+</pre></div></div>
+</div>
+<p>we now see that there are <em>eight</em> <code class="docutils literal notranslate"><span class="pre">FloatEquation</span></code> records – the original four, and four new ones. The extra ones correspond to the tangent-linear calculations. tlm_adjoint has recorded the original forward calculations, and <em>also</em> recorded the tangent-linear calculations.</p>
+</section>
+<section id="Computing-second-derivatives-using-an-adjoint-of-a-tangent-linear">
+<h2>Computing second derivatives using an adjoint of a tangent-linear<a class="headerlink" href="#Computing-second-derivatives-using-an-adjoint-of-a-tangent-linear" title="Link to this heading"></a></h2>
+<p>Since tlm_adjoint has recorded both forward and tangent-linear calculations, we can now compute second derivative information using an adjoint associated with a tangent-linear. Specifically we can compute a Hessian action on <span class="math notranslate nohighlight">\(\zeta\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[H \zeta = \frac{d}{dm} \left( \frac{dz}{dm} \zeta \right)^T.\]</div>
+<p>The inner directional derivative appearing here is computed using the tangent-linear method, and the outer derivative is computed by applying the adjoint method to the tangent-linear and forward calculations. In code we simply use <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> to compute the derivative of the tangent-linear result:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_x&quot;</span><span class="p">),</span> <span class="n">Float</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_y&quot;</span><span class="p">))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dz_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dm_zeta</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">d2z_dm_zeta_dx</span><span class="p">,</span> <span class="n">d2z_dm_zeta_dy</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dz_dm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d2z_dm_zeta_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d2z_dm_zeta_dy</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(dz_dm_zeta)=0.2005295584792861
+float(d2z_dm_zeta_dx)=-1.7764708733484629
+float(d2z_dm_zeta_dy)=-49.4290736694207
+</pre></div></div>
+</div>
+</section>
+<section id="Computing-second-derivatives-using-a-tangent-linear-of-a-tangent-linear">
+<h2>Computing second derivatives using a tangent-linear of a tangent-linear<a class="headerlink" href="#Computing-second-derivatives-using-a-tangent-linear-of-a-tangent-linear" title="Link to this heading"></a></h2>
+<p>We can also compute second derivative information using a tangent-linear associated with a tangent-linear. For example if we define <span class="math notranslate nohighlight">\(e_1 = \left( 1, 0 \right)^T\)</span>, then we can find the first component of the previously computed Hessian action on <span class="math notranslate nohighlight">\(\zeta\)</span> via</p>
+<div class="math notranslate nohighlight">
+\[e_1^T H \zeta = \left[ \frac{d}{dm} \left( \frac{dz}{dm} \zeta \right) \right] e_1.\]</div>
+<p>That is, here we now want to compute a directional derivative of a directional derivative, and we compute this using a tangent-linear associated with the previous tangent-linear and forward calculations.</p>
+<p>tlm_adjoint handles this case by supplying more arguments to <code class="docutils literal notranslate"><span class="pre">configure_tlm</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_x&quot;</span><span class="p">),</span> <span class="n">Float</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_y&quot;</span><span class="p">))</span>
+<span class="n">e_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;e_1_x&quot;</span><span class="p">),</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;e_1_y&quot;</span><span class="p">))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">),</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">e_1</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dz_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+<span class="n">dz_dx</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">e_1</span><span class="p">))</span>
+<span class="n">d2z_dm_zeta_dx</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">),</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">e_1</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dm_zeta</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d2z_dm_zeta_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(dz_dm_zeta)=0.2005295584792861
+float(dz_dx)=0.9885002159138745
+float(d2z_dm_zeta_dx)=-1.7764708733484629
+</pre></div></div>
+</div>
+<p>The first control-direction pair supplied to <code class="docutils literal notranslate"><span class="pre">configure_tlm</span></code> indicates that we seek to compute directional derivatives of the forward with respect to the control defined by <code class="docutils literal notranslate"><span class="pre">m</span></code> with direction defined by <code class="docutils literal notranslate"><span class="pre">zeta</span></code>. The second control-direction pair indicates that we seek to compute directional deriatives of <em>these</em> directional derivatives, with respect to the control defined by <code class="docutils literal notranslate"><span class="pre">m</span></code> and with direction defined by <code class="docutils literal notranslate"><span class="pre">e_1</span></code>. As a side-effect we find that we also compute the directional
+derivatives of the forward with respect to the control defined by <code class="docutils literal notranslate"><span class="pre">m</span></code> with direction defined by <code class="docutils literal notranslate"><span class="pre">e_1</span></code>.</p>
+<p>We then access the tangent-linear variables using <code class="docutils literal notranslate"><span class="pre">var_tlm</span></code>, supplying two control-variable pairs to access a second order tangent-linear variable.</p>
+<p>As before, tlm_adjoint has not just performed the tangent-linear calculations – if we display the information recorded by tlm_adjoint:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">manager_info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Equation manager status:
+Annotation state: AnnotationState.STOPPED
+Tangent-linear state: TangentLinearState.STOPPED
+Equations:
+  Block 0
+    Equation 0, FloatEquation solving for f_103 (id 103)
+      Dependency 0, f_103 (id 103), linear
+      Dependency 1, y (id 98), non-linear
+    Equation 1, FloatEquation solving for f_103_tlm((x,y),(zeta_x,zeta_y)) (id 105)
+      Dependency 0, f_103_tlm((x,y),(zeta_x,zeta_y)) (id 105), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, zeta_y (id 100), non-linear
+    Equation 2, FloatEquation solving for f_103_tlm((x,y),(e_1_x,e_1_y)) (id 107)
+      Dependency 0, f_103_tlm((x,y),(e_1_x,e_1_y)) (id 107), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, e_1_y (id 102), non-linear
+    Equation 3, FloatEquation solving for f_103_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 110)
+      Dependency 0, f_103_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 110), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, zeta_y (id 100), non-linear
+      Dependency 3, e_1_y (id 102), non-linear
+      Dependency 4, zeta_y_tlm((x,y),(e_1_x,e_1_y)) (id 109), non-linear
+    Equation 4, FloatEquation solving for f_112 (id 112)
+      Dependency 0, f_112 (id 112), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, f_103 (id 103), non-linear
+    Equation 5, FloatEquation solving for f_112_tlm((x,y),(zeta_x,zeta_y)) (id 114)
+      Dependency 0, f_112_tlm((x,y),(zeta_x,zeta_y)) (id 114), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, zeta_y (id 100), non-linear
+      Dependency 3, f_103 (id 103), non-linear
+      Dependency 4, f_103_tlm((x,y),(zeta_x,zeta_y)) (id 105), non-linear
+    Equation 6, FloatEquation solving for f_112_tlm((x,y),(e_1_x,e_1_y)) (id 116)
+      Dependency 0, f_112_tlm((x,y),(e_1_x,e_1_y)) (id 116), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, e_1_y (id 102), non-linear
+      Dependency 3, f_103 (id 103), non-linear
+      Dependency 4, f_103_tlm((x,y),(e_1_x,e_1_y)) (id 107), non-linear
+    Equation 7, FloatEquation solving for f_112_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 118)
+      Dependency 0, f_112_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 118), linear
+      Dependency 1, y (id 98), non-linear
+      Dependency 2, zeta_y (id 100), non-linear
+      Dependency 3, e_1_y (id 102), non-linear
+      Dependency 4, f_103 (id 103), non-linear
+      Dependency 5, f_103_tlm((x,y),(zeta_x,zeta_y)) (id 105), non-linear
+      Dependency 6, f_103_tlm((x,y),(e_1_x,e_1_y)) (id 107), non-linear
+      Dependency 7, zeta_y_tlm((x,y),(e_1_x,e_1_y)) (id 109), non-linear
+      Dependency 8, f_103_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 110), non-linear
+    Equation 8, FloatEquation solving for f_120 (id 120)
+      Dependency 0, f_120 (id 120), linear
+      Dependency 1, f_112 (id 112), non-linear
+    Equation 9, FloatEquation solving for f_120_tlm((x,y),(zeta_x,zeta_y)) (id 122)
+      Dependency 0, f_120_tlm((x,y),(zeta_x,zeta_y)) (id 122), linear
+      Dependency 1, f_112 (id 112), non-linear
+      Dependency 2, f_112_tlm((x,y),(zeta_x,zeta_y)) (id 114), non-linear
+    Equation 10, FloatEquation solving for f_120_tlm((x,y),(e_1_x,e_1_y)) (id 124)
+      Dependency 0, f_120_tlm((x,y),(e_1_x,e_1_y)) (id 124), linear
+      Dependency 1, f_112 (id 112), non-linear
+      Dependency 2, f_112_tlm((x,y),(e_1_x,e_1_y)) (id 116), non-linear
+    Equation 11, FloatEquation solving for f_120_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 126)
+      Dependency 0, f_120_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 126), linear
+      Dependency 1, f_112 (id 112), non-linear
+      Dependency 2, f_112_tlm((x,y),(zeta_x,zeta_y)) (id 114), non-linear
+      Dependency 3, f_112_tlm((x,y),(e_1_x,e_1_y)) (id 116), non-linear
+      Dependency 4, f_112_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 118), non-linear
+    Equation 12, FloatEquation solving for f_128 (id 128)
+      Dependency 0, f_128 (id 128), linear
+      Dependency 1, x (id 97), non-linear
+      Dependency 2, f_120 (id 120), non-linear
+    Equation 13, FloatEquation solving for f_128_tlm((x,y),(zeta_x,zeta_y)) (id 131)
+      Dependency 0, f_128_tlm((x,y),(zeta_x,zeta_y)) (id 131), linear
+      Dependency 1, x (id 97), non-linear
+      Dependency 2, zeta_x (id 99), non-linear
+      Dependency 3, f_120 (id 120), non-linear
+      Dependency 4, f_120_tlm((x,y),(zeta_x,zeta_y)) (id 122), non-linear
+    Equation 14, FloatEquation solving for f_128_tlm((x,y),(e_1_x,e_1_y)) (id 134)
+      Dependency 0, f_128_tlm((x,y),(e_1_x,e_1_y)) (id 134), linear
+      Dependency 1, x (id 97), non-linear
+      Dependency 2, e_1_x (id 101), non-linear
+      Dependency 3, f_120 (id 120), non-linear
+      Dependency 4, f_120_tlm((x,y),(e_1_x,e_1_y)) (id 124), non-linear
+    Equation 15, FloatEquation solving for f_128_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 138)
+      Dependency 0, f_128_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 138), linear
+      Dependency 1, x (id 97), non-linear
+      Dependency 2, zeta_x (id 99), non-linear
+      Dependency 3, e_1_x (id 101), non-linear
+      Dependency 4, f_120 (id 120), non-linear
+      Dependency 5, f_120_tlm((x,y),(zeta_x,zeta_y)) (id 122), non-linear
+      Dependency 6, f_120_tlm((x,y),(e_1_x,e_1_y)) (id 124), non-linear
+      Dependency 7, f_120_tlm((x,y),(zeta_x,zeta_y))_tlm((x,y),(e_1_x,e_1_y)) (id 126), non-linear
+      Dependency 8, zeta_x_tlm((x,y),(e_1_x,e_1_y)) (id 137), non-linear
+Storage:
+  Storing initial conditions: yes
+  Storing equation non-linear dependencies: yes
+  Initial conditions stored: 8
+  Initial conditions referenced: 0
+Checkpointing:
+  Method: memory
+</pre></div></div>
+</div>
+<p>we now find that there are <em>sixteen</em> <code class="docutils literal notranslate"><span class="pre">FloatEquation</span></code> records, constituting the forward and all tangent-linear calculations.</p>
+</section>
+<section id="Computing-third-derivatives-using-an-adjoint-of-a-tangent-linear-of-a-tangent-linear">
+<h2>Computing third derivatives using an adjoint of a tangent-linear of a tangent-linear<a class="headerlink" href="#Computing-third-derivatives-using-an-adjoint-of-a-tangent-linear-of-a-tangent-linear" title="Link to this heading"></a></h2>
+<p>We can now compute the derivative of the tangent-linear-computed second derivative by simply handing the second order tangent-linear variable to <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code>. This applies the adjoint method to the higher order tangent-linear calculations and the forward calculations, computing</p>
+<div class="math notranslate nohighlight">
+\[\frac{d}{dm} \left( e_1^T H \zeta \right) = \frac{d}{dm} \left[ \left[ \frac{d}{dm} \left( \frac{dz}{dm} \zeta \right) \right] e_1 \right].\]</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.25</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">zeta</span> <span class="o">=</span> <span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_x&quot;</span><span class="p">),</span> <span class="n">Float</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_y&quot;</span><span class="p">))</span>
+<span class="n">e_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">Float</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;e_1_x&quot;</span><span class="p">),</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;e_1_y&quot;</span><span class="p">))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">),</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">e_1</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dz_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+<span class="n">dz_dx</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">e_1</span><span class="p">))</span>
+<span class="n">d2z_dm_zeta_dx</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">),</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">e_1</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dm_zeta</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">dz_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d2z_dm_zeta_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">d3z_dm_zeta_dx_dx</span><span class="p">,</span> <span class="n">d3z_dm_zeta_dx_dy</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">d2z_dm_zeta_dx</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d3z_dm_zeta_dx_dx</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">d3z_dm_zeta_dx_dy</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+float(dz_dm_zeta)=0.2005295584792861
+float(dz_dx)=0.9885002159138745
+float(d2z_dm_zeta_dx)=-1.7764708733484629
+float(d3z_dm_zeta_dx_dx)=0.0
+float(d3z_dm_zeta_dx_dy)=-48.244759753855064
+</pre></div></div>
+</div>
+</section>
+<section id="Higher-order">
+<h2>Higher order<a class="headerlink" href="#Higher-order" title="Link to this heading"></a></h2>
+<p>The approach now generalizes.</p>
+<ul class="simple">
+<li><p>Supplying further arguments to <code class="docutils literal notranslate"><span class="pre">configure_tlm</span></code> indicates directional derivatives of directional derivatives, defining a tangent-linear calculation of increasingly high order.</p></li>
+<li><p>Supplying these arguments to <code class="docutils literal notranslate"><span class="pre">var_tlm</span></code> accesses the higher-order tangent-linear variables.</p></li>
+<li><p>These higher order tangent-linear variables can be handed to <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> to compute derivatives of the higher order derivatives using the adjoint method.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

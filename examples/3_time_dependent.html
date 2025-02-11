@@ -1,0 +1,1191 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time-dependent example &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Time-dependent example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/3_time_dependent.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Time-dependent-example">
+<h1>Time-dependent example<a class="headerlink" href="#Time-dependent-example" title="Link to this heading"></a></h1>
+<p>This notebook describes the calculation of derivative information for a time-dependent problem using tlm_adjoint with the <a class="reference external" href="https://firedrakeproject.org/">Firedrake</a> backend. Overheads associated with building the records of calculations are discussed, and a checkpointing schedule is applied.</p>
+<p>The binomial checkpointing schedule is based on the method described in:</p>
+<ul class="simple">
+<li><p>Andreas Griewank and Andrea Walther, ‘Algorithm 799: revolve: an implementation of checkpointing for the reverse or adjoint mode of computational differentiation’, ACM Transactions on Mathematical Software, 26(1), pp. 19–45, 2000, doi: 10.1145/347837.347846</p></li>
+</ul>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We consider the solution of a linear time-dependent partial differential equation, followed by the calculation of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the final time solution. We assume real spaces and a real build of Firedrake throughout.</p>
+<p>Specifically we consider the advection-diffusion equation in two dimensions, in the form</p>
+<div class="math notranslate nohighlight">
+\[\partial_t u + \partial_x \psi \partial_y u - \partial_y \psi \partial_x u = \kappa \left( \partial_{xx} + \partial_{yy} \right) u,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\psi\)</span> vanishes on the domain boundary, and subject to zero flux boundary conditions. We consider the spatial domain <span class="math notranslate nohighlight">\(\left( x, y \right) \in \left( 0, 1 \right)^2\)</span> and temporal domain <span class="math notranslate nohighlight">\(t \in \left[ 0, 0.1 \right]\)</span>, with <span class="math notranslate nohighlight">\(\psi \left( x, y \right) = -\sin \left( \pi x \right) \sin \left( \pi y \right)\)</span> and <span class="math notranslate nohighlight">\(\kappa = 0.01\)</span>, and an initial condition
+<span class="math notranslate nohighlight">\(u \left( x, y, t=0 \right) = \exp \left[ -50 \left( \left( x - 0.75 \right)^2 + \left( y - 0.5 \right)^2 \right) \right]\)</span>.</p>
+<p>The problem is discretized using <span class="math notranslate nohighlight">\(P_1\)</span> continuous finite elements to represent both the solution <span class="math notranslate nohighlight">\(u\)</span> at each time level and the stream function <span class="math notranslate nohighlight">\(\psi\)</span>. The problem is discretized in time using the implicit trapezoidal rule.</p>
+<p>A simple implementation in Firedrake takes the form:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">tricontourf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+<span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+<span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+     <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+     <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+<span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+<span class="n">problem</span> <span class="o">=</span> <span class="n">LinearVariationalProblem</span><span class="p">(</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+    <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">LinearVariationalSolver</span><span class="p">(</span>
+    <span class="n">problem</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+<span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+
+<span class="n">J</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.0e-12</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">tricontourf</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$u_0$&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;$u_n$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_3_time_dependent_1_0.png" src="../_images/examples_3_time_dependent_1_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_3_time_dependent_1_1.png" src="../_images/examples_3_time_dependent_1_1.png" />
+</div>
+</div>
+</section>
+<section id="Adding-tlm_adjoint">
+<h2>Adding tlm_adjoint<a class="headerlink" href="#Adding-tlm_adjoint" title="Link to this heading"></a></h2>
+<p>We first modify the code so that tlm_adjoint processes the calculations:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">problem</span> <span class="o">=</span> <span class="n">LinearVariationalProblem</span><span class="p">(</span>
+        <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">LinearVariationalSolver</span><span class="p">(</span>
+        <span class="n">problem</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(True, True)
+</pre></div></div>
+</div>
+<p>Later we will configure a checkpointing schedule. Resetting the manager resets the record of forward equations but does not reset the checkpointing configuration, and so in this example whenever we reset the manager we also return it to the default checkpointing configuration with <code class="docutils literal notranslate"><span class="pre">reset_manager(&quot;memory&quot;,</span> <span class="pre">{})</span></code>.</p>
+</section>
+<section id="Computing-derivatives-using-an-adjoint">
+<h2>Computing derivatives using an adjoint<a class="headerlink" href="#Computing-derivatives-using-an-adjoint" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> function can be used to compute derivatives using the adjoint method. Here we compute the derivative of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the final timestep solution, considered a function of the control defined by the initial condition <code class="docutils literal notranslate"><span class="pre">u_0</span></code> and stream function <code class="docutils literal notranslate"><span class="pre">psi</span></code>, with respect to this control:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dJ_du_0</span><span class="p">,</span> <span class="n">dJ_dpsi</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>As a simple check of the result, note that the solution to the (discretized) partial differential equation is unchanged by the addition of a constant to the stream function. Hence we expect the directional derivative with respect to the stream function, with direction equal to the unity valued function, to be zero. This is indeed found to be the case (except for roundoff errors):</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">)</span>
+<span class="n">one</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+
+<span class="n">dJ_dpsi_one</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">action</span><span class="p">(</span><span class="n">dJ_dpsi</span><span class="p">,</span> <span class="n">one</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dJ_dpsi_one</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dJ_dpsi_one</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-17</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dJ_dpsi_one=3.50741757937361e-18
+</pre></div></div>
+</div>
+</section>
+<section id="Computing-Hessian-information-using-an-adjoint-of-a-tangent-linear">
+<h2>Computing Hessian information using an adjoint of a tangent-linear<a class="headerlink" href="#Computing-Hessian-information-using-an-adjoint-of-a-tangent-linear" title="Link to this heading"></a></h2>
+<p>We next compute a Hessian action. Although the following calculation does work, it is inefficient – you may wish to skip forward to the optimized calculations.</p>
+<p>Here we compute a ‘mixed’ Hessian action, by defining a directional derivative with respect to the stream function, and then differentiating this with respect to the initial condition:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">problem</span> <span class="o">=</span> <span class="n">LinearVariationalProblem</span><span class="p">(</span>
+        <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">constant_jacobian</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">solver</span> <span class="o">=</span> <span class="n">LinearVariationalSolver</span><span class="p">(</span>
+        <span class="n">problem</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">psi</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dpsi_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">psi</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dpsi_zeta_du_0</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dpsi_zeta</span><span class="p">,</span> <span class="n">u_0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Optimization">
+<h2>Optimization<a class="headerlink" href="#Optimization" title="Link to this heading"></a></h2>
+<p>In the above we have successfully built a record of calculations, and used this to compute derivative information. However there are two issues:</p>
+<ol class="arabic simple">
+<li><p>Building the record has a noticable cost – the forward calculation has slowed down. In the second order calculation overheads associated with the tangent-linear lead to substantial additional costs.</p></li>
+<li><p>tlm_adjoint records the solution of the partial differential equation on all time levels. The memory usage here is manageable. However memory limits will be exceeded for larger problems with more fields, spatial degrees of freedom, or timesteps.</p></li>
+</ol>
+<p>Let’s fix these issues in order.</p>
+<section id="Optimizing-the-annotation">
+<h3>Optimizing the annotation<a class="headerlink" href="#Optimizing-the-annotation" title="Link to this heading"></a></h3>
+<p>In the above code tlm_adjoint builds a new record for each finite element variational problem it encounters. Even though only one <code class="docutils literal notranslate"><span class="pre">LinearVariationalSolver</span></code> is instantiated, an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> record is instantiated on each call to the <code class="docutils literal notranslate"><span class="pre">solve</span></code> method. Building the record is sufficiently expensive that the forward calculation noticeably slows down, and this also leads to significant extra processing in the derivative calculations.</p>
+<p>Instead we can instantiate an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> directly, and reuse it. However if we do only that then the code will still be inefficient. A single <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> will be used, but new linear solver data will be constructed each time its <code class="docutils literal notranslate"><span class="pre">solve</span></code> method is called. We need to also apply an optimization analogous to the <code class="docutils literal notranslate"><span class="pre">constant_jacobian=True</span></code> argument supplied to <code class="docutils literal notranslate"><span class="pre">LinearVariationalProblem</span></code>.</p>
+<p>A simple fix is to add <code class="docutils literal notranslate"><span class="pre">cache_jacobian=True</span></code> when instantiating the <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>eq = EquationSolver(
+    lhs == rhs, u_np1,
+    solver_parameters={&quot;ksp_type&quot;: &quot;preonly&quot;,
+                       &quot;pc_type&quot;: &quot;lu&quot;},
+    cache_jacobian=True)
+</pre></div>
+</div>
+<p>This works, but we can instead let tlm_adjoint detect that linear solver data can be cached. We can do that by adding <code class="docutils literal notranslate"><span class="pre">static=True</span></code> when instantiating variables whose value is unchanged throughout the forward calculation:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(True, True)
+</pre></div></div>
+</div>
+<p>If we now query the relevant tlm_adjoint caches:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">2</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+len(assembly_cache())=2
+len(linear_solver_cache())=1
+</pre></div></div>
+</div>
+<p>we find that linear solver data associated with a single matrix has been cached. We also find that two assembled objects have been cached – it turns out that there are two cached matrices. As well as caching the matrix associated with the left-hand-side of the discrete problem, a matrix associated with the <em>right-hand-side</em> has been assembled and cached. Assembly of the right-hand-side has been converted into a matrix multiply. If we wished we could disable right-hand-side optimizations by
+adding <code class="docutils literal notranslate"><span class="pre">cache_rhs_assembly=False</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>eq = EquationSolver(
+    lhs == rhs, u_np1,
+    solver_parameters={&quot;ksp_type&quot;: &quot;preonly&quot;,
+                       &quot;pc_type&quot;: &quot;lu&quot;},
+    cache_rhs_assembly=False)
+</pre></div>
+</div>
+</section>
+<section id="Using-a-checkpointing-schedule">
+<h3>Using a checkpointing schedule<a class="headerlink" href="#Using-a-checkpointing-schedule" title="Link to this heading"></a></h3>
+<p>To address the storage issue we enable checkpointing. Here we enable binomial checkpointing with storage of a maximum of <span class="math notranslate nohighlight">\(10\)</span> forward restart checkpoints in memory:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;tlm_adjoint&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">new_block</span><span class="p">()</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">configure_checkpointing</span><span class="p">(</span><span class="s2">&quot;multistage&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;snaps_in_ram&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;blocks&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">})</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+forward: forward advance to 9223372036854775807
+forward: forward advance to 21
+forward: save checkpoint data at 0 in RAM
+forward: forward advance to 40
+forward: save checkpoint data at 21 in RAM
+forward: forward advance to 57
+forward: save checkpoint data at 40 in RAM
+forward: forward advance to 72
+forward: save checkpoint data at 57 in RAM
+forward: forward advance to 79
+forward: save checkpoint data at 72 in RAM
+forward: forward advance to 85
+forward: save checkpoint data at 79 in RAM
+forward: forward advance to 90
+forward: save checkpoint data at 85 in RAM
+forward: forward advance to 94
+forward: save checkpoint data at 90 in RAM
+forward: forward advance to 97
+forward: save checkpoint data at 94 in RAM
+forward: forward advance to 99
+forward: save checkpoint data at 97 in RAM
+forward: forward advance to 100
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(True, True)
+</pre></div></div>
+</div>
+<p>The key changes here are:</p>
+<ul class="simple">
+<li><p>Configuration of a checkpointing schedule using <code class="docutils literal notranslate"><span class="pre">configure_checkpointing</span></code>. Here binomial checkpointing is applied, with a maximum of <span class="math notranslate nohighlight">\(10\)</span> forward restart checkpoints stored in memory, indicated using the <code class="docutils literal notranslate"><span class="pre">&quot;snaps_in_ram&quot;</span></code> parameter. The total number of steps is indicated using the <code class="docutils literal notranslate"><span class="pre">&quot;blocks&quot;</span></code> parameter.</p></li>
+<li><p>The indication of the steps using <code class="docutils literal notranslate"><span class="pre">new_block()</span></code>.</p></li>
+</ul>
+<p>Extra logging output is also enabled so that we can see the details of the checkpointing schedule.</p>
+</section>
+<section id="Computing-derivatives">
+<h3>Computing derivatives<a class="headerlink" href="#Computing-derivatives" title="Link to this heading"></a></h3>
+<p>We are now ready to compute derivatives. However a key restriction is that we can, with this checkpointing schedule, only perform the adjoint calculation <em>once</em> per forward calculation. We cannot call <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> a second time, without first rerunning the entire forward calculation.</p>
+<p>In the following we compute both first and second derivative information using a single adjoint calculation:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;tlm_adjoint&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="n">reset_manager</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">psi</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">u_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">50.0</span> <span class="o">*</span> <span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_n&quot;</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+
+    <span class="n">u_h</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">u_n</span> <span class="o">+</span> <span class="n">trial</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span> <span class="o">-</span> <span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_h</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+         <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">kappa</span> <span class="o">*</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_h</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">lhs</span> <span class="o">==</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">u_np1</span><span class="p">,</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+
+    <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">new_block</span><span class="p">()</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">u_n</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta_u_0</span> <span class="o">=</span> <span class="n">ZeroFunction</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_u_0&quot;</span><span class="p">)</span>
+<span class="n">zeta_psi</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_psi&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">zeta_psi</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">psi</span><span class="p">)</span>
+<span class="n">configure_tlm</span><span class="p">(((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">),</span> <span class="p">(</span><span class="n">zeta_u_0</span><span class="p">,</span> <span class="n">zeta_psi</span><span class="p">)))</span>
+
+<span class="n">configure_checkpointing</span><span class="p">(</span><span class="s2">&quot;multistage&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;snaps_in_ram&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;blocks&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">})</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dpsi_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">psi</span><span class="p">),</span> <span class="p">(</span><span class="n">zeta_u_0</span><span class="p">,</span> <span class="n">zeta_psi</span><span class="p">)))</span>
+
+<span class="n">dJ_du_0</span><span class="p">,</span> <span class="n">dJ_dpsi</span><span class="p">,</span> <span class="n">d2J_dpsi_zeta_du_0</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span>
+    <span class="n">dJ_dpsi_zeta</span><span class="p">,</span> <span class="p">(</span><span class="n">zeta_u_0</span><span class="p">,</span> <span class="n">zeta_psi</span><span class="p">,</span> <span class="n">u_0</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+forward: forward advance to 9223372036854775807
+forward: forward advance to 21
+forward: save checkpoint data at 0 in RAM
+forward: forward advance to 40
+forward: save checkpoint data at 21 in RAM
+forward: forward advance to 57
+forward: save checkpoint data at 40 in RAM
+forward: forward advance to 72
+forward: save checkpoint data at 57 in RAM
+forward: forward advance to 79
+forward: save checkpoint data at 72 in RAM
+forward: forward advance to 85
+forward: save checkpoint data at 79 in RAM
+forward: forward advance to 90
+forward: save checkpoint data at 85 in RAM
+forward: forward advance to 94
+forward: save checkpoint data at 90 in RAM
+forward: forward advance to 97
+forward: save checkpoint data at 94 in RAM
+forward: forward advance to 99
+forward: save checkpoint data at 97 in RAM
+forward: forward advance to 100
+reverse: adjoint step back to 99
+reverse: load checkpoint data at 97 from RAM and keep
+reverse: forward advance to 98
+reverse: forward advance to 99
+reverse: adjoint step back to 98
+reverse: load checkpoint data at 97 from RAM and delete
+reverse: forward advance to 98
+reverse: adjoint step back to 97
+reverse: load checkpoint data at 94 from RAM and keep
+reverse: forward advance to 95
+reverse: forward advance to 96
+reverse: save checkpoint data at 95 in RAM
+reverse: forward advance to 97
+reverse: adjoint step back to 96
+reverse: load checkpoint data at 95 from RAM and delete
+reverse: forward advance to 96
+reverse: adjoint step back to 95
+reverse: load checkpoint data at 94 from RAM and delete
+reverse: forward advance to 95
+reverse: adjoint step back to 94
+reverse: load checkpoint data at 90 from RAM and keep
+reverse: forward advance to 91
+reverse: forward advance to 92
+reverse: save checkpoint data at 91 in RAM
+reverse: forward advance to 93
+reverse: save checkpoint data at 92 in RAM
+reverse: forward advance to 94
+reverse: adjoint step back to 93
+reverse: load checkpoint data at 92 from RAM and delete
+reverse: forward advance to 93
+reverse: adjoint step back to 92
+reverse: load checkpoint data at 91 from RAM and delete
+reverse: forward advance to 92
+reverse: adjoint step back to 91
+reverse: load checkpoint data at 90 from RAM and delete
+reverse: forward advance to 91
+reverse: adjoint step back to 90
+reverse: load checkpoint data at 85 from RAM and keep
+reverse: forward advance to 86
+reverse: forward advance to 87
+reverse: save checkpoint data at 86 in RAM
+reverse: forward advance to 88
+reverse: save checkpoint data at 87 in RAM
+reverse: forward advance to 89
+reverse: save checkpoint data at 88 in RAM
+reverse: forward advance to 90
+reverse: adjoint step back to 89
+reverse: load checkpoint data at 88 from RAM and delete
+reverse: forward advance to 89
+reverse: adjoint step back to 88
+reverse: load checkpoint data at 87 from RAM and delete
+reverse: forward advance to 88
+reverse: adjoint step back to 87
+reverse: load checkpoint data at 86 from RAM and delete
+reverse: forward advance to 87
+reverse: adjoint step back to 86
+reverse: load checkpoint data at 85 from RAM and delete
+reverse: forward advance to 86
+reverse: adjoint step back to 85
+reverse: load checkpoint data at 79 from RAM and keep
+reverse: forward advance to 80
+reverse: forward advance to 81
+reverse: save checkpoint data at 80 in RAM
+reverse: forward advance to 82
+reverse: save checkpoint data at 81 in RAM
+reverse: forward advance to 83
+reverse: save checkpoint data at 82 in RAM
+reverse: forward advance to 84
+reverse: save checkpoint data at 83 in RAM
+reverse: forward advance to 85
+reverse: adjoint step back to 84
+reverse: load checkpoint data at 83 from RAM and delete
+reverse: forward advance to 84
+reverse: adjoint step back to 83
+reverse: load checkpoint data at 82 from RAM and delete
+reverse: forward advance to 83
+reverse: adjoint step back to 82
+reverse: load checkpoint data at 81 from RAM and delete
+reverse: forward advance to 82
+reverse: adjoint step back to 81
+reverse: load checkpoint data at 80 from RAM and delete
+reverse: forward advance to 81
+reverse: adjoint step back to 80
+reverse: load checkpoint data at 79 from RAM and delete
+reverse: forward advance to 80
+reverse: adjoint step back to 79
+reverse: load checkpoint data at 72 from RAM and keep
+reverse: forward advance to 73
+reverse: forward advance to 74
+reverse: save checkpoint data at 73 in RAM
+reverse: forward advance to 75
+reverse: save checkpoint data at 74 in RAM
+reverse: forward advance to 76
+reverse: save checkpoint data at 75 in RAM
+reverse: forward advance to 77
+reverse: save checkpoint data at 76 in RAM
+reverse: forward advance to 78
+reverse: save checkpoint data at 77 in RAM
+reverse: forward advance to 79
+reverse: adjoint step back to 78
+reverse: load checkpoint data at 77 from RAM and delete
+reverse: forward advance to 78
+reverse: adjoint step back to 77
+reverse: load checkpoint data at 76 from RAM and delete
+reverse: forward advance to 77
+reverse: adjoint step back to 76
+reverse: load checkpoint data at 75 from RAM and delete
+reverse: forward advance to 76
+reverse: adjoint step back to 75
+reverse: load checkpoint data at 74 from RAM and delete
+reverse: forward advance to 75
+reverse: adjoint step back to 74
+reverse: load checkpoint data at 73 from RAM and delete
+reverse: forward advance to 74
+reverse: adjoint step back to 73
+reverse: load checkpoint data at 72 from RAM and delete
+reverse: forward advance to 73
+reverse: adjoint step back to 72
+reverse: load checkpoint data at 57 from RAM and keep
+reverse: forward advance to 59
+reverse: forward advance to 61
+reverse: save checkpoint data at 59 in RAM
+reverse: forward advance to 63
+reverse: save checkpoint data at 61 in RAM
+reverse: forward advance to 65
+reverse: save checkpoint data at 63 in RAM
+reverse: forward advance to 67
+reverse: save checkpoint data at 65 in RAM
+reverse: forward advance to 69
+reverse: save checkpoint data at 67 in RAM
+reverse: forward advance to 71
+reverse: save checkpoint data at 69 in RAM
+reverse: forward advance to 72
+reverse: adjoint step back to 71
+reverse: load checkpoint data at 69 from RAM and keep
+reverse: forward advance to 70
+reverse: forward advance to 71
+reverse: adjoint step back to 70
+reverse: load checkpoint data at 69 from RAM and delete
+reverse: forward advance to 70
+reverse: adjoint step back to 69
+reverse: load checkpoint data at 67 from RAM and keep
+reverse: forward advance to 68
+reverse: forward advance to 69
+reverse: adjoint step back to 68
+reverse: load checkpoint data at 67 from RAM and delete
+reverse: forward advance to 68
+reverse: adjoint step back to 67
+reverse: load checkpoint data at 65 from RAM and keep
+reverse: forward advance to 66
+reverse: forward advance to 67
+reverse: adjoint step back to 66
+reverse: load checkpoint data at 65 from RAM and delete
+reverse: forward advance to 66
+reverse: adjoint step back to 65
+reverse: load checkpoint data at 63 from RAM and keep
+reverse: forward advance to 64
+reverse: forward advance to 65
+reverse: adjoint step back to 64
+reverse: load checkpoint data at 63 from RAM and delete
+reverse: forward advance to 64
+reverse: adjoint step back to 63
+reverse: load checkpoint data at 61 from RAM and keep
+reverse: forward advance to 62
+reverse: forward advance to 63
+reverse: adjoint step back to 62
+reverse: load checkpoint data at 61 from RAM and delete
+reverse: forward advance to 62
+reverse: adjoint step back to 61
+reverse: load checkpoint data at 59 from RAM and keep
+reverse: forward advance to 60
+reverse: forward advance to 61
+reverse: adjoint step back to 60
+reverse: load checkpoint data at 59 from RAM and delete
+reverse: forward advance to 60
+reverse: adjoint step back to 59
+reverse: load checkpoint data at 57 from RAM and keep
+reverse: forward advance to 58
+reverse: forward advance to 59
+reverse: adjoint step back to 58
+reverse: load checkpoint data at 57 from RAM and delete
+reverse: forward advance to 58
+reverse: adjoint step back to 57
+reverse: load checkpoint data at 40 from RAM and keep
+reverse: forward advance to 42
+reverse: forward advance to 44
+reverse: save checkpoint data at 42 in RAM
+reverse: forward advance to 46
+reverse: save checkpoint data at 44 in RAM
+reverse: forward advance to 48
+reverse: save checkpoint data at 46 in RAM
+reverse: forward advance to 50
+reverse: save checkpoint data at 48 in RAM
+reverse: forward advance to 52
+reverse: save checkpoint data at 50 in RAM
+reverse: forward advance to 54
+reverse: save checkpoint data at 52 in RAM
+reverse: forward advance to 56
+reverse: save checkpoint data at 54 in RAM
+reverse: forward advance to 57
+reverse: adjoint step back to 56
+reverse: load checkpoint data at 54 from RAM and keep
+reverse: forward advance to 55
+reverse: forward advance to 56
+reverse: adjoint step back to 55
+reverse: load checkpoint data at 54 from RAM and delete
+reverse: forward advance to 55
+reverse: adjoint step back to 54
+reverse: load checkpoint data at 52 from RAM and keep
+reverse: forward advance to 53
+reverse: forward advance to 54
+reverse: adjoint step back to 53
+reverse: load checkpoint data at 52 from RAM and delete
+reverse: forward advance to 53
+reverse: adjoint step back to 52
+reverse: load checkpoint data at 50 from RAM and keep
+reverse: forward advance to 51
+reverse: forward advance to 52
+reverse: adjoint step back to 51
+reverse: load checkpoint data at 50 from RAM and delete
+reverse: forward advance to 51
+reverse: adjoint step back to 50
+reverse: load checkpoint data at 48 from RAM and keep
+reverse: forward advance to 49
+reverse: forward advance to 50
+reverse: adjoint step back to 49
+reverse: load checkpoint data at 48 from RAM and delete
+reverse: forward advance to 49
+reverse: adjoint step back to 48
+reverse: load checkpoint data at 46 from RAM and keep
+reverse: forward advance to 47
+reverse: forward advance to 48
+reverse: adjoint step back to 47
+reverse: load checkpoint data at 46 from RAM and delete
+reverse: forward advance to 47
+reverse: adjoint step back to 46
+reverse: load checkpoint data at 44 from RAM and keep
+reverse: forward advance to 45
+reverse: forward advance to 46
+reverse: adjoint step back to 45
+reverse: load checkpoint data at 44 from RAM and delete
+reverse: forward advance to 45
+reverse: adjoint step back to 44
+reverse: load checkpoint data at 42 from RAM and keep
+reverse: forward advance to 43
+reverse: forward advance to 44
+reverse: adjoint step back to 43
+reverse: load checkpoint data at 42 from RAM and delete
+reverse: forward advance to 43
+reverse: adjoint step back to 42
+reverse: load checkpoint data at 40 from RAM and keep
+reverse: forward advance to 41
+reverse: forward advance to 42
+reverse: adjoint step back to 41
+reverse: load checkpoint data at 40 from RAM and delete
+reverse: forward advance to 41
+reverse: adjoint step back to 40
+reverse: load checkpoint data at 21 from RAM and keep
+reverse: forward advance to 23
+reverse: forward advance to 25
+reverse: save checkpoint data at 23 in RAM
+reverse: forward advance to 27
+reverse: save checkpoint data at 25 in RAM
+reverse: forward advance to 29
+reverse: save checkpoint data at 27 in RAM
+reverse: forward advance to 31
+reverse: save checkpoint data at 29 in RAM
+reverse: forward advance to 33
+reverse: save checkpoint data at 31 in RAM
+reverse: forward advance to 35
+reverse: save checkpoint data at 33 in RAM
+reverse: forward advance to 37
+reverse: save checkpoint data at 35 in RAM
+reverse: forward advance to 39
+reverse: save checkpoint data at 37 in RAM
+reverse: forward advance to 40
+reverse: adjoint step back to 39
+reverse: load checkpoint data at 37 from RAM and keep
+reverse: forward advance to 38
+reverse: forward advance to 39
+reverse: adjoint step back to 38
+reverse: load checkpoint data at 37 from RAM and delete
+reverse: forward advance to 38
+reverse: adjoint step back to 37
+reverse: load checkpoint data at 35 from RAM and keep
+reverse: forward advance to 36
+reverse: forward advance to 37
+reverse: adjoint step back to 36
+reverse: load checkpoint data at 35 from RAM and delete
+reverse: forward advance to 36
+reverse: adjoint step back to 35
+reverse: load checkpoint data at 33 from RAM and keep
+reverse: forward advance to 34
+reverse: forward advance to 35
+reverse: adjoint step back to 34
+reverse: load checkpoint data at 33 from RAM and delete
+reverse: forward advance to 34
+reverse: adjoint step back to 33
+reverse: load checkpoint data at 31 from RAM and keep
+reverse: forward advance to 32
+reverse: forward advance to 33
+reverse: adjoint step back to 32
+reverse: load checkpoint data at 31 from RAM and delete
+reverse: forward advance to 32
+reverse: adjoint step back to 31
+reverse: load checkpoint data at 29 from RAM and keep
+reverse: forward advance to 30
+reverse: forward advance to 31
+reverse: adjoint step back to 30
+reverse: load checkpoint data at 29 from RAM and delete
+reverse: forward advance to 30
+reverse: adjoint step back to 29
+reverse: load checkpoint data at 27 from RAM and keep
+reverse: forward advance to 28
+reverse: forward advance to 29
+reverse: adjoint step back to 28
+reverse: load checkpoint data at 27 from RAM and delete
+reverse: forward advance to 28
+reverse: adjoint step back to 27
+reverse: load checkpoint data at 25 from RAM and keep
+reverse: forward advance to 26
+reverse: forward advance to 27
+reverse: adjoint step back to 26
+reverse: load checkpoint data at 25 from RAM and delete
+reverse: forward advance to 26
+reverse: adjoint step back to 25
+reverse: load checkpoint data at 23 from RAM and keep
+reverse: forward advance to 24
+reverse: forward advance to 25
+reverse: adjoint step back to 24
+reverse: load checkpoint data at 23 from RAM and delete
+reverse: forward advance to 24
+reverse: adjoint step back to 23
+reverse: load checkpoint data at 21 from RAM and keep
+reverse: forward advance to 22
+reverse: forward advance to 23
+reverse: adjoint step back to 22
+reverse: load checkpoint data at 21 from RAM and delete
+reverse: forward advance to 22
+reverse: adjoint step back to 21
+reverse: load checkpoint data at 0 from RAM and keep
+reverse: forward advance to 2
+reverse: forward advance to 4
+reverse: save checkpoint data at 2 in RAM
+reverse: forward advance to 6
+reverse: save checkpoint data at 4 in RAM
+reverse: forward advance to 8
+reverse: save checkpoint data at 6 in RAM
+reverse: forward advance to 10
+reverse: save checkpoint data at 8 in RAM
+reverse: forward advance to 12
+reverse: save checkpoint data at 10 in RAM
+reverse: forward advance to 14
+reverse: save checkpoint data at 12 in RAM
+reverse: forward advance to 16
+reverse: save checkpoint data at 14 in RAM
+reverse: forward advance to 18
+reverse: save checkpoint data at 16 in RAM
+reverse: forward advance to 20
+reverse: save checkpoint data at 18 in RAM
+reverse: forward advance to 21
+reverse: adjoint step back to 20
+reverse: load checkpoint data at 18 from RAM and keep
+reverse: forward advance to 19
+reverse: forward advance to 20
+reverse: adjoint step back to 19
+reverse: load checkpoint data at 18 from RAM and delete
+reverse: forward advance to 19
+reverse: adjoint step back to 18
+reverse: load checkpoint data at 16 from RAM and keep
+reverse: forward advance to 17
+reverse: forward advance to 18
+reverse: adjoint step back to 17
+reverse: load checkpoint data at 16 from RAM and delete
+reverse: forward advance to 17
+reverse: adjoint step back to 16
+reverse: load checkpoint data at 14 from RAM and keep
+reverse: forward advance to 15
+reverse: forward advance to 16
+reverse: adjoint step back to 15
+reverse: load checkpoint data at 14 from RAM and delete
+reverse: forward advance to 15
+reverse: adjoint step back to 14
+reverse: load checkpoint data at 12 from RAM and keep
+reverse: forward advance to 13
+reverse: forward advance to 14
+reverse: adjoint step back to 13
+reverse: load checkpoint data at 12 from RAM and delete
+reverse: forward advance to 13
+reverse: adjoint step back to 12
+reverse: load checkpoint data at 10 from RAM and keep
+reverse: forward advance to 11
+reverse: forward advance to 12
+reverse: adjoint step back to 11
+reverse: load checkpoint data at 10 from RAM and delete
+reverse: forward advance to 11
+reverse: adjoint step back to 10
+reverse: load checkpoint data at 8 from RAM and keep
+reverse: forward advance to 9
+reverse: forward advance to 10
+reverse: adjoint step back to 9
+reverse: load checkpoint data at 8 from RAM and delete
+reverse: forward advance to 9
+reverse: adjoint step back to 8
+reverse: load checkpoint data at 6 from RAM and keep
+reverse: forward advance to 7
+reverse: forward advance to 8
+reverse: adjoint step back to 7
+reverse: load checkpoint data at 6 from RAM and delete
+reverse: forward advance to 7
+reverse: adjoint step back to 6
+reverse: load checkpoint data at 4 from RAM and keep
+reverse: forward advance to 5
+reverse: forward advance to 6
+reverse: adjoint step back to 5
+reverse: load checkpoint data at 4 from RAM and delete
+reverse: forward advance to 5
+reverse: adjoint step back to 4
+reverse: load checkpoint data at 2 from RAM and keep
+reverse: forward advance to 3
+reverse: forward advance to 4
+reverse: adjoint step back to 3
+reverse: load checkpoint data at 2 from RAM and delete
+reverse: forward advance to 3
+reverse: adjoint step back to 2
+reverse: load checkpoint data at 0 from RAM and keep
+reverse: forward advance to 1
+reverse: forward advance to 2
+reverse: adjoint step back to 1
+reverse: load checkpoint data at 0 from RAM and delete
+reverse: forward advance to 1
+reverse: adjoint step back to 0
+</pre></div></div>
+</div>
+<p>The derivative calculation now alternates between forward + tangent-linear calculations, and adjoint calculations.</p>
+<p>If we wished we could perform higher order adjoint calculations, using a binomial checkpointing schedule, by supplying a higher order tangent-linear configuration and differentiating the result.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

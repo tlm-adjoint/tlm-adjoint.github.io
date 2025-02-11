@@ -1,0 +1,261 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.firedrake.variables &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.variables</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/firedrake/variables/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.firedrake.variables">
+<span id="tlm-adjoint-firedrake-variables"></span><h1><a class="reference internal" href="#module-tlm_adjoint.firedrake.variables" title="tlm_adjoint.firedrake.variables"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.variables</span></code></a><a class="headerlink" href="#module-tlm_adjoint.firedrake.variables" title="Link to this heading"></a></h1>
+<p>Firedrake variables.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.Constant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.Constant" title="Link to this definition"></a></dt>
+<dd><p>Extends the <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.constant.Constant" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.constant.Constant</span></code></a> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The initial value. <cite>None</cite> indicates a value of zero.</p></li>
+<li><p><strong>name</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> name.</p></li>
+<li><p><strong>domain</strong> – The domain on which the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> is defined.</p></li>
+<li><p><strong>space</strong> – The space on which the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> is defined.</p></li>
+<li><p><strong>space_type</strong> – The space type for the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>. <cite>‘primal’</cite>,
+<cite>‘dual’</cite>, <cite>‘conjugate’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+<li><p><strong>shape</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> objects defining the shape of
+the value.</p></li>
+<li><p><strong>comm</strong> – The communicator for the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>.</p></li>
+<li><p><strong>static</strong> – Defines whether the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> is static, meaning that
+it is stored by reference in checkpointing/replay, and an associated
+tangent-linear variable is zero.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> may be
+cached. Default <cite>static</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.constant.Constant" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.constant.Constant</span></code></a>
+constructor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.Function">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">Function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.Function" title="Link to this definition"></a></dt>
+<dd><p>Extends <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space_type</strong> – The space type for the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Function" title="tlm_adjoint.firedrake.variables.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a>. <cite>‘primal’</cite> or
+<cite>‘conjugate’</cite>.</p></li>
+<li><p><strong>static</strong> – Defines whether the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Function" title="tlm_adjoint.firedrake.variables.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> is static, meaning that
+it is stored by reference in checkpointing/replay, and an associated
+tangent-linear variable is zero.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Function" title="tlm_adjoint.firedrake.variables.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> may
+be cached. Default <cite>static</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a>
+constructor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.Cofunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">Cofunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'conjugate_dual'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.Cofunction" title="Link to this definition"></a></dt>
+<dd><p>Extends the <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space_type</strong> – The space type for the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Cofunction" title="tlm_adjoint.firedrake.variables.Cofunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cofunction</span></code></a>. <cite>‘dual’</cite> or
+<cite>‘conjugate_dual’</cite>.</p></li>
+<li><p><strong>static</strong> – Defines whether the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Cofunction" title="tlm_adjoint.firedrake.variables.Cofunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cofunction</span></code></a> is static, meaning
+that it is stored by reference in checkpointing/replay, and an
+associated tangent-linear variable is zero.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Cofunction" title="tlm_adjoint.firedrake.variables.Cofunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cofunction</span></code></a> may
+be cached. Default <cite>static</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Remaining arguments are passed to the
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a> constructor.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.Cofunction.equals">
+<span class="sig-name descname"><span class="pre">equals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.Cofunction.equals" title="Link to this definition"></a></dt>
+<dd><p>Check equality.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ZeroConstant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ZeroConstant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ZeroConstant" title="Link to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> which is flagged as having a value of zero.</p>
+<p>Arguments are passed to the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Constant" title="tlm_adjoint.firedrake.variables.Constant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> constructor, together with
+<cite>static=True</cite> and <cite>cache=True</cite>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ZeroFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ZeroFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ZeroFunction" title="Link to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Function" title="tlm_adjoint.firedrake.variables.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> which is flagged as having a value of zero.</p>
+<p>Arguments are passed to the <a class="reference internal" href="#tlm_adjoint.firedrake.variables.Function" title="tlm_adjoint.firedrake.variables.Function"><code class="xref py py-class docutils literal notranslate"><span class="pre">Function</span></code></a> constructor, together with
+<cite>static=True</cite> and <cite>cache=True</cite>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ReplacementConstant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ReplacementConstant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ReplacementConstant" title="Link to this definition"></a></dt>
+<dd><p>Represents a symbolic <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.constant.Constant" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.constant.Constant</span></code></a>, but has no
+value.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ReplacementFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ReplacementFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ReplacementFunction" title="Link to this definition"></a></dt>
+<dd><p>Represents a symbolic <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a>, but has no
+value.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ReplacementCofunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ReplacementCofunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ReplacementCofunction" title="Link to this definition"></a></dt>
+<dd><p>Represents a symbolic <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>, but has
+no value.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ReplacementZeroConstant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ReplacementZeroConstant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ReplacementZeroConstant" title="Link to this definition"></a></dt>
+<dd><p>Represents a symbolic <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.constant.Constant" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.constant.Constant</span></code></a> which is
+zero, but has no value.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.ReplacementZeroFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">ReplacementZeroFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.ReplacementZeroFunction" title="Link to this definition"></a></dt>
+<dd><p>Represents a symbolic <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> which is
+zero, but has no value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.variables.to_firedrake">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.variables.</span></span><span class="sig-name descname"><span class="pre">to_firedrake</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.variables.to_firedrake" title="Link to this definition"></a></dt>
+<dd><p>Convert a variable to a <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – A variable.</p></li>
+<li><p><strong>space</strong> – The space for the return value.</p></li>
+<li><p><strong>name</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> or
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

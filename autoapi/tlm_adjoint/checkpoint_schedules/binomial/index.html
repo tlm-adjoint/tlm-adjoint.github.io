@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.checkpoint_schedules.binomial &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.checkpoint_schedules.binomial</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/checkpoint_schedules/binomial/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.checkpoint_schedules.binomial">
+<span id="tlm-adjoint-checkpoint-schedules-binomial"></span><h1><a class="reference internal" href="#module-tlm_adjoint.checkpoint_schedules.binomial" title="tlm_adjoint.checkpoint_schedules.binomial"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.checkpoint_schedules.binomial</span></code></a><a class="headerlink" href="#module-tlm_adjoint.checkpoint_schedules.binomial" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpoint_schedules.binomial.</span></span><span class="sig-name descname"><span class="pre">MultistageCheckpointSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshots_in_ram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snapshots_on_disk</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'maximum'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule" title="Link to this definition"></a></dt>
+<dd><p>A binomial checkpointing schedule using the approach described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Andreas Griewank and Andrea Walther, ‘Algorithm 799: revolve: an
+implementation of checkpointing for the reverse or adjoint mode of
+computational differentiation’, ACM Transactions on Mathematical
+Software, 26(1), pp. 19–45, 2000, doi: 10.1145/347837.347846</p></li>
+</ul>
+</div></blockquote>
+<p>hereafter referred to as GW2000.</p>
+<p>Uses a ‘MultiStage’ distribution of checkpoints between RAM and disk
+equivalent to that described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Philipp Stumm and Andrea Walther, ‘MultiStage approaches for optimal
+offline checkpointing’, SIAM Journal on Scientific Computing, 31(3),
+pp. 1946–1967, 2009, doi: 10.1137/080718036</p></li>
+</ul>
+</div></blockquote>
+<p>The distribution between RAM and disk is determined using an initial run of
+the schedule.</p>
+<p>Offline, one adjoint calculation permitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_n</strong> – The number of forward steps in the initial forward calculation.</p></li>
+<li><p><strong>snapshots_in_ram</strong> – The maximum number of forward restart checkpoints
+to store in memory.</p></li>
+<li><p><strong>snapshots_on_disk</strong> – The maximum number of forward restart checkpoints
+to store on disk.</p></li>
+<li><p><strong>trajectory</strong> – <p>When advancing <cite>n</cite> forward steps with <cite>s</cite> checkpointing
+units available there are in general multiple solutions to the problem
+of determining the number of forward steps to advance before storing
+a new forward restart checkpoint – see Fig. 4 of GW2000. This argument
+selects a solution:</p>
+<blockquote>
+<div><ul>
+<li><p><cite>’revolve’</cite>: The standard revolve solution, as specified in the
+equation at the bottom of p. 34 of GW2000.</p></li>
+<li><p><cite>’maximum’</cite>: The maximum possible number of steps, corresponding
+to the maximum step size compatible with the optimal region in
+Fig. 4 of GW2000.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>The argument names <cite>snaps_in_ram</cite> and <cite>snaps_on_disk</cite> originate from the
+corresponding arguments for the <cite>dolfin_adjoint.solving.adj_checkpointing</cite>
+function in dolfin-adjoint (see e.g. version 2017.1.0).</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule.is_exhausted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_exhausted</span></span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule.is_exhausted" title="Link to this definition"></a></dt>
+<dd><p>Whether the schedule has concluded. Note that some schedules permit
+multiple adjoint calculation, and may never conclude.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule.uses_disk_storage">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uses_disk_storage</span></span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule.uses_disk_storage" title="Link to this definition"></a></dt>
+<dd><p>Whether the schedule may use disk storage. If <cite>False</cite> then no disk
+storage is required.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule.iter" title="Link to this definition"></a></dt>
+<dd><p>A generator which should be overridden in derived classes in order
+to define a checkpointing schedule.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpoint_schedules.binomial.</span></span><span class="sig-name descname"><span class="pre">TwoLevelCheckpointSchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binomial_snapshots</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binomial_storage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'disk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binomial_trajectory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'maximum'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule" title="Link to this definition"></a></dt>
+<dd><p>A two-level mixed periodic/binomial checkpointing schedule using the
+approach described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Gavin J. Pringle, Daniel C. Jones, Sudipta Goswami, Sri Hari Krishna
+Narayanan, and Daniel Goldberg, ‘Providing the ARCHER community with
+adjoint modelling tools for high-performance oceanographic and
+cryospheric computation’, version 1.1, EPCC, 2016</p></li>
+</ul>
+</div></blockquote>
+<p>and in the supporting information for</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>D. N. Goldberg, T. A. Smith, S. H. K. Narayanan, P. Heimbach, and M.
+Morlighem, ‘Bathymetric influences on Antarctic ice-shelf melt
+rates’, Journal of Geophysical Research: Oceans, 125(11),
+e2020JC016370, 2020, doi: 10.1029/2020JC016370</p></li>
+</ul>
+</div></blockquote>
+<p>Online, unlimited adjoint calculations permitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>period</strong> – Forward restart checkpoints are stored to disk every <cite>period</cite>
+forward steps in the initial forward calculation.</p></li>
+<li><p><strong>binomial_snapshots</strong> – The maximum number of additional forward restart
+checkpointing units to use when advancing the adjoint between periodic
+disk checkpoints.</p></li>
+<li><p><strong>binomial_storage</strong> – The storage to use for the additional forward
+restart checkpoints generated when advancing the adjoint between
+periodic disk checkpoints. Either <cite>‘RAM’</cite> or <cite>‘disk’</cite>.</p></li>
+<li><p><strong>binomial_trajectory</strong> – See the <cite>trajectory</cite> constructor argument for
+<a class="reference internal" href="#tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule" title="tlm_adjoint.checkpoint_schedules.binomial.MultistageCheckpointSchedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultistageCheckpointSchedule</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule.is_exhausted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_exhausted</span></span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule.is_exhausted" title="Link to this definition"></a></dt>
+<dd><p>Whether the schedule has concluded. Note that some schedules permit
+multiple adjoint calculation, and may never conclude.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule.uses_disk_storage">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uses_disk_storage</span></span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule.uses_disk_storage" title="Link to this definition"></a></dt>
+<dd><p>Whether the schedule may use disk storage. If <cite>False</cite> then no disk
+storage is required.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpoint_schedules.binomial.TwoLevelCheckpointSchedule.iter" title="Link to this definition"></a></dt>
+<dd><p>A generator which should be overridden in derived classes in order
+to define a checkpointing schedule.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

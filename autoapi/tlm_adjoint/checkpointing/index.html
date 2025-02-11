@@ -1,0 +1,640 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.checkpointing &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.checkpointing</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/checkpointing/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.checkpointing">
+<span id="tlm-adjoint-checkpointing"></span><h1><a class="reference internal" href="#module-tlm_adjoint.checkpointing" title="tlm_adjoint.checkpointing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.checkpointing</span></code></a><a class="headerlink" href="#module-tlm_adjoint.checkpointing" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpointing.</span></span><span class="sig-name descname"><span class="pre">CheckpointStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_ics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="Link to this definition"></a></dt>
+<dd><p>A buffer for forward restart data, and a cache for non-linear dependency
+data. Contains three types of data:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>References: Dependencies which are stored by reference. Variables
+<cite>x</cite> for which <cite>var_is_static(x)</cite> is <cite>True</cite> are stored by reference.</p></li>
+<li><p>Forward restart / initial condition data: Dependencies which are
+used to restart and advance the forward calculation.</p></li>
+<li><p>Non-linear dependency data: Non-linear dependencies of the forward
+which are used to advance the adjoint.</p></li>
+</ol>
+</div></blockquote>
+<p>These may overlap – for example non-linear dependency data may be stored
+by reference.</p>
+<p>Non-linear dependency data has an associated key <cite>(n, i)</cite>, where <cite>n</cite> is an
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> indicating the block index and <cite>i</cite> is an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+indicating the equation index within that block. Non-linear-dependency data
+for an <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> can be accessed via, e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nl_deps</span> <span class="o">=</span> <span class="n">cp</span><span class="p">[(</span><span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>where <cite>cp</cite> is a <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointStorage</span></code></a>. Here <cite>nl_deps</cite> is a
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of variables storing values associated with
+<cite>eq.nonlinear_dependencies()</cite>, for <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> <cite>i</cite> in block <cite>n</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>store_ics</strong> – Whether to enable storage of forward restart data.</p></li>
+<li><p><strong>store_data</strong> – Whether to enable storage of non-linear dependency data.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.store_ics">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">store_ics</span></span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.store_ics" title="Link to this definition"></a></dt>
+<dd><p>Whether storage of forward restart data is enabled.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.store_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">store_data</span></span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.store_data" title="Link to this definition"></a></dt>
+<dd><p>Whether storage of non-linear dependency data is enabled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_ics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.configure" title="Link to this definition"></a></dt>
+<dd><p>Enable or disable storage of forward restart and non-linear
+dependency data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>store_ics</strong> – Whether storage of forward restart data should be
+enabled (<cite>store_ics=True</cite>) or disabled (<cite>store_ics=False</cite>).</p></li>
+<li><p><strong>store_data</strong> – Whether storage of non-linear dependency data should
+be enabled (<cite>store_data=True</cite>) or disabled (<cite>store_data=False</cite>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_refs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.clear" title="Link to this definition"></a></dt>
+<dd><p>Clear stored data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clear_ics</strong> – Whether forward restart data should be cleared.</p></li>
+<li><p><strong>clear_data</strong> – Whether non-linear dependency data should be cleared.</p></li>
+<li><p><strong>clear_refs</strong> – Whether references should be cleared.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.initial_condition">
+<span class="sig-name descname"><span class="pre">initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.initial_condition" title="Link to this definition"></a></dt>
+<dd><p>Return the forward restart value associated with a variable <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The variable, or the <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> variable ID, for which the
+forward restart value should be returned.</p></li>
+<li><p><strong>copy</strong> – If <cite>True</cite> then a copy of the stored value is returned. If
+<cite>False</cite> then an internal variable storing the value is returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A variable containing the forward restart value for <cite>x</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.initial_conditions">
+<span class="sig-name descname"><span class="pre">initial_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.initial_conditions" title="Link to this definition"></a></dt>
+<dd><p>Access stored forward restart data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cp</strong> – Whether to include forward restart data that is stored by
+value.</p></li>
+<li><p><strong>refs</strong> – Whether to include data that is stored by reference. May
+include non-linear dependency data that is not forward restart
+data.</p></li>
+<li><p><strong>copy</strong> – If <cite>True</cite> then a copy of the stored data is returned. If
+<cite>False</cite> then internal variables storing the data are returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="../interface/index.html#tlm_adjoint.interface.VariableStateLockDictionary" title="tlm_adjoint.interface.VariableStateLockDictionary"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableStateLockDictionary</span></code></a>, with items <cite>(x_id:
+x_value)</cite>, where <cite>x_id</cite> is the <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> variable ID and
+<cite>x_value</cite> is a variable storing the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.add_initial_condition">
+<span class="sig-name descname"><span class="pre">add_initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.add_initial_condition" title="Link to this definition"></a></dt>
+<dd><p>Store forward restart data / an initial condition dependency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The initial condition dependency variable.</p></li>
+<li><p><strong>value</strong> – A variable defining the initial condition dependency value.
+<cite>x</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.update_keys">
+<span class="sig-name descname"><span class="pre">update_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.update_keys" title="Link to this definition"></a></dt>
+<dd><p>The <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointStorage</span></code></a> keeps an internal map from forward
+variables to equations in which values for those variables are
+computed. Keys are updated automatically as needed. This method allows
+keys to be updated manually.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block.</p></li>
+<li><p><strong>i</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the equation.</p></li>
+<li><p><strong>eq</strong> – An <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>, equation <cite>i</cite> in block <cite>n</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.add_equation">
+<span class="sig-name descname"><span class="pre">add_equation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.add_equation" title="Link to this definition"></a></dt>
+<dd><p>Store checkpoint data associated with an equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block.</p></li>
+<li><p><strong>i</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the equation.</p></li>
+<li><p><strong>eq</strong> – An <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>, equation <cite>i</cite> in block <cite>n</cite>.</p></li>
+<li><p><strong>deps</strong> – Equation dependency values. <cite>eq.dependencies()</cite> is used if
+not supplied.</p></li>
+<li><p><strong>nl_deps</strong> – Equation non-linear dependency values. Extracted from
+<cite>deps</cite> if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.add_equation_data">
+<span class="sig-name descname"><span class="pre">add_equation_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.add_equation_data" title="Link to this definition"></a></dt>
+<dd><p>Store checkpoint data associated with an equation. As
+<a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.add_equation" title="tlm_adjoint.checkpointing.CheckpointStorage.add_equation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.add_equation()</span></code></a>, but adds only <em>non-linear</em>
+dependency data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block.</p></li>
+<li><p><strong>i</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the equation.</p></li>
+<li><p><strong>eq</strong> – An <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>, equation <cite>i</cite> in block <cite>n</cite>.</p></li>
+<li><p><strong>nl_deps</strong> – Equation non-linear dependency values.
+<cite>eq.nonlinear_dependencies()</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.checkpoint_data">
+<span class="sig-name descname"><span class="pre">checkpoint_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.checkpoint_data" title="Link to this definition"></a></dt>
+<dd><p>Extract checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ics</strong> – Whether to extract forward restart data.</p></li>
+<li><p><strong>data</strong> – Whether to extract non-linear dependency data.</p></li>
+<li><p><strong>copy</strong> – If <cite>True</cite> then a copy of the stored data is returned. If
+<cite>False</cite> then internal variables storing the data are returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(cp, data, storage)</cite>. Elements of this
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> are as for the three arguments for the
+<a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a> method, and here <cite>storage</cite> is a
+<a class="reference internal" href="../interface/index.html#tlm_adjoint.interface.VariableStateLockDictionary" title="tlm_adjoint.interface.VariableStateLockDictionary"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableStateLockDictionary</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.CheckpointStorage.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="Link to this definition"></a></dt>
+<dd><p>Update the <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointStorage</span></code></a> using the provided
+checkpoint data. Used to update the <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointStorage</span></code></a> from
+loaded data. Note that the <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointStorage</span></code></a> is <em>not</em>
+cleared prior to updating using the provided data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cp</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of keys. Forward restart data is defined by
+<cite>(storage[key] for key in cp)</cite>.</p></li>
+<li><p><strong>data</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>. Items are <cite>((n, i), keys)</cite>, indicating
+that non-linear dependency data for equation <cite>i</cite> in block <cite>n</cite> is
+<cite>(storage[key] for key in keys)</cite>.</p></li>
+<li><p><strong>storage</strong> – The stored data. A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> with items <cite>((x_id,
+x_indices), x_value)</cite>. <cite>x_id</cite> is the <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> ID for a variable
+whose value <cite>x_value</cite> is stored. <cite>x_indices</cite> is either <cite>None</cite>, if
+the variable value has not been computed by solving equations with
+forward restart data storage enabled, or a tuple <cite>(n, i, m)</cite>
+indicating that the variable value was computed as component <cite>m</cite> of
+the solution to equation <cite>i</cite> in block <cite>n</cite>.</p></li>
+<li><p><strong>copy</strong> – Whether the values in <cite>storage</cite> should be copied when being
+stored in the <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage" title="tlm_adjoint.checkpointing.CheckpointStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointStorage</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.ReplayStorage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpointing.</span></span><span class="sig-name descname"><span class="pre">ReplayStorage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.ReplayStorage" title="Link to this definition"></a></dt>
+<dd><p>Storage used when solving forward equations.</p>
+<p>A value for a forward variable can be accessed via</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">x_value</span> <span class="o">=</span> <span class="n">replay_storage</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>and set via</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">replay_storage</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_value</span>
+</pre></div>
+</div>
+<p>where here <cite>x</cite> is either a variable of an <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> variable ID.
+Containment can also be tested,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">replay_storage</span><span class="p">:</span>
+    <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blocks</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code>, whose elements or
+values are <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> objects containing <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>
+objects. Forward equations.</p></li>
+<li><p><strong>N0</strong> – An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>. <cite>(blocks[n] for n in range(N0, N1))</cite> defines the
+forward equations which will be solved.</p></li>
+<li><p><strong>N1</strong> – An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>. <cite>(blocks[n] for n in range(N0, N1))</cite> defines the
+forward equations which will be solved.</p></li>
+<li><p><strong>transpose_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">TransposeComputationalGraph</span></code>. If supplied
+then an activity analysis is applied.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.ReplayStorage.is_active">
+<span class="sig-name descname"><span class="pre">is_active</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.ReplayStorage.is_active" title="Link to this definition"></a></dt>
+<dd><p>Return whether the activity analysis indicates that an equation is
+‘active’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block.</p></li>
+<li><p><strong>i</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the equation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>True</cite> if the equation is active, and <cite>False</cite> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.ReplayStorage.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.ReplayStorage.update" title="Link to this definition"></a></dt>
+<dd><p>Use the supplied <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> to update forward values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code>. Updates values for those keys in <cite>d</cite>
+which are also in the <a class="reference internal" href="#tlm_adjoint.checkpointing.ReplayStorage" title="tlm_adjoint.checkpointing.ReplayStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReplayStorage</span></code></a>.</p></li>
+<li><p><strong>copy</strong> – Whether the values in <cite>d</cite> should be copied when being stored
+in the <a class="reference internal" href="#tlm_adjoint.checkpointing.ReplayStorage" title="tlm_adjoint.checkpointing.ReplayStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReplayStorage</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.ReplayStorage.popleft">
+<span class="sig-name descname"><span class="pre">popleft</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.ReplayStorage.popleft" title="Link to this definition"></a></dt>
+<dd><p>Remove the first equation. Used to deallocate forward variables
+which are no longer needed as the solution of forward equations
+progresses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(n, i)</cite>, indicating that equation <cite>i</cite> in
+block <cite>n</cite> has been removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.Checkpoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpointing.</span></span><span class="sig-name descname"><span class="pre">Checkpoints</span></span><a class="headerlink" href="#tlm_adjoint.checkpointing.Checkpoints" title="Link to this definition"></a></dt>
+<dd><p>Disk checkpointing abstract base class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.Checkpoints.write">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.Checkpoints.write" title="Link to this definition"></a></dt>
+<dd><p>Write checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be written is associated.</p></li>
+<li><p><strong>cp</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+<li><p><strong>data</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+<li><p><strong>storage</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.Checkpoints.read">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ic_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.Checkpoints.read" title="Link to this definition"></a></dt>
+<dd><p>Read checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be read is associated.</p></li>
+<li><p><strong>ics</strong> – Whether forward restart data should be included.</p></li>
+<li><p><strong>data</strong> – Whether non-linear dependency data should be included.</p></li>
+<li><p><strong>ic_ids</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code>. If provided then only variables with
+ID in <cite>ic_ids</cite> are included.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(cp, data, storage)</cite>. Elements of this
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> are as for the three arguments for the
+<a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a> method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.Checkpoints.delete">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.Checkpoints.delete" title="Link to this definition"></a></dt>
+<dd><p>Delete checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be deleted is associated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.PickleCheckpoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpointing.</span></span><span class="sig-name descname"><span class="pre">PickleCheckpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.PickleCheckpoints" title="Link to this definition"></a></dt>
+<dd><p>Disk checkpointing using the pickle module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> – Checkpoint files are stored at
+<cite>[prefix]_[root_pid]_[root_py2f]_[rank].pickle</cite>. Here <cite>prefix</cite> is
+defined by this argument, <cite>root_pid</cite> is the process ID on the root
+process (i.e. process 0), <cite>root_py2f</cite> is the Fortran MPI communicator
+on the root process, and <cite>rank</cite> is the process rank.</p></li>
+<li><p><strong>comm</strong> – A communicator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.PickleCheckpoints.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.PickleCheckpoints.write" title="Link to this definition"></a></dt>
+<dd><p>Write checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be written is associated.</p></li>
+<li><p><strong>cp</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+<li><p><strong>data</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+<li><p><strong>storage</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.PickleCheckpoints.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ic_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.PickleCheckpoints.read" title="Link to this definition"></a></dt>
+<dd><p>Read checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be read is associated.</p></li>
+<li><p><strong>ics</strong> – Whether forward restart data should be included.</p></li>
+<li><p><strong>data</strong> – Whether non-linear dependency data should be included.</p></li>
+<li><p><strong>ic_ids</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code>. If provided then only variables with
+ID in <cite>ic_ids</cite> are included.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(cp, data, storage)</cite>. Elements of this
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> are as for the three arguments for the
+<a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a> method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.PickleCheckpoints.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.PickleCheckpoints.delete" title="Link to this definition"></a></dt>
+<dd><p>Delete checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be deleted is associated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.HDF5Checkpoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.checkpointing.</span></span><span class="sig-name descname"><span class="pre">HDF5Checkpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.HDF5Checkpoints" title="Link to this definition"></a></dt>
+<dd><p>Disk checkpointing using the h5py library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> – Checkpoint files are stored at
+<cite>[prefix]_[root_pid]_[root_py2f].hdf5</cite>. Here <cite>prefix</cite> is defined by
+this argument, <cite>root_pid</cite> is the process ID on the root process (i.e.
+process 0), and <cite>root_py2f</cite> is the Fortran MPI communicator on the root
+process.</p></li>
+<li><p><strong>comm</strong> – A communicator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.HDF5Checkpoints.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.HDF5Checkpoints.write" title="Link to this definition"></a></dt>
+<dd><p>Write checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be written is associated.</p></li>
+<li><p><strong>cp</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+<li><p><strong>data</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+<li><p><strong>storage</strong> – See <a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.HDF5Checkpoints.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ic_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.HDF5Checkpoints.read" title="Link to this definition"></a></dt>
+<dd><p>Read checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be read is associated.</p></li>
+<li><p><strong>ics</strong> – Whether forward restart data should be included.</p></li>
+<li><p><strong>data</strong> – Whether non-linear dependency data should be included.</p></li>
+<li><p><strong>ic_ids</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code>. If provided then only variables with
+ID in <cite>ic_ids</cite> are included.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(cp, data, storage)</cite>. Elements of this
+<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> are as for the three arguments for the
+<a class="reference internal" href="#tlm_adjoint.checkpointing.CheckpointStorage.update" title="tlm_adjoint.checkpointing.CheckpointStorage.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CheckpointStorage.update()</span></code></a> method.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.checkpointing.HDF5Checkpoints.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.checkpointing.HDF5Checkpoints.delete" title="Link to this definition"></a></dt>
+<dd><p>Delete checkpoint data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> – The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> index of the block with which the checkpoint
+data to be deleted is associated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

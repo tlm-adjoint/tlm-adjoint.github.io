@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.manager &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.manager</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/manager/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.manager">
+<span id="tlm-adjoint-manager"></span><h1><a class="reference internal" href="#module-tlm_adjoint.manager" title="tlm_adjoint.manager"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.manager</span></code></a><a class="headerlink" href="#module-tlm_adjoint.manager" title="Link to this heading"></a></h1>
+<p>This module provides a simple <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> interface. Functions
+defined here access and interact with the default manager.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">manager</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.manager" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a>, the current default manager.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.set_manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">set_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.set_manager" title="Link to this definition"></a></dt>
+<dd><p>Set the default manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>manager</strong> – An <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> to use as the default manager.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.restore_manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">restore_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.restore_manager" title="Link to this definition"></a></dt>
+<dd><p>Decorator to revert the default manager to the manager used prior to
+calling the decorated callable. A typical use is</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@restore_manager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">decorated</span><span class="p">(</span><span class="o">*</span><span class="n">M</span><span class="p">):</span>
+    <span class="n">set_manager</span><span class="p">(</span><span class="n">manager</span><span class="p">()</span><span class="o">.</span><span class="n">new</span><span class="p">())</span>
+    <span class="n">forward</span><span class="p">(</span><span class="o">*</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> – A decorated callable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A callable, where the default manager on entry is restored on
+exit.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.configure_checkpointing">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">configure_checkpointing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.configure_checkpointing" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.manager_info">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">manager_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">print</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.manager_info" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.info" title="tlm_adjoint.tlm_adjoint.EquationManager.info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.info()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.reset_manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">reset_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.reset_manager" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.reset" title="tlm_adjoint.tlm_adjoint.EquationManager.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.reset()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.annotation_enabled">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">annotation_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.annotation_enabled" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.annotation_enabled" title="tlm_adjoint.tlm_adjoint.EquationManager.annotation_enabled"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.annotation_enabled()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.start_manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">start_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.start_manager" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.start" title="tlm_adjoint.tlm_adjoint.EquationManager.start"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.start()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.stop_manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">stop_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.stop_manager" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.stop" title="tlm_adjoint.tlm_adjoint.EquationManager.stop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.stop()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.paused_manager">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">paused_manager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.paused_manager" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.paused" title="tlm_adjoint.tlm_adjoint.EquationManager.paused"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.paused()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.manager_disabled">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">manager_disabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.manager_disabled" title="Link to this definition"></a></dt>
+<dd><p>Decorator which can be used to disable processing of equations and
+derivation and solution of tangent-linear equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate</strong> – Whether to disable processing of equations.</p></li>
+<li><p><strong>tlm</strong> – Whether to disable derivation and solution of tangent-linear
+equations.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.configure_tlm">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">configure_tlm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.configure_tlm" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_tlm()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.tlm_enabled">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">tlm_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.tlm_enabled" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.tlm_enabled" title="tlm_adjoint.tlm_adjoint.EquationManager.tlm_enabled"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.tlm_enabled()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.var_tlm">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">var_tlm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.var_tlm" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.var_tlm" title="tlm_adjoint.tlm_adjoint.EquationManager.var_tlm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.var_tlm()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.compute_gradient">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Js</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_forward</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_adjoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_replay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_adjoint_degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_adjoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.compute_gradient" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.compute_gradient" title="tlm_adjoint.tlm_adjoint.EquationManager.compute_gradient"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.compute_gradient()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.manager.new_block">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.manager.</span></span><span class="sig-name descname"><span class="pre">new_block</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.manager.new_block" title="Link to this definition"></a></dt>
+<dd><p>See <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.new_block" title="tlm_adjoint.tlm_adjoint.EquationManager.new_block"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.new_block()</span></code></a>.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

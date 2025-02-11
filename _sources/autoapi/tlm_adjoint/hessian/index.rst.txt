@@ -1,0 +1,300 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.hessian`
+=============================
+
+.. py:module:: tlm_adjoint.hessian
+
+
+Module Contents
+---------------
+
+.. py:class:: Hessian
+
+
+
+
+   
+   Represents a Hessian associated with a given forward.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: action(M, dM, M0=None)
+      :abstractmethod:
+
+      
+      Compute (the conjugate of) a Hessian action on some :math:`\zeta`
+      using an adjoint of a tangent-linear. i.e. compute
+
+      .. math::
+
+          \left( \frac{d}{dm} \left[
+              \frac{d \mathcal{J}}{d m} \zeta \right] \right)^{*,T}.
+
+      :Parameters:
+
+          **M** : variable or Sequence[variable, ...]
+              Defines the control.
+
+          **dM** : variable or Sequence[variable, ...]
+              Defines the direction :math:`\zeta`.
+
+          **M0** : variable or Sequence[variable, ...]
+              Defines the value of the control. `M` is used if not supplied.
+
+
+
+      :Returns:
+
+          **J** : Complex
+              Value of the functional.
+
+          **dJ** : variable or tuple[variable, ...]
+              Value of the directional derivative
+              :math:`\left( d \mathcal{J} / d m \right) \zeta`.
+
+          **ddJ** : variable or tuple[variable, ...]
+              The (conjugate of) the Hessian action on :math:`\zeta`.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: GeneralHessian(forward, *, manager=None)
+
+
+
+
+   
+   Represents a Hessian associated with a given forward. Calls to
+   :meth:`.GeneralHessian.action` re-run the forward.
+
+
+   :Parameters:
+
+       **forward** : callable
+           Accepts one or more variable arguments, and returns a scalar variable
+           defining the functional.
+
+       **manager** : :class:`.EquationManager`
+           Used to create an internal manager via :meth:`.EquationManager.new`.
+           `manager()` is used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: action(M, dM, M0=None)
+
+      
+      Compute (the conjugate of) a Hessian action on some :math:`\zeta`
+      using an adjoint of a tangent-linear. i.e. compute
+
+      .. math::
+
+          \left( \frac{d}{dm} \left[
+              \frac{d \mathcal{J}}{d m} \zeta \right] \right)^{*,T}.
+
+      :Parameters:
+
+          **M** : variable or Sequence[variable, ...]
+              Defines the control.
+
+          **dM** : variable or Sequence[variable, ...]
+              Defines the direction :math:`\zeta`.
+
+          **M0** : variable or Sequence[variable, ...]
+              Defines the value of the control. `M` is used if not supplied.
+
+
+
+      :Returns:
+
+          **J** : Complex
+              Value of the functional.
+
+          **dJ** : variable or tuple[variable, ...]
+              Value of the directional derivative
+              :math:`\left( d \mathcal{J} / d m \right) \zeta`.
+
+          **ddJ** : variable or tuple[variable, ...]
+              The (conjugate of) the Hessian action on :math:`\zeta`.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: GaussNewton(R_inv_action, B_inv_action=None)
+
+
+
+
+   
+   Represents a Gauss-Newton approximation for a Hessian.
+
+   This defines a Hessian approximation
+
+   .. math::
+
+       H = J^T R_\text{obs}^{-1} J + B^{-1},
+
+   where :math:`J` is the forward Jacobian. In a variational assimilation
+   approach :math:`R_\text{obs}^{-1}` corresponds to the observational inverse
+   covariance and :math:`B^{-1}` corresponds to the background inverse
+   covariance.
+
+   :Parameters:
+
+       **R_inv_action** : callable
+           Accepts one or more variables as arguments, defining a direction, and
+           returns a variable or a :class:`Sequence` of variables defining the
+           conjugate of the action of :math:`R^{-1}` on this direction. Arguments
+           should not be modified.
+
+       **B_inv_action** : callable
+           Accepts one or more variables as arguments, defining a direction, and
+           returns a variable or a :class:`Sequence` of variables defining the
+           conjugate of the action of :math:`B^{-1}` on this direction. Arguments
+           should not be modified.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: action(M, dM, M0=None)
+
+      
+      Compute (the conjugate of) a Hessian action on some :math:`\zeta`,
+      using the Gauss-Newton approximation for the Hessian. i.e. compute
+
+      .. math::
+
+          \left[ J^T R_\text{obs}^{-1} J \zeta + B^{-1} \zeta \right]^{*,T}.
+
+      :Parameters:
+
+          **M** : variable or Sequence[variable, ...]
+              Defines the control.
+
+          **dM** : variable or Sequence[variable, ...]
+              Defines the direction :math:`\zeta`.
+
+          **M0** : variable or Sequence[variable, ...]
+              Defines the value of the control. `M` is used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: GeneralGaussNewton(forward, R_inv_action, B_inv_action=None, *, manager=None)
+
+
+
+
+   
+   Represents a Gauss-Newton approximation to a Hessian associated with a
+   given forward. Calls to :meth:`.GaussNewton.action` re-run the forward.
+
+
+   :Parameters:
+
+       **forward** : callable
+           Accepts one or more variable arguments, and returns a variable
+           or :class:`Sequence` of variables defining the state.
+
+       **R_inv_action** : callable
+           See :class:`.GaussNewton`.
+
+       **B_inv_action** : callable
+           See :class:`.GaussNewton`.
+
+       **manager** : :class:`.EquationManager`
+           Used to create an internal manager via :meth:`.EquationManager.new`.
+           `manager()` is used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

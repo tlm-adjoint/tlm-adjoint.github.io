@@ -1,0 +1,337 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.verification &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.verification</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/verification/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.verification">
+<span id="tlm-adjoint-verification"></span><h1><a class="reference internal" href="#module-tlm_adjoint.verification" title="tlm_adjoint.verification"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.verification</span></code></a><a class="headerlink" href="#module-tlm_adjoint.verification" title="Link to this heading"></a></h1>
+<p>This module implements Taylor remainder convergence testing using the
+approach described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>P. E. Farrell, D. A. Ham, S. W. Funke, and M. E. Rognes, ‘Automated
+derivation of the adjoint of high-level transient finite element
+programs’, SIAM Journal on Scientific Computing 35(4), pp. C369–C393,
+2013, doi: 10.1137/120873558</p></li>
+</ul>
+</div></blockquote>
+<p>Specifically for a sufficiently regular functional <span class="math notranslate nohighlight">\(J\)</span>, via Taylor’s
+theorem we have, for some direction <span class="math notranslate nohighlight">\(\zeta\)</span> and with perturbation
+magnitude controlled by <span class="math notranslate nohighlight">\(\varepsilon\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\left| J \left( m + \varepsilon \right) - J \left( m \right) \right|
+    = O \left( \varepsilon \right),\]</div>
+<div class="math notranslate nohighlight">
+\[\left| J \left( m + \varepsilon \right) - J \left( m \right)
+    - \varepsilon dJ \left( m; \zeta \right) \right|
+    = O \left( \varepsilon^2 \right),\]</div>
+<p>where here <span class="math notranslate nohighlight">\(dJ \left( m; \zeta \right)\)</span> denotes the directional
+derivative of <span class="math notranslate nohighlight">\(J\)</span> with respect to <span class="math notranslate nohighlight">\(m\)</span> with direction <span class="math notranslate nohighlight">\(\zeta\)</span>.
+Here we refer to the quantity appearing on the left-hand-side in the first case
+as the ‘uncorrected Taylor remainder magnitude’, and the quantity appearing on
+the left-hand-side in the second case as the ‘corrected Taylor remainder
+magnitude’</p>
+<p>A Taylor remainder convergence test considers some direction, and a number of
+different values for <span class="math notranslate nohighlight">\(\varepsilon\)</span>, and investigates the convergence
+rates of the uncorrected and corrected Taylor remainder magnitudes, with the
+directional derivative computed using a tangent-linear or adjoint. In a
+successful verification the uncorrected Taylor remainder magnitude is observed
+to converge to zero at first order, while the corrected Taylor remainder
+magnitude is observed to converge to zero at second order.</p>
+<p>There are a number of ways that a Taylor remainder convergence test can fail,
+including:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The computed derivative is incorrect. This is the case that the test is
+designed to find, and indicates an error in the tangent-linear or adjoint
+calculation.</p></li>
+<li><p>The considered values of <span class="math notranslate nohighlight">\(\varepsilon\)</span> are too large, and the
+asymptotic convergence orders are not observable.</p></li>
+<li><p>The considered values of <span class="math notranslate nohighlight">\(\varepsilon\)</span> are too small, and iterative
+solver tolerances or floating point roundoff prevent the convergence
+orders being observable.</p></li>
+<li><p>The convergence order is higher than expected. For example if the
+directional derivative is zero then the uncorrected Taylor remainder
+magnitude can converge at higher than first order.</p></li>
+</ul>
+</div></blockquote>
+<p>In principle higher order derivative calculations can be tested by considering
+more terms in the Taylor expansion of the functional. In practice the
+corresponding higher order convergence rate can mean that iterative solver
+tolerances or floating point roundoff effects are more problematic. Instead,
+one can verify the derivative of a derivative, by redefining <span class="math notranslate nohighlight">\(J\)</span> to be a
+directional derivative of some other functional <span class="math notranslate nohighlight">\(K\)</span>, with the directional
+derivative computed using a tangent-linear. A successful verification then once
+again corresponds to second order convergence of the corrected Taylor remainder
+magnitude.</p>
+<p>The functions defined in this module log the uncorrected and corrected Taylor
+remainder magnitudes, and also log the observed orders computed using a power
+law fit between between consecutive pairs of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>.
+Logging is performed on a logging module logger, with name
+<cite>‘tlm_adjoint.verification</cite>’ and with severity <cite>logging.INFO</cite>. The minimum
+order computed for the corrected Taylor remainder magnitude is returned.</p>
+<p>A typical test considers tangent-linears and adjoints up to the relevant order,
+e.g. to verify Hessian calculations</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.verification.taylor_test">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.verification.</span></span><span class="sig-name descname"><span class="pre">taylor_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J_val</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dJ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddJ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dM</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.verification.taylor_test" title="Link to this definition"></a></dt>
+<dd><p>Perform a Taylor remainder convergence test.</p>
+<p>Originally aimed for similar behaviour to the <cite>taylor_test</cite> function in
+dolfin-adjoint 2017.1.0.</p>
+<p>Uncorrected and corrected Taylor remainder magnitudes are computed by
+repeatedly re-running the forward and evaluating the functional. The
+perturbation direction <span class="math notranslate nohighlight">\(\zeta\)</span> is defined by the <cite>dM</cite> argument.
+<span class="math notranslate nohighlight">\(\varepsilon\)</span> is set equal to</p>
+<div class="math notranslate nohighlight">
+\[\varepsilon = 2^{-p} \eta
+    \quad \text{ for } p \in \left\{ 0, \ldots, P - 1 \right\},\]</div>
+<p>where the norm appearing here is defined to be the <span class="math notranslate nohighlight">\(l_\infty\)</span> norm of
+the control value degree of freedom vector. The argument <cite>seed</cite> sets the
+value of <span class="math notranslate nohighlight">\(\eta\)</span>, and the argument <cite>size</cite> sets the value of <span class="math notranslate nohighlight">\(P\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> – A callable which accepts one or more variable arguments, and
+which returns a variable defining the forward functional <span class="math notranslate nohighlight">\(J\)</span>.</p></li>
+<li><p><strong>M</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining the control
+<span class="math notranslate nohighlight">\(m\)</span>.</p></li>
+<li><p><strong>J_val</strong> – A scalar defining the value of the functional <span class="math notranslate nohighlight">\(J\)</span> for
+control value defined by <cite>M0</cite>.</p></li>
+<li><p><strong>dJ</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining a value
+for the derivative of the functional with respect to the control.
+Required if <cite>ddJ</cite> is not supplied.</p></li>
+<li><p><strong>ddJ</strong> – A <a class="reference internal" href="../hessian/index.html#tlm_adjoint.hessian.Hessian" title="tlm_adjoint.hessian.Hessian"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hessian</span></code></a> used to compute the Hessian action on the
+considered perturbation direction. If supplied then a higher order
+corrected Taylor remainder magnitude is computed. If <cite>dJ</cite> is not
+supplied, also computes the first order directional derivative.</p></li>
+<li><p><strong>seed</strong> – Defines the value of <span class="math notranslate nohighlight">\(\eta\)</span>. Controls the magnitude of the
+perturbation.</p></li>
+<li><p><strong>dM</strong> – Defines the perturbation direction <span class="math notranslate nohighlight">\(\zeta\)</span>. If not provided
+then the direction used has degrees of freedom real and (in the complex
+case) complex components set using <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.random()</span></code></a>, scaled
+by the <span class="math notranslate nohighlight">\(l_\infty\)</span> norm of the degree of freedom vector for <cite>M</cite> if
+this is non-zero.</p></li>
+<li><p><strong>M0</strong> – Defines the value of the control at which the functional and
+derivatives are evaluated. <cite>M</cite> is used if not supplied.</p></li>
+<li><p><strong>size</strong> – The number of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span> to consider.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The minimum order observed, via a power law fit between
+consecutive pairs of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>, in the calculations
+for the corrected Taylor remainder magnitude. In a successful
+verification this should be close to 2 if <cite>ddJ</cite> is not supplied, and
+close to 3 if <cite>ddJ</cite> is supplied.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.verification.taylor_test_tlm">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.verification.</span></span><span class="sig-name descname"><span class="pre">taylor_test_tlm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_order</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dMs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.verification.taylor_test_tlm" title="Link to this definition"></a></dt>
+<dd><p>Perform a Taylor remainder convergence test for a functional <span class="math notranslate nohighlight">\(J\)</span>
+defined to the <cite>(tlm_order - 1)</cite> th derivative of some functional
+<span class="math notranslate nohighlight">\(K\)</span>. The <cite>tlm_order</cite> th derivative of <span class="math notranslate nohighlight">\(K\)</span>, appearing in the
+corrected Taylor remainder magnitude, is computed using a <cite>tlm_order</cite> th
+order tangent-linear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> – A callable which accepts one or more variable arguments, and
+which returns a variable defining the forward functional <span class="math notranslate nohighlight">\(K\)</span>.</p></li>
+<li><p><strong>M</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining the control
+<span class="math notranslate nohighlight">\(m\)</span> and its value.</p></li>
+<li><p><strong>tlm_order</strong> – An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> defining the tangent-linear order to
+test.</p></li>
+<li><p><strong>seed</strong> – Controls the perturbation magnitude. See <a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a>.</p></li>
+<li><p><strong>dMs</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of length <cite>tlm_order</cite> whose elements are each
+a variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables. The functional
+<span class="math notranslate nohighlight">\(J\)</span> appearing in the definition of the Taylor remainder
+magnitudes is defined to be a <cite>(tlm_adjoint - 1)</cite> th derivative,
+defined by successively taking the derivative of <span class="math notranslate nohighlight">\(K\)</span> with respect
+to the control and with directions defined by the <cite>dM[:-1]</cite> (with the
+directions considered in order). The perturbation direction
+<span class="math notranslate nohighlight">\(\zeta\)</span> is defined by <cite>dM[-1]</cite> – see <a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a>. By
+default <cite>dMs[:-1]</cite> have real and (in the complex case) complex
+components set using <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.random()</span></code></a>, and the default for
+<cite>dMs[-1]</cite> is set as described in <a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a> (see the <cite>dM</cite>
+argument).</p></li>
+<li><p><strong>size</strong> – The number of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span> to consider. See
+<a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a>.</p></li>
+<li><p><strong>manager</strong> – An <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> used to create an internal
+manager via <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.new" title="tlm_adjoint.tlm_adjoint.EquationManager.new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.new()</span></code></a>. <cite>manager()</cite> is used if not
+supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The minimum order observed, via a power law fit between
+consecutive pairs of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>, in the calculations
+for the corrected Taylor remainder magnitude. In a successful
+verification this should be close to 2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.verification.taylor_test_tlm_adjoint">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.verification.</span></span><span class="sig-name descname"><span class="pre">taylor_test_tlm_adjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_order</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dMs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.verification.taylor_test_tlm_adjoint" title="Link to this definition"></a></dt>
+<dd><p>Perform a Taylor remainder convergence test for a functional <span class="math notranslate nohighlight">\(J\)</span>
+defined to the <cite>(adjoint_order - 1)</cite> th derivative of some functional
+<span class="math notranslate nohighlight">\(K\)</span>. The <cite>adjoint_order</cite> th derivative of <span class="math notranslate nohighlight">\(K\)</span>, appearing in the
+corrected Taylor remainder magnitude, is computed using an adjoint
+associated with an <cite>(adjoint_order - 1)</cite> th order tangent-linear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forward</strong> – A callable which accepts one or more variable arguments, and
+which returns a variable defining the forward functional <span class="math notranslate nohighlight">\(K\)</span>.</p></li>
+<li><p><strong>M</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining the control
+<span class="math notranslate nohighlight">\(m\)</span> and its value.</p></li>
+<li><p><strong>adjoint_order</strong> – An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> defining the adjoint order to test.</p></li>
+<li><p><strong>seed</strong> – Controls the perturbation magnitude. See <a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a>.</p></li>
+<li><p><strong>dMs</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of length <cite>adjoint_order</cite> whose elements are
+each a variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables. The functional
+<span class="math notranslate nohighlight">\(J\)</span> appearing in the definition of the Taylor remainder
+magnitudes is defined to be a <cite>(adjoint_order - 1)</cite> th derivative,
+defined by successively taking the derivative of <span class="math notranslate nohighlight">\(K\)</span> with respect
+to the control and with directions defined by the <cite>dM[:-1]</cite> (with the
+directions considered in order). The perturbation direction
+<span class="math notranslate nohighlight">\(\zeta\)</span> is defined by <cite>dM[-1]</cite> – see <a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a>. By
+default <cite>dMs[:-1]</cite> have real and (in the complex case) complex
+components set using <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="(in NumPy v2.2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.random()</span></code></a>, and the default for
+<cite>dMs[-1]</cite> is set as described in <a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a> (see the <cite>dM</cite>
+argument).</p></li>
+<li><p><strong>size</strong> – The number of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span> to consider. See
+<a class="reference internal" href="#tlm_adjoint.verification.taylor_test" title="tlm_adjoint.verification.taylor_test"><code class="xref py py-func docutils literal notranslate"><span class="pre">taylor_test()</span></code></a>.</p></li>
+<li><p><strong>manager</strong> – An <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> used to create an internal
+manager via <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.new" title="tlm_adjoint.tlm_adjoint.EquationManager.new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.new()</span></code></a>. <cite>manager()</cite> is used if not
+supplied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The minimum order observed, via a power law fit between
+consecutive pairs of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>, in the calculations
+for the corrected Taylor remainder magnitude. In a successful
+verification this should be close to 2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1150 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.interface &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.interface</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/interface/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.interface">
+<span id="tlm-adjoint-interface"></span><h1><a class="reference internal" href="#module-tlm_adjoint.interface" title="tlm_adjoint.interface"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.interface</span></code></a><a class="headerlink" href="#module-tlm_adjoint.interface" title="Link to this heading"></a></h1>
+<p>This module defines an interface for interaction with backend data types.
+This is implemented via runtime binding of mixins. The
+<a class="reference internal" href="#tlm_adjoint.interface.VariableInterface" title="tlm_adjoint.interface.VariableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableInterface</span></code></a> adds methods to ‘variables’ which can be used to
+interact with backend variables. The <a class="reference internal" href="#tlm_adjoint.interface.SpaceInterface" title="tlm_adjoint.interface.SpaceInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceInterface</span></code></a> adds methods to
+‘spaces’ which define the vector spaces in which those ‘variables’ are defined.</p>
+<p>The extra methods are accessed using the callables defined in this module
+(which also handle some extra details, e.g. related to cache invalidation and
+space type checking). Typically these are prefixed with <cite>space_</cite> for spaces and
+<cite>var_</cite> for variables.</p>
+<p>The interface distinguishes between original backend ‘variables’, which both
+define symbolic variables and store values, and replacement ‘variables’, which
+define the same variables but which need not store values.</p>
+<p>Variables have an associated ‘space type’, which indicates e.g. if the variable
+is ‘primal’, meaning a member on an originating vector space, or ‘conjugate
+dual’, meaning a member of the corresponding antidual space of antilinear
+functionals from the originating vector space. Variables can also be ‘dual’,
+meaning a member of the dual space of linear functionals, or ‘conjugate’,
+meaning a member of a space defined by a conjugate operator from the primal
+space. This conjugate operator is defined by complex conjugation of the vector
+of degrees of freedom, and could e.g. correspond to complex conjugation of a
+finite element discretized function.</p>
+<p>The space type associated with a variable is defined relative to an originating
+vector space (e.g. a finite element discrete function space). A ‘relative space
+type’ is defined relative to one of the ‘primal’, ‘conjugate’, ‘dual’, or
+‘conjugate dual’ spaces. For example the primal space associated with the dual
+space is the dual space, and the dual space associated with the dual space is
+the primal space.</p>
+<p>This module defines a default communicator <cite>DEFAULT_COMM</cite>.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.comm_dup_cached">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">comm_dup_cached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.comm_dup_cached" title="Link to this definition"></a></dt>
+<dd><p>Return an internal duplicated communicator with key <cite>key</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> – A communicator. Defines the base communicator.</p></li>
+<li><p><strong>key</strong> – The key.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An internal duplicated communicator. May be <cite>comm</cite> itself. Freed
+when the original base communicator is freed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.garbage_cleanup">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">garbage_cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.garbage_cleanup" title="Link to this definition"></a></dt>
+<dd><p>Call <cite>petsc4py.PETSc.garbage_cleanup(comm)</cite> for a communicator, and any
+communicators duplicated from it using <a class="reference internal" href="#tlm_adjoint.interface.comm_dup_cached" title="tlm_adjoint.interface.comm_dup_cached"><code class="xref py py-func docutils literal notranslate"><span class="pre">comm_dup_cached()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>comm</strong> – A communicator. Defaults to <cite>DEFAULT_COMM</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.add_interface">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">add_interface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.add_interface" title="Link to this definition"></a></dt>
+<dd><p>Attach a mixin <cite>interface_cls</cite>, defining an interface, to <cite>obj</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – An object to which the mixin should be attached.</p></li>
+<li><p><strong>interface_cls</strong> – A subclass of <a class="reference internal" href="#tlm_adjoint.interface.SpaceInterface" title="tlm_adjoint.interface.SpaceInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceInterface</span></code></a> or
+<a class="reference internal" href="#tlm_adjoint.interface.VariableInterface" title="tlm_adjoint.interface.VariableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableInterface</span></code></a> defining the interface.</p></li>
+<li><p><strong>attrs</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining any attributes. Used to set an
+attribute <cite>_tlm_adjoint__space_interface_attrs</cite> (for a
+<a class="reference internal" href="#tlm_adjoint.interface.SpaceInterface" title="tlm_adjoint.interface.SpaceInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceInterface</span></code></a>) or <cite>_tlm_adjoint__var_interface_attrs</cite>
+(for a <a class="reference internal" href="#tlm_adjoint.interface.VariableInterface" title="tlm_adjoint.interface.VariableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableInterface</span></code></a>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.SpaceInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">SpaceInterface</span></span><a class="headerlink" href="#tlm_adjoint.interface.SpaceInterface" title="Link to this definition"></a></dt>
+<dd><p>A mixin defining an interface for spaces. Space types do not inherit
+from this class – instead an interface is defined by a
+<a class="reference internal" href="#tlm_adjoint.interface.SpaceInterface" title="tlm_adjoint.interface.SpaceInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceInterface</span></code></a> subclass, and methods are bound dynamically at
+runtime using <a class="reference internal" href="#tlm_adjoint.interface.add_interface" title="tlm_adjoint.interface.add_interface"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_interface()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.is_space">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">is_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.is_space" title="Link to this definition"></a></dt>
+<dd><p>Return whether <cite>space</cite> is a space – i.e. has had a
+<a class="reference internal" href="#tlm_adjoint.interface.SpaceInterface" title="tlm_adjoint.interface.SpaceInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceInterface</span></code></a> attached.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>space</strong> – An arbitrary <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>True</cite> if <cite>space</cite> is a space, and <cite>False</cite> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_comm">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_comm" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>space</strong> – A space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The communicator associated with the space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_default_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_default_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_default_space_type" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>space</strong> – A space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The default space type associated with the space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_dtype">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_dtype" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>space</strong> – A space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data type associated with the space. Typically
+<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.double" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.double</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.cdouble" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.cdouble</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_id">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_id" title="Link to this definition"></a></dt>
+<dd><p>Return a unique <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> ID associated with a space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>space</strong> – The space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The unique <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> ID.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_eq">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_eq" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space</strong> – The space.</p></li>
+<li><p><strong>other</strong> – A second space, to compare to space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the two spaces are equal.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_local_size">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_local_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_local_size" title="Link to this definition"></a></dt>
+<dd><p>Return the process local number of degrees of freedom associated with
+a variable in a space. This is the number of ‘owned’ degrees of freedom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The process local number of degrees of freedom for a variable in
+the space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_global_size">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_global_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_global_size" title="Link to this definition"></a></dt>
+<dd><p>Return the global number of degrees of freedom associated with a
+variable in a space. This is the total number of ‘owned’ degrees of
+freedom, summed across all processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The global number of degrees of freedom for a variable in the
+space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_local_indices">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_local_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_local_indices" title="Link to this definition"></a></dt>
+<dd><p>Return the indices of process local degrees of freedom associated with
+a variable in a space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The space.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">slice</span></code></a>, yielding the indices of the process local
+elements.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.space_new">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">space_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.space_new" title="Link to this definition"></a></dt>
+<dd><p>Return a new variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space</strong> – The space.</p></li>
+<li><p><strong>name</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> name for the variable.</p></li>
+<li><p><strong>space_type</strong> – The space type for the new variable. <cite>‘primal’</cite>, <cite>‘dual’</cite>,
+<cite>‘conjugate’</cite>, or <cite>‘conjugate_dual’</cite>. Defaults to
+<cite>space_default_space_type(space)</cite>.</p></li>
+<li><p><strong>static</strong> – Defines whether the new variable is static, meaning that it is
+stored by reference in checkpointing/replay, and an associated
+tangent-linear variable is zero.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving the new variable may be
+cached. Default <cite>static</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.relative_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">relative_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_space_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.relative_space_type" title="Link to this definition"></a></dt>
+<dd><p>Return a relative space type. For example if <cite>space_type</cite> is <cite>‘dual’</cite>
+and <cite>rel_space_type</cite> is <cite>‘conjugate_dual’</cite>, this returns <cite>‘conjugate’</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space_type</strong> – An input space type. One of <cite>‘primal’</cite>, <cite>‘conjugate’</cite>,
+<cite>‘dual’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+<li><p><strong>rel_space_type</strong> – The relative space type to return. One of <cite>‘primal’</cite>,
+<cite>‘conjugate’</cite>, <cite>‘dual’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A space type relative to <cite>space_type</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.conjugate_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">conjugate_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.conjugate_space_type" title="Link to this definition"></a></dt>
+<dd><p>Defines a map</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘primal’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘conjugate’</cite></p></li>
+<li><p><cite>‘conjugate’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘primal’</cite></p></li>
+<li><p><cite>‘dual’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘conjugate_dual’</cite></p></li>
+<li><p><cite>‘conjugate_dual’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘dual’</cite></p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The space type conjugate to <cite>space_type</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.dual_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">dual_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.dual_space_type" title="Link to this definition"></a></dt>
+<dd><p>Defines a map</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘primal’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘dual’</cite></p></li>
+<li><p><cite>‘conjugate’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘conjugate_dual’</cite></p></li>
+<li><p><cite>‘dual’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘primal’</cite></p></li>
+<li><p><cite>‘conjugate_dual’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘conjugate’</cite></p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The space type dual to <cite>space_type</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.conjugate_dual_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">conjugate_dual_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.conjugate_dual_space_type" title="Link to this definition"></a></dt>
+<dd><p>Defines a map</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘primal’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘conjugate_dual’</cite></p></li>
+<li><p><cite>‘conjugate’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘dual’</cite></p></li>
+<li><p><cite>‘dual’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘conjugate’</cite></p></li>
+<li><p><cite>‘conjugate_dual’</cite> <span class="math notranslate nohighlight">\(\rightarrow\)</span> <cite>‘primal’</cite></p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The space type conjugate dual to <cite>space_type</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.no_space_type_checking">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">no_space_type_checking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.no_space_type_checking" title="Link to this definition"></a></dt>
+<dd><p>Decorator to disable space type checking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> – A callable for which space type checking should be disabled.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A callable for which space type checking is disabled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.paused_space_type_checking">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">paused_space_type_checking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.paused_space_type_checking" title="Link to this definition"></a></dt>
+<dd><p>Construct a context manager which can be used to temporarily disable
+space type checking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A context manager which can be used to temporarily disable
+space type checking.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.SpaceTypeError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">SpaceTypeError</span></span><a class="headerlink" href="#tlm_adjoint.interface.SpaceTypeError" title="Link to this definition"></a></dt>
+<dd><p>Raised when an unexpected space type is encountered with space type
+checking enabled.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.check_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">check_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.check_space_type" title="Link to this definition"></a></dt>
+<dd><p>Check that a variable has a given space type.</p>
+<p>Raises a <a class="reference internal" href="#tlm_adjoint.interface.SpaceTypeError" title="tlm_adjoint.interface.SpaceTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTypeError</span></code></a> if the check fails and space type
+checking is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable, whose space type should be checked.</p></li>
+<li><p><strong>space_type</strong> – The space type. One of <cite>‘primal’</cite>, <cite>‘conjugate’</cite>,
+<cite>‘dual’</cite>, or <cite>‘conjugate_dual’</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.check_space_types">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">check_space_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.check_space_types" title="Link to this definition"></a></dt>
+<dd><p>Check that <cite>x</cite> and <cite>y</cite> have compatible space types.</p>
+<p>Raises a <a class="reference internal" href="#tlm_adjoint.interface.SpaceTypeError" title="tlm_adjoint.interface.SpaceTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTypeError</span></code></a> if the check fails and space type
+checking is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>y</strong> – A variable.</p></li>
+<li><p><strong>rel_space_type</strong> – Check that the space type of <cite>x</cite> is <cite>rel_space_type</cite>
+relative to <cite>y</cite>. For example if <cite>rel_space_type=’dual’</cite>, and the
+space type of <cite>y</cite> is <cite>‘conjugate_dual’</cite>, checks that the space type of
+<cite>x</cite> is <cite>‘conjugate’</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.check_space_types_conjugate">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">check_space_types_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.check_space_types_conjugate" title="Link to this definition"></a></dt>
+<dd><p>Check that <cite>x</cite> has space type conjugate to the space type for <cite>y</cite>.</p>
+<p>Raises a <a class="reference internal" href="#tlm_adjoint.interface.SpaceTypeError" title="tlm_adjoint.interface.SpaceTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTypeError</span></code></a> if the check fails and space type
+checking is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>y</strong> – A variable.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.check_space_types_dual">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">check_space_types_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.check_space_types_dual" title="Link to this definition"></a></dt>
+<dd><p>Check that <cite>x</cite> has space type dual to the space type for <cite>y</cite>.</p>
+<p>Raises a <a class="reference internal" href="#tlm_adjoint.interface.SpaceTypeError" title="tlm_adjoint.interface.SpaceTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTypeError</span></code></a> if the check fails and space type
+checking is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>y</strong> – A variable.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.check_space_types_conjugate_dual">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">check_space_types_conjugate_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.check_space_types_conjugate_dual" title="Link to this definition"></a></dt>
+<dd><p>Check that <cite>x</cite> has space type conjugate dual to the space type for <cite>y</cite>.</p>
+<p>Raises a <a class="reference internal" href="#tlm_adjoint.interface.SpaceTypeError" title="tlm_adjoint.interface.SpaceTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTypeError</span></code></a> if the check fails and space type
+checking is enabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>y</strong> – A variable.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.VariableInterface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">VariableInterface</span></span><a class="headerlink" href="#tlm_adjoint.interface.VariableInterface" title="Link to this definition"></a></dt>
+<dd><p>A mixin defining an interface for variables. Variables types do not
+inherit from this class – instead an interface is defined by a
+<a class="reference internal" href="#tlm_adjoint.interface.VariableInterface" title="tlm_adjoint.interface.VariableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableInterface</span></code></a> subclass, and methods are bound dynamically at
+runtime using <a class="reference internal" href="#tlm_adjoint.interface.add_interface" title="tlm_adjoint.interface.add_interface"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_interface()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.is_var">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">is_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.is_var" title="Link to this definition"></a></dt>
+<dd><p>Return whether <cite>x</cite> is a variable – i.e. has had a
+<a class="reference internal" href="#tlm_adjoint.interface.VariableInterface" title="tlm_adjoint.interface.VariableInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableInterface</span></code></a> added.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – An arbitrary <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>True</cite> if <cite>x</cite> is a variable, and <cite>False</cite> otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_comm">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_comm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_comm" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – A variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The communicator associated with the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_space">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_space" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – A variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The space associated with the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_space_type">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_space_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_space_type" title="Link to this definition"></a></dt>
+<dd><p>Return the space type of a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The variable.</p></li>
+<li><p><strong>rel_space_type</strong> – If supplied then return a space type relative to the
+variable space type. One of <cite>‘primal’</cite>, <cite>‘conjugate’</cite>, <cite>‘dual’</cite>, or
+<cite>‘conjugate_dual’</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The space type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_dtype">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_dtype" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – A variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The data type associated with the variable. Typically
+<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.double" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.double</span></code></a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.cdouble" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.cdouble</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_id">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_id" title="Link to this definition"></a></dt>
+<dd><p>Return a unique <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> ID associated with a variable.</p>
+<p>Note that two variables share the same ID if they represent the same
+symbolic variable – for example if one variable represents both a variable
+and stores a value, and a second the same variable with no value (i.e. is a
+‘replacement’), then the two variables share the same ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> ID.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_name">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_name" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – A variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> name of the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_state">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_state" title="Link to this definition"></a></dt>
+<dd><p>Return the value of the state counter for a variable. Updated when the
+value of the variable changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> state value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_lock_state">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_lock_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_lock_state" title="Link to this definition"></a></dt>
+<dd><p>Lock the state of a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.VariableStateLockDictionary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">VariableStateLockDictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.VariableStateLockDictionary" title="Link to this definition"></a></dt>
+<dd><p>A dictionary-like class. If a value is a variable and not a replacement
+then the variable state is ‘locked’ so that a state update, with the lock
+active, will raise an exception.</p>
+<p>State locks are automatically released when the
+<a class="reference internal" href="#tlm_adjoint.interface.VariableStateLockDictionary" title="tlm_adjoint.interface.VariableStateLockDictionary"><code class="xref py py-class docutils literal notranslate"><span class="pre">VariableStateLockDictionary</span></code></a> is destroyed. Consequently objects of
+this type should be used with caution. In particular object destruction via
+the garbage collector may lead to non-deterministic release of the state
+lock.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_locked">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_locked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_locked" title="Link to this definition"></a></dt>
+<dd><p>Construct a context manager which can be used to temporarily lock the
+state of one or more variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of variables.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A context manager which can be used to temporarily lock the state
+of the variables in <cite>X</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_update_state">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_update_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_update_state" title="Link to this definition"></a></dt>
+<dd><p>Ensure that variable state is updated, and check for cache invalidation.
+May delegate updating of the state to a backend library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of variables.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_is_static">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_is_static</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_is_static" title="Link to this definition"></a></dt>
+<dd><p>Return whether a variable is flagged as ‘static’. A static variable
+is stored by reference in checkpointing/replay, and the associated
+tangent-linear variable is zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the variable is flagged as static.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_is_cached">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_is_cached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_is_cached" title="Link to this definition"></a></dt>
+<dd><p>Return whether results involving this variable may be cached.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether results involving the variable may be cached.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_caches">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_caches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_caches" title="Link to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="../caches/index.html#tlm_adjoint.caches.Caches" title="tlm_adjoint.caches.Caches"><code class="xref py py-class docutils literal notranslate"><span class="pre">Caches</span></code></a> associated with a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <a class="reference internal" href="../caches/index.html#tlm_adjoint.caches.Caches" title="tlm_adjoint.caches.Caches"><code class="xref py py-class docutils literal notranslate"><span class="pre">Caches</span></code></a> associated with the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_update_caches">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_update_caches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_update_caches" title="Link to this definition"></a></dt>
+<dd><p>Check for cache invalidation associated with a possible change in value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of variables whose value may have changed.</p></li>
+<li><p><strong>value</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining the
+possible new values. <cite>X</cite> is used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_zero">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_zero" title="Link to this definition"></a></dt>
+<dd><p>Zero a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_assign">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_assign" title="Link to this definition"></a></dt>
+<dd><p>Perform an assignment <cite>x = y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>y</strong> – A variable.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_axpy">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_axpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_axpy" title="Link to this definition"></a></dt>
+<dd><p>Perform an in-place addition <cite>y += alpha * x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – A variable.</p></li>
+<li><p><strong>alpha</strong> – A scalar.</p></li>
+<li><p><strong>x</strong> – A variable.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_inner">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_inner" title="Link to this definition"></a></dt>
+<dd><p>Compute the <span class="math notranslate nohighlight">\(l_2\)</span> inner product of the degrees of freedom vectors
+associated with <cite>x</cite> and <cite>y</cite>. By convention if <cite>y</cite> is in the conjugate dual
+space associated with <cite>x</cite>, this returns the complex conjugate of the
+functional associated with <cite>y</cite> evaluated at <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>y</strong> – A variable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the inner product.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_linf_norm">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_linf_norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_linf_norm" title="Link to this definition"></a></dt>
+<dd><p>Compute the <span class="math notranslate nohighlight">\(l_\infty\)</span> norm of the degrees of freedom vector
+associated with a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <span class="math notranslate nohighlight">\(l_\infty\)</span> norm of the degrees of freedom vector.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_local_size">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_local_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_local_size" title="Link to this definition"></a></dt>
+<dd><p>Return the process local number of degrees of freedom associated with
+a variable. This is the number of ‘owned’ degrees of freedom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The process local number of degrees of freedom for the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_global_size">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_global_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_global_size" title="Link to this definition"></a></dt>
+<dd><p>Return the global number of degrees of freedom associated with a
+variable. This is the total number of ‘owned’ degrees of freedom, summed
+across all processes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The global number of degrees of freedom for the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_local_indices">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_local_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_local_indices" title="Link to this definition"></a></dt>
+<dd><p>Return the indices of process local degrees of freedom associated with
+a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <a class="reference external" href="https://docs.python.org/3/library/functions.html#slice" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">slice</span></code></a>, yielding the indices of the process local
+elements.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_get_values">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_get_values" title="Link to this definition"></a></dt>
+<dd><p>Return a copy of the process local degrees of freedom vector associated
+with a variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing a copy of the degrees of
+freedom.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_set_values">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_set_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_set_values" title="Link to this definition"></a></dt>
+<dd><p>Set the process local degrees of freedom vector associated with a
+variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The variable.</p></li>
+<li><p><strong>values</strong> – A <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing the degrees of freedom
+values.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_to_petsc">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_to_petsc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_to_petsc" title="Link to this definition"></a></dt>
+<dd><p>Copy values from a variable into a <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a>.</p>
+<p>Does not update the <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a> ghost.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x</strong><span class="classifier">variable</span></dt><dd><p>The input variable.</p>
+</dd>
+<dt><strong>vec</strong><span class="classifier"><a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a></span></dt><dd><p>The output <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a>. The ghost is not updated.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_from_petsc">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_from_petsc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_from_petsc" title="Link to this definition"></a></dt>
+<dd><p>Copy values from a <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a> into a variable.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>x</strong><span class="classifier">variable</span></dt><dd><p>The output variable.</p>
+</dd>
+<dt><strong>vec</strong><span class="classifier"><a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a></span></dt><dd><p>The input <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_new">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primal'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_new" title="Link to this definition"></a></dt>
+<dd><p>Return a new variable defined using the same space as <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable.</p></li>
+<li><p><strong>name</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> name for the new variable.</p></li>
+<li><p><strong>static</strong> – Defines whether the new variable is static, meaning that it is
+stored by reference in checkpointing/replay, and an associated
+tangent-linear variable is zero.</p></li>
+<li><p><strong>cache</strong> – Defines whether results involving the new variable may be
+cached. Default <cite>static</cite>.</p></li>
+<li><p><strong>rel_space_type</strong> – Defines the space type of the new variable, relative
+to the space type of <cite>x</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_new_conjugate">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_new_conjugate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_new_conjugate" title="Link to this definition"></a></dt>
+<dd><p>Return a new conjugate variable. See <a class="reference internal" href="#tlm_adjoint.interface.var_new" title="tlm_adjoint.interface.var_new"><code class="xref py py-func docutils literal notranslate"><span class="pre">var_new()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new variable defined using the same space as <cite>x</cite>, with space
+type conjugate to the space type for <cite>x</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_new_dual">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_new_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_new_dual" title="Link to this definition"></a></dt>
+<dd><p>Return a new dual variable. See <a class="reference internal" href="#tlm_adjoint.interface.var_new" title="tlm_adjoint.interface.var_new"><code class="xref py py-func docutils literal notranslate"><span class="pre">var_new()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new variable defined using the same space as <cite>x</cite>, with space
+type dual to the space type for <cite>x</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_new_conjugate_dual">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_new_conjugate_dual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_new_conjugate_dual" title="Link to this definition"></a></dt>
+<dd><p>Return a new conjugate dual variable. See <a class="reference internal" href="#tlm_adjoint.interface.var_new" title="tlm_adjoint.interface.var_new"><code class="xref py py-func docutils literal notranslate"><span class="pre">var_new()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new variable defined using the same space as <cite>x</cite>, with space
+type conjugate dual to the space type for <cite>x</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_copy">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_copy" title="Link to this definition"></a></dt>
+<dd><p>Copy a variable. See <a class="reference internal" href="#tlm_adjoint.interface.var_new" title="tlm_adjoint.interface.var_new"><code class="xref py py-func docutils literal notranslate"><span class="pre">var_new()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The copied variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_replacement">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_replacement" title="Link to this definition"></a></dt>
+<dd><p>Return a variable, associated with the same variable as <cite>x</cite>, but
+possibly without a value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A variable which symbolically represents the same variable as
+<cite>x</cite>, but which may not store a value. May return <cite>x</cite> itself.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_is_replacement">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_is_replacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_is_replacement" title="Link to this definition"></a></dt>
+<dd><p>Return whether a variable is a ‘replacement’, meaning that it has no
+associated value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether <cite>x</cite> is a replacement.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_is_scalar">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_is_scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_is_scalar" title="Link to this definition"></a></dt>
+<dd><p>Return whether a variable defines a scalar variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether <cite>x</cite> defines a scalar variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_scalar_value">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_scalar_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_scalar_value" title="Link to this definition"></a></dt>
+<dd><p>If <cite>x</cite> defines a scalar variable, returns its value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable, defining a scalar variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The scalar value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.var_is_alias">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">var_is_alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.var_is_alias" title="Link to this definition"></a></dt>
+<dd><p>Return whether a variable is an ‘alias’, meaning part or all of the
+degree of freedom vector associated with the variable is shared with some
+different aliased variable. A variable may not appear as an equation
+dependency if it is an alias.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the variable is an alias.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.interface.subtract_adjoint_derivative_action">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.interface.</span></span><span class="sig-name descname"><span class="pre">subtract_adjoint_derivative_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.interface.subtract_adjoint_derivative_action" title="Link to this definition"></a></dt>
+<dd><p>Subtract an adjoint right-hand-side contribution defined by <cite>y</cite> from
+the right-hand-side defined by <cite>x</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable storing the adjoint right-hand-side.</p></li>
+<li><p><strong>y</strong> – A contribution to subtract from the adjoint right-hand-side. An
+<a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation.adjoint_derivative_action" title="tlm_adjoint.equation.Equation.adjoint_derivative_action"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Equation.adjoint_derivative_action()</span></code></a> return value. Valid types
+depend upon the variable type. Typically this will be a variable, or a
+two element <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(alpha, F)</cite>, where <cite>alpha</cite> is a
+<a class="reference external" href="https://docs.python.org/3/library/numbers.html#numbers.Complex" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numbers.Complex</span></code></a> and <cite>F</cite> a variable, with the value to subtract
+defined by the product of <cite>alpha</cite> and <cite>F</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

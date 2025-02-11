@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.caches &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.caches</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/caches/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.caches">
+<span id="tlm-adjoint-caches"></span><h1><a class="reference internal" href="#module-tlm_adjoint.caches" title="tlm_adjoint.caches"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.caches</span></code></a><a class="headerlink" href="#module-tlm_adjoint.caches" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.CacheRef">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.caches.</span></span><span class="sig-name descname"><span class="pre">CacheRef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.CacheRef" title="Link to this definition"></a></dt>
+<dd><p>A cache entry. Stores a reference to a cached value, which can later be
+cleared. Calling a <a class="reference internal" href="#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheRef</span></code></a> returns the cached object, or <cite>None</cite>
+if no object is referenced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> – The object to reference. <cite>None</cite> may be supplied to indicate an
+empty cache entry.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.CacheRef.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.CacheRef.clear" title="Link to this definition"></a></dt>
+<dd><p>Clear the cache entry. After calling this method, calling the
+<a class="reference internal" href="#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheRef</span></code></a> will return <cite>None</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.clear_caches">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.caches.</span></span><span class="sig-name descname"><span class="pre">clear_caches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">deps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.clear_caches" title="Link to this definition"></a></dt>
+<dd><p>Clear caches entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables. If non-empty then clear only
+cache entries which depend on the supplied variables. Otherwise clear
+all cache entries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.local_caches">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.caches.</span></span><span class="sig-name descname"><span class="pre">local_caches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.local_caches" title="Link to this definition"></a></dt>
+<dd><p>Decorator clearing caches before and after calling the decorated
+callable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> – A callable for which caches should be cleared.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A callable where caches are cleared before and after calling.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Cache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.caches.</span></span><span class="sig-name descname"><span class="pre">Cache</span></span><a class="headerlink" href="#tlm_adjoint.caches.Cache" title="Link to this definition"></a></dt>
+<dd><p>Stores cache entries.</p>
+<p>Cleared cache entries are removed from the <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Cache.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#tlm_adjoint.caches.Cache.id" title="Link to this definition"></a></dt>
+<dd><p>A unique <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> ID associated with this <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Cache.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">deps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Cache.clear" title="Link to this definition"></a></dt>
+<dd><p>Clear cache entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables. If non-empty then only
+clear cache entries which depend on the supplied variables.
+Otherwise clear all cache entries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Cache.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Cache.add" title="Link to this definition"></a></dt>
+<dd><p>Add a cache entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – The key associated with the cache entry.</p></li>
+<li><p><strong>value</strong> – A callable, taking no arguments, returning the value
+associated with the cache entry. Only called to if no entry
+associated with <cite>key</cite> exists.</p></li>
+<li><p><strong>deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables, defining dependencies of
+the cache entry.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(value_ref, value)</cite>, where <cite>value</cite> is the
+cache entry value and <cite>value_ref</cite> is a <a class="reference internal" href="#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheRef</span></code></a> storing a
+reference to the value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Cache.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Cache.get" title="Link to this definition"></a></dt>
+<dd><p>Return the cache entry associated with a given key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> – The key.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cache entry or, if supplied, a default value.</p>
+</dd>
+</dl>
+<p><cite>args</cite> should contain zero or one elements and defines the default
+value. If there is no entry associated with the key then:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>args</cite> has no elements an exception is raised.</p></li>
+<li><p>If <cite>args</cite> has one element then this is returned.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Caches">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.caches.</span></span><span class="sig-name descname"><span class="pre">Caches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Caches" title="Link to this definition"></a></dt>
+<dd><p>Multiple <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> objects, associated with a variable.</p>
+<p>Cache entries may depend on the variable. The variable also defines an
+initial value, and the value is indicated by the variable ID and variable
+state value. The value may be changed either by supplying a new variable
+(changing the ID), or by changing the value of the current variable
+defining the value (which should be indicated by a change to the variable
+state value). Either change invalidates cache entries, in the
+<a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> objects, which depend on the original variable.</p>
+<p>The <a class="reference internal" href="#tlm_adjoint.caches.Caches.update" title="tlm_adjoint.caches.Caches.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Caches.update()</span></code></a> method can be used to check for cache entry
+invalidation, and to clear invalid cache entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The variable defining a possible cache entry dependency, and an
+initial value for that dependency.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Caches.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Caches.clear" title="Link to this definition"></a></dt>
+<dd><p>Clear cache entries which depend on the associated variable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Caches.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Caches.add" title="Link to this definition"></a></dt>
+<dd><p>Add a new <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> to the <a class="reference internal" href="#tlm_adjoint.caches.Caches" title="tlm_adjoint.caches.Caches"><code class="xref py py-class docutils literal notranslate"><span class="pre">Caches</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cache</strong> – The <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> to add to the <a class="reference internal" href="#tlm_adjoint.caches.Caches" title="tlm_adjoint.caches.Caches"><code class="xref py py-class docutils literal notranslate"><span class="pre">Caches</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Caches.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Caches.remove" title="Link to this definition"></a></dt>
+<dd><p>Remove a <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> from the <a class="reference internal" href="#tlm_adjoint.caches.Caches" title="tlm_adjoint.caches.Caches"><code class="xref py py-class docutils literal notranslate"><span class="pre">Caches</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cache</strong> – The <a class="reference internal" href="#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> to remove from the <a class="reference internal" href="#tlm_adjoint.caches.Caches" title="tlm_adjoint.caches.Caches"><code class="xref py py-class docutils literal notranslate"><span class="pre">Caches</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.caches.Caches.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.caches.Caches.update" title="Link to this definition"></a></dt>
+<dd><p>Check for cache invalidation associated with a possible change in
+value, and clear invalid cache entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – A variable which defines a potentially new value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

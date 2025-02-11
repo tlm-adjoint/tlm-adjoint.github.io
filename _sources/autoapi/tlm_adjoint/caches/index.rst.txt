@@ -1,0 +1,385 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.caches`
+============================
+
+.. py:module:: tlm_adjoint.caches
+
+
+Module Contents
+---------------
+
+.. py:class:: CacheRef(value=None)
+
+
+   
+   A cache entry. Stores a reference to a cached value, which can later be
+   cleared. Calling a :class:`.CacheRef` returns the cached object, or `None`
+   if no object is referenced.
+
+   :arg value: The object to reference. `None` may be supplied to indicate an
+       empty cache entry.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: clear()
+
+      
+      Clear the cache entry. After calling this method, calling the
+      :class:`.CacheRef` will return `None`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: clear_caches(*deps)
+
+   
+   Clear caches entries.
+
+   :arg deps: A :class:`Sequence` of variables. If non-empty then clear only
+       cache entries which depend on the supplied variables. Otherwise clear
+       all cache entries.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: local_caches(fn)
+
+   
+   Decorator clearing caches before and after calling the decorated
+   callable.
+
+   :arg fn: A callable for which caches should be cleared.
+   :returns: A callable where caches are cleared before and after calling.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: Cache
+
+
+   
+   Stores cache entries.
+
+   Cleared cache entries are removed from the :class:`.Cache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: id
+
+      
+      A unique :class:`int` ID associated with this :class:`.Cache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: clear(*deps)
+
+      
+      Clear cache entries.
+
+      :arg deps: A :class:`Sequence` of variables. If non-empty then only
+          clear cache entries which depend on the supplied variables.
+          Otherwise clear all cache entries.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: add(key, value, deps=None)
+
+      
+      Add a cache entry.
+
+      :arg key: The key associated with the cache entry.
+      :arg value: A callable, taking no arguments, returning the value
+          associated with the cache entry. Only called to if no entry
+          associated with `key` exists.
+      :arg deps: A :class:`Sequence` of variables, defining dependencies of
+          the cache entry.
+      :returns: A :class:`tuple` `(value_ref, value)`, where `value` is the
+          cache entry value and `value_ref` is a :class:`.CacheRef` storing a
+          reference to the value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: get(key, *args)
+
+      
+      Return the cache entry associated with a given key.
+
+      :arg key: The key.
+      :returns: The cache entry or, if supplied, a default value.
+
+      `args` should contain zero or one elements and defines the default
+      value. If there is no entry associated with the key then:
+
+          - If `args` has no elements an exception is raised.
+          - If `args` has one element then this is returned.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: Caches(x)
+
+
+   
+   Multiple :class:`.Cache` objects, associated with a variable.
+
+   Cache entries may depend on the variable. The variable also defines an
+   initial value, and the value is indicated by the variable ID and variable
+   state value. The value may be changed either by supplying a new variable
+   (changing the ID), or by changing the value of the current variable
+   defining the value (which should be indicated by a change to the variable
+   state value). Either change invalidates cache entries, in the
+   :class:`.Cache` objects, which depend on the original variable.
+
+   The :meth:`.Caches.update` method can be used to check for cache entry
+   invalidation, and to clear invalid cache entries.
+
+   :arg x: The variable defining a possible cache entry dependency, and an
+       initial value for that dependency.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: clear()
+
+      
+      Clear cache entries which depend on the associated variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: add(cache)
+
+      
+      Add a new :class:`.Cache` to the :class:`.Caches`.
+
+      :arg cache: The :class:`.Cache` to add to the :class:`.Caches`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: remove(cache)
+
+      
+      Remove a :class:`.Cache` from the :class:`.Caches`.
+
+      :arg cache: The :class:`.Cache` to remove from the :class:`.Caches`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: update(x)
+
+      
+      Check for cache invalidation associated with a possible change in
+      value, and clear invalid cache entries.
+
+      :arg x: A variable which defines a potentially new value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

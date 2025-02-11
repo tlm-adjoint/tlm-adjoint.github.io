@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.firedrake.caches &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.caches</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/firedrake/caches/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.firedrake.caches">
+<span id="tlm-adjoint-firedrake-caches"></span><h1><a class="reference internal" href="#module-tlm_adjoint.firedrake.caches" title="tlm_adjoint.firedrake.caches"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.caches</span></code></a><a class="headerlink" href="#module-tlm_adjoint.firedrake.caches" title="Link to this heading"></a></h1>
+<p>This module implements finite element assembly and linear solver data
+caching.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.AssemblyCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">AssemblyCache</span></span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.AssemblyCache" title="Link to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> for finite element assembly data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.AssemblyCache.assemble">
+<span class="sig-name descname"><span class="pre">assemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.AssemblyCache.assemble" title="Link to this definition"></a></dt>
+<dd><p>Perform finite element assembly and cache the result, or return a
+previously cached result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> – The <a class="reference external" href="https://fenics.readthedocs.io/projects/ufl/en/latest/api-doc/ufl.html#ufl.Form" title="(in Unified Form Language (UFL) v2021.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.Form</span></code></a> to assemble.</p></li>
+<li><p><strong>bcs</strong> – Dirichlet boundary conditions.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>linear_solver_parameters</strong> – Linear solver parameters. Required for
+assembly parameters which appear in the linear solver parameters.</p></li>
+<li><p><strong>replace_map</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining a map from symbolic
+variables to values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(value_ref, value)</cite>, where <cite>value</cite> is the
+result of the finite element assembly, and <cite>value_ref</cite> is a
+<a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheRef</span></code></a> storing a reference to <cite>value</cite>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>For an arity zero or arity one form <cite>value_ref</cite> stores the
+assembled value.</p></li>
+<li><p>For an arity two form <cite>value_ref</cite> is a tuple <cite>(A, b_bc)</cite>. <cite>A</cite>
+is the assembled matrix, and <cite>b_bc</cite> is a boundary condition
+right-hand-side term which should be added after assembling a
+right-hand-side with homogeneous boundary conditions applied.
+<cite>b_bc</cite> may be <cite>None</cite> to indicate that this term is zero.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.LinearSolverCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">LinearSolverCache</span></span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.LinearSolverCache" title="Link to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> for linear solver data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.LinearSolverCache.linear_solver">
+<span class="sig-name descname"><span class="pre">linear_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assembly_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.LinearSolverCache.linear_solver" title="Link to this definition"></a></dt>
+<dd><p>Construct a linear solver and cache the result, or return a
+previously cached result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> – An arity two <a class="reference external" href="https://fenics.readthedocs.io/projects/ufl/en/latest/api-doc/ufl.html#ufl.Form" title="(in Unified Form Language (UFL) v2021.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.Form</span></code></a>, defining the matrix.</p></li>
+<li><p><strong>bcs</strong> – Dirichlet boundary conditions.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>linear_solver_parameters</strong> – Linear solver parameters.</p></li>
+<li><p><strong>replace_map</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining a map from symbolic
+variables to values.</p></li>
+<li><p><strong>assembly_cache</strong> – <a class="reference internal" href="#tlm_adjoint.firedrake.caches.AssemblyCache" title="tlm_adjoint.firedrake.caches.AssemblyCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssemblyCache</span></code></a> to use for finite element
+assembly. Defaults to <cite>assembly_cache()</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(value_ref, value)</cite>. <cite>value</cite> is a tuple
+<cite>(solver, A, b_bc)</cite>, where <cite>solver</cite> is the linear solver, <cite>A</cite> is
+the assembled matrix, and <cite>b_bc</cite> is a boundary condition
+right-hand-side term which should be added after assembling a
+right-hand-side with homogeneous boundary conditions applied.
+<cite>b_bc</cite> may be <cite>None</cite> to indicate that this term is zero.
+<cite>value_ref</cite> is a <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheRef</span></code></a> storing a reference to <cite>value</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.LocalSolverCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">LocalSolverCache</span></span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.LocalSolverCache" title="Link to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.Cache" title="tlm_adjoint.caches.Cache"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> for element-wise local block diagonal linear solver
+data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.LocalSolverCache.local_solver">
+<span class="sig-name descname"><span class="pre">local_solver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.LocalSolverCache.local_solver" title="Link to this definition"></a></dt>
+<dd><p>Compute data for an element-wise local block diagonal linear
+solver and cache the result, or return a previously cached result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> – An arity two <a class="reference external" href="https://fenics.readthedocs.io/projects/ufl/en/latest/api-doc/ufl.html#ufl.Form" title="(in Unified Form Language (UFL) v2021.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.Form</span></code></a>, defining the element-wise
+local block diagonal matrix.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>replace_map</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining a map from symbolic
+variables to values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(value_ref, value)</cite>. <cite>value</cite> is a
+<cite>tlm_adjoint.firedrake.backend_interface.LocalSolver</cite> and
+<cite>value_ref</cite> is a <a class="reference internal" href="../../caches/index.html#tlm_adjoint.caches.CacheRef" title="tlm_adjoint.caches.CacheRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheRef</span></code></a> storing a reference to
+<cite>value</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.assembly_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">assembly_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.assembly_cache" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.AssemblyCache" title="tlm_adjoint.firedrake.caches.AssemblyCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssemblyCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.set_assembly_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">set_assembly_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assembly_cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.set_assembly_cache" title="Link to this definition"></a></dt>
+<dd><p>Set the default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.AssemblyCache" title="tlm_adjoint.firedrake.caches.AssemblyCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssemblyCache</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>assembly_cache</strong> – The new default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.AssemblyCache" title="tlm_adjoint.firedrake.caches.AssemblyCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">AssemblyCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.linear_solver_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">linear_solver_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.linear_solver_cache" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.LinearSolverCache" title="tlm_adjoint.firedrake.caches.LinearSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSolverCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.set_linear_solver_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">set_linear_solver_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">linear_solver_cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.set_linear_solver_cache" title="Link to this definition"></a></dt>
+<dd><p>Set the default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.LinearSolverCache" title="tlm_adjoint.firedrake.caches.LinearSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSolverCache</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>linear_solver_cache</strong> – The new default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.LinearSolverCache" title="tlm_adjoint.firedrake.caches.LinearSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSolverCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.local_solver_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">local_solver_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.local_solver_cache" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.LocalSolverCache" title="tlm_adjoint.firedrake.caches.LocalSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSolverCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.caches.set_local_solver_cache">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.caches.</span></span><span class="sig-name descname"><span class="pre">set_local_solver_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_solver_cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.caches.set_local_solver_cache" title="Link to this definition"></a></dt>
+<dd><p>Set the default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.LocalSolverCache" title="tlm_adjoint.firedrake.caches.LocalSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSolverCache</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>local_solver_cache</strong> – The new default <a class="reference internal" href="#tlm_adjoint.firedrake.caches.LocalSolverCache" title="tlm_adjoint.firedrake.caches.LocalSolverCache"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSolverCache</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

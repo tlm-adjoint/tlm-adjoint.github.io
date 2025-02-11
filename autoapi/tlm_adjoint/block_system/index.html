@@ -1,0 +1,899 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.block_system &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.block_system</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/block_system/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.block_system">
+<span id="tlm-adjoint-block-system"></span><h1><a class="reference internal" href="#module-tlm_adjoint.block_system" title="tlm_adjoint.block_system"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.block_system</span></code></a><a class="headerlink" href="#module-tlm_adjoint.block_system" title="Link to this heading"></a></h1>
+<p>Mixed space linear algebra utilities.</p>
+<p>Given a linear problem with a potentially singular matrix <span class="math notranslate nohighlight">\(A\)</span></p>
+<div class="math notranslate nohighlight">
+\[A u = b,\]</div>
+<p>a <a class="reference internal" href="#tlm_adjoint.block_system.LinearSolver" title="tlm_adjoint.block_system.LinearSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSolver</span></code></a> instead solves the linear problem</p>
+<div class="math notranslate nohighlight">
+\[\left[ (I - M U (U^* M U)^{-1} U^*) A (I - V (V^* C V)^{-1} V^* C)
+    + M U S V^* C \right] u = (I - M U (U^* M U)^{-1} U^*) b.\]</div>
+<p>Here</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(U\)</span> is a full rank matrix whose columns span the left nullspace for
+a modified system matrix <span class="math notranslate nohighlight">\(\tilde{A}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(V\)</span> is a full rank matrix with the same number of columns as
+<span class="math notranslate nohighlight">\(U\)</span>, whose columns span the nullspace for <span class="math notranslate nohighlight">\(\tilde{A}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(V^* C V\)</span> and <span class="math notranslate nohighlight">\(S\)</span> are invertible matrices.</p></li>
+<li><p><span class="math notranslate nohighlight">\(M\)</span> is a Hermitian positive definite matrix.</p></li>
+</ul>
+</div></blockquote>
+<p>Here the left nullspace for a matrix is defined to be the nullspace for its
+Hermitian transpose, and the modified system matrix <span class="math notranslate nohighlight">\(\tilde{A}\)</span> is
+defined</p>
+<div class="math notranslate nohighlight">
+\[\tilde{A} = (I - M U (U^* M U)^{-1} U^*) A (I - V (V^* C V)^{-1} V^* C).\]</div>
+<p>This has two primary use cases:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Where a matrix <span class="math notranslate nohighlight">\(A\)</span> and right-hand-side <span class="math notranslate nohighlight">\(b\)</span> are constructed
+via finite element assembly on superspaces of the test space and trial
+space. The typical example is in the application of homogeneous
+essential Dirichlet boundary conditions.</p></li>
+<li><p>Where the matrix <span class="math notranslate nohighlight">\(A\)</span> is singular and <span class="math notranslate nohighlight">\(b\)</span> is orthogonal to
+the left nullspace of <span class="math notranslate nohighlight">\(A\)</span>. Typically one would then choose
+<span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> so that their columns respectively span the left
+nullspace and nullspace of <span class="math notranslate nohighlight">\(A\)</span>, and the <a class="reference internal" href="#tlm_adjoint.block_system.LinearSolver" title="tlm_adjoint.block_system.LinearSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSolver</span></code></a>
+then seeks a solution to the original problem subject to the linear
+constraints <span class="math notranslate nohighlight">\(V^* C u = 0\)</span>.</p></li>
+</ol>
+</div></blockquote>
+<p>Spaces are defined via backend spaces or <a class="reference internal" href="#tlm_adjoint.block_system.TypedSpace" title="tlm_adjoint.block_system.TypedSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypedSpace</span></code></a> objects, and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> objects containing backend spaces, <a class="reference internal" href="#tlm_adjoint.block_system.TypedSpace" title="tlm_adjoint.block_system.TypedSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypedSpace</span></code></a>
+objects, or similar <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> objects. Similarly variables are defined
+via backend variables, or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> objects containing backend
+variables, or similar <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> objects. This defines a basic tree
+structure which is useful e.g. when defining block matrices in terms of
+sub-block matrices.</p>
+<p>Elements of the tree are accessed in a consistent order using a depth first
+search. Hence e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">u_1</span><span class="p">),</span> <span class="n">u_2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="n">u_1</span><span class="p">,</span> <span class="n">u_2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <cite>u_0</cite>, <cite>u_1</cite>, and <cite>u_2</cite> are backend variables, are both valid
+representations of a mixed space solution.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.TypedSpace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">TypedSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.TypedSpace" title="Link to this definition"></a></dt>
+<dd><p>A space with an associated space type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>space</strong><span class="classifier">space</span></dt><dd><p>The backend space.</p>
+</dd>
+<dt><strong>space_type</strong><span class="classifier">str</span></dt><dd><p>The space type.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>comm</strong><span class="classifier">communicator</span></dt><dd><p>The communicator associated with the space.</p>
+</dd>
+<dt><strong>space</strong><span class="classifier">space</span></dt><dd><p>The backend space.</p>
+</dd>
+<dt><strong>space_type</strong><span class="classifier">str</span></dt><dd><p>The space type.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.TypedSpace.new">
+<span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.TypedSpace.new" title="Link to this definition"></a></dt>
+<dd><p>Create a new variable in the space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>variable</dt><dd><p>The new variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MixedSpace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">MixedSpace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spaces</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MixedSpace" title="Link to this definition"></a></dt>
+<dd><p>Used to map between different versions of a mixed space.</p>
+<p>This class defines two representations for the space:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>As a ‘split space’: A tree defining the mixed space. Stored using
+<a class="reference internal" href="#tlm_adjoint.block_system.TypedSpace" title="tlm_adjoint.block_system.TypedSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypedSpace</span></code></a> and <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> objects, each corresponding
+to a node in the tree. <a class="reference internal" href="#tlm_adjoint.block_system.TypedSpace" title="tlm_adjoint.block_system.TypedSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypedSpace</span></code></a> objects correspond to
+leaf nodes, and <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> objects to other nodes in the tree.</p></li>
+<li><p>As a ‘flattened space’: A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> containing leaf nodes of
+the split space with an ordering determined using a depth first
+search.</p></li>
+</ol>
+</div></blockquote>
+<p>Provides methods to allow data to be copied to and from a compatible
+<a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a>. This allows, for example, the construction
+(with Firedrake):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space_0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;u_0&#39;</span><span class="p">)</span>
+<span class="n">u_1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space_1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;u_1&#39;</span><span class="p">)</span>
+<span class="n">u_2</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space_2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;u_2&#39;</span><span class="p">)</span>
+
+<span class="n">mixed_space</span> <span class="o">=</span> <span class="n">MixedSpace</span><span class="p">(((</span><span class="n">space_0</span><span class="p">,</span> <span class="n">space_1</span><span class="p">),</span> <span class="n">space_2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>and then data can be copied to a compatible <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a> via</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mixed_space</span><span class="o">.</span><span class="n">to_petsc</span><span class="p">(</span><span class="n">u_petsc</span><span class="p">,</span> <span class="p">((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">u_1</span><span class="p">),</span> <span class="n">u_2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>and from a compatible <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.Vec.html#petsc4py.PETSc.Vec" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.Vec</span></code></a> via</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mixed_space</span><span class="o">.</span><span class="n">from_petsc</span><span class="p">(</span><span class="n">u_petsc</span><span class="p">,</span> <span class="p">((</span><span class="n">u_0</span><span class="p">,</span> <span class="n">u_1</span><span class="p">),</span> <span class="n">u_2</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spaces</strong> – Defines the split space.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MixedSpace.split_space">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">split_space</span></span><a class="headerlink" href="#tlm_adjoint.block_system.MixedSpace.split_space" title="Link to this definition"></a></dt>
+<dd><p>The split space representation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MixedSpace.flattened_space">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flattened_space</span></span><a class="headerlink" href="#tlm_adjoint.block_system.MixedSpace.flattened_space" title="Link to this definition"></a></dt>
+<dd><p>The flattened space representation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MixedSpace.tuple_sub">
+<span class="sig-name descname"><span class="pre">tuple_sub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MixedSpace.tuple_sub" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>u</strong> – An <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> storing elements in <cite>u</cite> using the tree
+structure of the split space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MixedSpace.new">
+<span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MixedSpace.new" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new element in the split space.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">Nullspace</span></span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace" title="Link to this definition"></a></dt>
+<dd><p>Represents a nullspace and left nullspace for a square matrix.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.apply_nullspace_transformation_lhs_right">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.apply_nullspace_transformation_lhs_right" title="Link to this definition"></a></dt>
+<dd><p>Apply the nullspace transformation associated with a matrix action
+on <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.apply_nullspace_transformation_lhs_left">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.apply_nullspace_transformation_lhs_left" title="Link to this definition"></a></dt>
+<dd><p>Apply the left nullspace transformation associated with a matrix
+action,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.constraint_correct_lhs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constraint_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.constraint_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Add the linear constraint term to <span class="math notranslate nohighlight">\(y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow y + M U S V^* C x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.pc_constraint_correct_soln">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pc_constraint_correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.pc_constraint_correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Add the preconditioner linear constraint term to <span class="math notranslate nohighlight">\(u\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[u \rightarrow u + V \tilde{S}^{-1} U^* b,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\tilde{S}^{-1} =
+    \left( V^* C V \right)^{-1}
+    S^{-1}
+    \left( U^* M U \right)^{-1}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.correct_soln">
+<span class="sig-name descname"><span class="pre">correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Correct the linear system solution so that it is orthogonal to
+space spanned by the columns of <span class="math notranslate nohighlight">\(V\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – The linear system solution, to be corrected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.pre_mult_correct_lhs">
+<span class="sig-name descname"><span class="pre">pre_mult_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.pre_mult_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Apply the pre-left-multiplication nullspace transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines the vector on which the matrix action is computed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.post_mult_correct_lhs">
+<span class="sig-name descname"><span class="pre">post_mult_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.post_mult_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Apply the post-left-multiplication nullspace transformation, and add
+the linear constraint term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines the vector on which the matrix action is computed, and
+used to add the linear constraint term. If <cite>None</cite> is supplied then
+the linear constraint term is not added.</p></li>
+<li><p><strong>y</strong> – Defines the result of the matrix action on <cite>x</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.correct_rhs">
+<span class="sig-name descname"><span class="pre">correct_rhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.correct_rhs" title="Link to this definition"></a></dt>
+<dd><p>Correct the linear system right-hand-side so that it is orthogonal
+to the space spanned by the columns of <span class="math notranslate nohighlight">\(U\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> – The linear system right-hand-side, to be corrected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.pc_pre_mult_correct">
+<span class="sig-name descname"><span class="pre">pc_pre_mult_correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.pc_pre_mult_correct" title="Link to this definition"></a></dt>
+<dd><p>Apply the pre-preconditioner-application nullspace transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> – Defines the vector on which the preconditioner action is
+computed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Nullspace.pc_post_mult_correct">
+<span class="sig-name descname"><span class="pre">pc_post_mult_correct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Nullspace.pc_post_mult_correct" title="Link to this definition"></a></dt>
+<dd><p>Apply the post-preconditioner-application left nullspace
+transformation, and add the linear constraint term.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines the result of the preconditioner action on <cite>b</cite>.</p></li>
+<li><p><strong>b</strong> – Defines the vector on which the preconditioner action is
+computed, and used to add the linear constraint term. If <cite>None</cite> is
+supplied then the linear constraint term is not added.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.NoneNullspace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">NoneNullspace</span></span><a class="headerlink" href="#tlm_adjoint.block_system.NoneNullspace" title="Link to this definition"></a></dt>
+<dd><p>An empty nullspace and left nullspace.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.NoneNullspace.apply_nullspace_transformation_lhs_right">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.NoneNullspace.apply_nullspace_transformation_lhs_right" title="Link to this definition"></a></dt>
+<dd><p>Apply the nullspace transformation associated with a matrix action
+on <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.NoneNullspace.apply_nullspace_transformation_lhs_left">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.NoneNullspace.apply_nullspace_transformation_lhs_left" title="Link to this definition"></a></dt>
+<dd><p>Apply the left nullspace transformation associated with a matrix
+action,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.NoneNullspace.constraint_correct_lhs">
+<span class="sig-name descname"><span class="pre">constraint_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.NoneNullspace.constraint_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Add the linear constraint term to <span class="math notranslate nohighlight">\(y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow y + M U S V^* C x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.NoneNullspace.pc_constraint_correct_soln">
+<span class="sig-name descname"><span class="pre">pc_constraint_correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.NoneNullspace.pc_constraint_correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Add the preconditioner linear constraint term to <span class="math notranslate nohighlight">\(u\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[u \rightarrow u + V \tilde{S}^{-1} U^* b,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\tilde{S}^{-1} =
+    \left( V^* C V \right)^{-1}
+    S^{-1}
+    \left( U^* M U \right)^{-1}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockNullspace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">BlockNullspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nullspaces</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockNullspace" title="Link to this definition"></a></dt>
+<dd><p>Nullspaces for a square <a class="reference internal" href="#tlm_adjoint.block_system.BlockMatrix" title="tlm_adjoint.block_system.BlockMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">BlockMatrix</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nullspaces</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> objects defining the nullspace. <cite>None</cite> indicates a
+<a class="reference internal" href="#tlm_adjoint.block_system.NoneNullspace" title="tlm_adjoint.block_system.NoneNullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneNullspace</span></code></a>.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockNullspace.apply_nullspace_transformation_lhs_right">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockNullspace.apply_nullspace_transformation_lhs_right" title="Link to this definition"></a></dt>
+<dd><p>Apply the nullspace transformation associated with a matrix action
+on <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockNullspace.apply_nullspace_transformation_lhs_left">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockNullspace.apply_nullspace_transformation_lhs_left" title="Link to this definition"></a></dt>
+<dd><p>Apply the left nullspace transformation associated with a matrix
+action,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockNullspace.constraint_correct_lhs">
+<span class="sig-name descname"><span class="pre">constraint_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockNullspace.constraint_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Add the linear constraint term to <span class="math notranslate nohighlight">\(y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow y + M U S V^* C x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockNullspace.pc_constraint_correct_soln">
+<span class="sig-name descname"><span class="pre">pc_constraint_correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockNullspace.pc_constraint_correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Add the preconditioner linear constraint term to <span class="math notranslate nohighlight">\(u\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[u \rightarrow u + V \tilde{S}^{-1} U^* b,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\tilde{S}^{-1} =
+    \left( V^* C V \right)^{-1}
+    S^{-1}
+    \left( U^* M U \right)^{-1}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Matrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">Matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Matrix" title="Link to this definition"></a></dt>
+<dd><p>Represents a matrix defining a mapping
+<span class="math notranslate nohighlight">\(A\)</span> mapping <span class="math notranslate nohighlight">\(V \rightarrow W\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg_space</strong> – Defines the space <span class="math notranslate nohighlight">\(V\)</span>.</p></li>
+<li><p><strong>action_space</strong> – Defines the space <span class="math notranslate nohighlight">\(W\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Matrix.arg_space">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">arg_space</span></span><a class="headerlink" href="#tlm_adjoint.block_system.Matrix.arg_space" title="Link to this definition"></a></dt>
+<dd><p>The space defining <span class="math notranslate nohighlight">\(V\)</span>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Matrix.action_space">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">action_space</span></span><a class="headerlink" href="#tlm_adjoint.block_system.Matrix.action_space" title="Link to this definition"></a></dt>
+<dd><p>The space defining <span class="math notranslate nohighlight">\(W\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Matrix.mult">
+<span class="sig-name descname"><span class="pre">mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Matrix.mult" title="Link to this definition"></a></dt>
+<dd><p>Compute <span class="math notranslate nohighlight">\(y = A x\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>. Should not be modified.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Matrix.mult_add">
+<span class="sig-name descname"><span class="pre">mult_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Matrix.mult_add" title="Link to this definition"></a></dt>
+<dd><p>Add <span class="math notranslate nohighlight">\(A x\)</span> to <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>. Should not be modified.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MatrixFreeMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">MatrixFreeMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mult</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MatrixFreeMatrix" title="Link to this definition"></a></dt>
+<dd><p>Represents a matrix defining a mapping
+<span class="math notranslate nohighlight">\(A\)</span> mapping <span class="math notranslate nohighlight">\(V \rightarrow W\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg_space</strong> – Defines the space <span class="math notranslate nohighlight">\(V\)</span>.</p></li>
+<li><p><strong>action_space</strong> – Defines the space <span class="math notranslate nohighlight">\(W\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MatrixFreeMatrix.mult">
+<span class="sig-name descname"><span class="pre">mult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MatrixFreeMatrix.mult" title="Link to this definition"></a></dt>
+<dd><p>Compute <span class="math notranslate nohighlight">\(y = A x\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>. Should not be modified.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">BlockMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockMatrix" title="Link to this definition"></a></dt>
+<dd><p>A matrix defining a mapping <span class="math notranslate nohighlight">\(A\)</span> mapping <span class="math notranslate nohighlight">\(V \rightarrow W\)</span>,
+where <span class="math notranslate nohighlight">\(V\)</span> and <span class="math notranslate nohighlight">\(W\)</span> are defined by mixed spaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg_space</strong> – Defines the space <span class="math notranslate nohighlight">\(V\)</span>.</p></li>
+<li><p><strong>action_space</strong> – Defines the space <span class="math notranslate nohighlight">\(W\)</span>.</p></li>
+<li><p><strong>block</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining the blocks of the matrix. Items are
+<cite>((i, j), block)</cite> where the block in the <cite>i</cite> th and <cite>j</cite> th column is
+defined by <cite>block</cite>. Each <cite>block</cite> is a
+<a class="reference internal" href="#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a>, or <cite>None</cite> to indicate a zero
+block.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.BlockMatrix.mult_add">
+<span class="sig-name descname"><span class="pre">mult_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.BlockMatrix.mult_add" title="Link to this definition"></a></dt>
+<dd><p>Add <span class="math notranslate nohighlight">\(A x\)</span> to <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>. Should not be modified.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.LinearSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">LinearSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nullspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pc_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.LinearSolver" title="Link to this definition"></a></dt>
+<dd><p>Solver for a linear system</p>
+<div class="math notranslate nohighlight">
+\[A u = b,\]</div>
+<p>using PETSc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> defining <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>nullspace</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> objects defining the nullspace and left nullspace
+of <span class="math notranslate nohighlight">\(A\)</span>. <cite>None</cite> indicates a <a class="reference internal" href="#tlm_adjoint.block_system.NoneNullspace" title="tlm_adjoint.block_system.NoneNullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneNullspace</span></code></a>.</p></li>
+<li><p><strong>solver_parameters</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining Krylov solver
+parameters.</p></li>
+<li><p><strong>pc_fn</strong> – <p>Defines the application of a preconditioner. A callable</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pc_fn</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The preconditioner is applied to <cite>b</cite>, and the result stored in <cite>u</cite>.
+Defaults to an identity.</p>
+</p></li>
+<li><p><strong>comm</strong> – Communicator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.LinearSolver.ksp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ksp</span></span><a class="headerlink" href="#tlm_adjoint.block_system.LinearSolver.ksp" title="Link to this definition"></a></dt>
+<dd><p>The <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.KSP.html#petsc4py.PETSc.KSP" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.KSP</span></code></a> used to solve the linear problem.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.LinearSolver.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_initial_guess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_solution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.LinearSolver.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve the linear system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines the solution <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines the right-hand-side <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+<li><p><strong>correct_initial_guess</strong> – Whether to apply a nullspace correction to
+the initial guess.</p></li>
+<li><p><strong>correct_solution</strong> – Whether to apply a nullspace correction to
+the solution.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">Eigensolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B_inv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nullspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver" title="Link to this definition"></a></dt>
+<dd><p>Solver for an eigenproblem</p>
+<div class="math notranslate nohighlight">
+\[A v = \lambda B v\]</div>
+<p>using SLEPc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> defining <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>B</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> defining <span class="math notranslate nohighlight">\(B\)</span>. If
+supplied then a generalized eigenproblem is solved. Otherwise a
+standard eigenproblem (with <span class="math notranslate nohighlight">\(B\)</span> equal to an identity) is solved.</p></li>
+<li><p><strong>B_inv</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> defining the inverse
+of <span class="math notranslate nohighlight">\(B\)</span>.</p></li>
+<li><p><strong>nullspace</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> objects defining the nullspace and left nullspace
+of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. <cite>None</cite> indicates a <a class="reference internal" href="#tlm_adjoint.block_system.NoneNullspace" title="tlm_adjoint.block_system.NoneNullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneNullspace</span></code></a>.</p></li>
+<li><p><strong>solver_parameters</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining solver parameters.</p></li>
+<li><p><strong>comm</strong> – Communicator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver.eps">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eps</span></span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver.eps" title="Link to this definition"></a></dt>
+<dd><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">slepc4py.SLEPc.EPS</span></code> used to solve the eigenproblem.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver.is_hermitian_and_positive">
+<span class="sig-name descname"><span class="pre">is_hermitian_and_positive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver.is_hermitian_and_positive" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether the eigenproblem is Hermitian with positive
+semi-definite <span class="math notranslate nohighlight">\(B\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve the eigenproblem.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver.eigenvalues">
+<span class="sig-name descname"><span class="pre">eigenvalues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver.eigenvalues" title="Link to this definition"></a></dt>
+<dd><p>Return converged eigenvalues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing eigenvalues.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver.eigenpairs">
+<span class="sig-name descname"><span class="pre">eigenpairs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver.eigenpairs" title="Link to this definition"></a></dt>
+<dd><p>Return converged eigenpairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(Lam, V)</cite>, where</p>
+<ul class="simple">
+<li><p><cite>Lam</cite> is a <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> containing eigenvalues.</p></li>
+<li><p><cite>V</cite> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of length two <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> objects,
+<cite>(v_r, v_i)</cite>, defining corresponding eigenvectors. Each
+eigenvectors is defined by <cite>v_r + 1.0j v_i</cite>. <cite>v_i</cite> is <cite>None</cite>,
+to indicate a value of zero, for Hermitian eigenvalue problems
+or with a complex PETSc build.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.Eigensolver.B_orthonormality_test">
+<span class="sig-name descname"><span class="pre">B_orthonormality_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.Eigensolver.B_orthonormality_test" title="Link to this definition"></a></dt>
+<dd><p>Test <span class="math notranslate nohighlight">\(B\)</span> orthonormality of the eigenvectors for a Hermitian
+eigenvalue problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="math notranslate nohighlight">\(\left| V^* B V - I \right|_\infty\)</span> where
+<span class="math notranslate nohighlight">\(V\)</span> is the matrix whose columns are the eigenvectors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MatrixFunctionSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.block_system.</span></span><span class="sig-name descname"><span class="pre">MatrixFunctionSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nullspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MatrixFunctionSolver" title="Link to this definition"></a></dt>
+<dd><p>Matrix function action evaluation</p>
+<div class="math notranslate nohighlight">
+\[v = f ( A ) u\]</div>
+<p>using SLEPc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> defining <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>nullspace</strong> – A <a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference internal" href="#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> objects defining the nullspace and left nullspace
+of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>. <cite>None</cite> indicates a <a class="reference internal" href="#tlm_adjoint.block_system.NoneNullspace" title="tlm_adjoint.block_system.NoneNullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneNullspace</span></code></a>.</p></li>
+<li><p><strong>solver_parameters</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining solver parameters.</p></li>
+<li><p><strong>comm</strong> – Communicator.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MatrixFunctionSolver.mfn">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mfn</span></span><a class="headerlink" href="#tlm_adjoint.block_system.MatrixFunctionSolver.mfn" title="Link to this definition"></a></dt>
+<dd><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">slepc4py.SLEPc.MFN</span></code> used to compute the matrix function
+action.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.block_system.MatrixFunctionSolver.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.block_system.MatrixFunctionSolver.solve" title="Link to this definition"></a></dt>
+<dd><p>Compute the matrix function action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines the argument <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>v</strong> – Defines the result <span class="math notranslate nohighlight">\(v\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

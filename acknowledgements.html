@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>References and acknowledgements &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Dependencies" href="dependencies.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">tlm_adjoint</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Dependencies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">References and acknowledgements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#citing-tlm-adjoint">Citing tlm_adjoint</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dolfin-adjoint">dolfin-adjoint</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#taylor-remainder-convergence-testing">Taylor remainder convergence testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#differentiating-fixed-point-problems">Differentiating fixed-point problems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#binomial-checkpointing">Binomial checkpointing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pytorch">PyTorch</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#funding">Funding</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">References and acknowledgements</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/acknowledgements.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="references-and-acknowledgements">
+<h1>References and acknowledgements<a class="headerlink" href="#references-and-acknowledgements" title="Link to this heading"></a></h1>
+<section id="citing-tlm-adjoint">
+<h2>Citing tlm_adjoint<a class="headerlink" href="#citing-tlm-adjoint" title="Link to this heading"></a></h2>
+<p>tlm_adjoint is described in</p>
+<ul class="simple">
+<li><p>James R. Maddison, Daniel N. Goldberg, and Benjamin D. Goddard, ‘Automated
+calculation of higher order partial differential equation constrained
+derivative information’, SIAM Journal on Scientific Computing, 41(5), pp.
+C417–C445, 2019, doi: 10.1137/18M1209465</p></li>
+</ul>
+<p>The automated assembly and linear solver caching applied by tlm_adjoint is
+based on the approach described in</p>
+<ul class="simple">
+<li><p>J. R. Maddison and P. E. Farrell, ‘Rapid development and adjoining of
+transient finite element models’, Computer Methods in Applied Mechanics and
+Engineering, 276, 95–121, 2014, doi: 10.1016/j.cma.2014.03.010</p></li>
+</ul>
+<p>Checkpointing with tlm_adjoint is described in</p>
+<ul class="simple">
+<li><p>James R. Maddison, ‘Step-based checkpointing with high-level algorithmic
+differentiation’, Journal of Computational Science 82, 102405, 2024,
+doi: 10.1016/j.jocs.2024.102405</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<section id="dolfin-adjoint">
+<h3>dolfin-adjoint<a class="headerlink" href="#dolfin-adjoint" title="Link to this heading"></a></h3>
+<p>tlm_adjoint implements high-level algorithmic differentiation using an
+approach based on that used by dolfin-adjoint, described in</p>
+<ul class="simple">
+<li><p>P. E. Farrell, D. A. Ham, S. W. Funke, and M. E. Rognes, ‘Automated
+derivation of the adjoint of high-level transient finite element programs’,
+SIAM Journal on Scientific Computing 35(4), pp. C369–C393, 2013,
+doi: 10.1137/120873558</p></li>
+</ul>
+<p>tlm_adjoint was developed from a custom extension to dolfin-adjoint.</p>
+</section>
+<section id="taylor-remainder-convergence-testing">
+<h3>Taylor remainder convergence testing<a class="headerlink" href="#taylor-remainder-convergence-testing" title="Link to this heading"></a></h3>
+<p>The functions in <a class="reference external" href="autoapi/tlm_adjoint/verification/index.html">tlm_adjoint/verification.py</a> implement Taylor remainder
+convergence testing using the approach described in</p>
+<ul class="simple">
+<li><p>P. E. Farrell, D. A. Ham, S. W. Funke, and M. E. Rognes, ‘Automated
+derivation of the adjoint of high-level transient finite element programs’,
+SIAM Journal on Scientific Computing 35(4), pp. C369–C393, 2013,
+doi: 10.1137/120873558</p></li>
+</ul>
+</section>
+<section id="differentiating-fixed-point-problems">
+<h3>Differentiating fixed-point problems<a class="headerlink" href="#differentiating-fixed-point-problems" title="Link to this heading"></a></h3>
+<p>The <cite>FixedPointSolver</cite> class in <a class="reference external" href="autoapi/tlm_adjoint/fixed_point/index.html">tlm_adjoint/fixed_point.py</a> derives tangent-linear and
+adjoint information using the approach described in</p>
+<ul class="simple">
+<li><p>Jean Charles Gilbert, ‘Automatic differentiation and iterative processes’,
+Optimization Methods and Software, 1(1), pp. 13–21, 1992,
+doi: 10.1080/10556789208805503</p></li>
+<li><p>Bruce Christianson, ‘Reverse accumulation and attractive fixed points’,
+Optimization Methods and Software, 3(4), pp. 311–326, 1994,
+doi: 10.1080/10556789408805572</p></li>
+</ul>
+</section>
+<section id="binomial-checkpointing">
+<h3>Binomial checkpointing<a class="headerlink" href="#binomial-checkpointing" title="Link to this heading"></a></h3>
+<p>The <cite>MultistageCheckpointSchedule</cite> class in
+<a class="reference external" href="autoapi/tlm_adjoint/checkpoint_schedules/binomial/index.html">tlm_adjoint/checkpoint_schedules/binomial.py</a> implements the
+binomial checkpointing strategy described in</p>
+<ul class="simple">
+<li><p>Andreas Griewank and Andrea Walther, ‘Algorithm 799: revolve: an
+implementation of checkpointing for the reverse or adjoint mode of
+computational differentiation’, ACM Transactions on Mathematical Software,
+26(1), pp. 19–45, 2000, doi: 10.1145/347837.347846</p></li>
+</ul>
+<p>The <cite>MultistageCheckpointSchedule</cite> class determines a memory/disk storage
+distribution using an initial run of the checkpoint schedule, leading to a
+distribution equivalent to that in</p>
+<ul class="simple">
+<li><p>Philipp Stumm and Andrea Walther, ‘MultiStage approaches for optimal offline
+checkpointing’, SIAM Journal on Scientific Computing, 31(3), pp. 1946–1967,
+2009, doi: 10.1137/080718036</p></li>
+</ul>
+<p>The <cite>TwoLevelCheckpointSchedule</cite> class in
+<a class="reference external" href="autoapi/tlm_adjoint/checkpoint_schedules/binomial/index.html">tlm_adjoint/checkpoint_schedules/binomial.py</a> implements the
+two-level mixed periodic/binomial checkpointing approach described in</p>
+<ul class="simple">
+<li><p>Gavin J. Pringle, Daniel C. Jones, Sudipta Goswami, Sri Hari Krishna
+Narayanan, and Daniel Goldberg, ‘Providing the ARCHER community with adjoint
+modelling tools for high-performance oceanographic and cryospheric
+computation’, version 1.1, EPCC, 2016</p></li>
+</ul>
+<p>and in the supporting information for</p>
+<ul class="simple">
+<li><p>D. N. Goldberg, T. A. Smith, S. H. K. Narayanan, P. Heimbach, and M.
+Morlighem,, ‘Bathymetric influences on Antarctic ice-shelf melt rates’,
+Journal of Geophysical Research: Oceans, 125(11), e2020JC016370, 2020,
+doi: 10.1029/2020JC016370</p></li>
+</ul>
+</section>
+<section id="pytorch">
+<h3>PyTorch<a class="headerlink" href="#pytorch" title="Link to this heading"></a></h3>
+<p>The PyTorch interface in <a class="reference external" href="autoapi/tlm_adjoint/torch/index.html">tlm_adjoint/torch.py</a> follows the same principles as
+described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Nacime Bouziani and David A. Ham, ‘Physics-driven machine learning models
+coupling PyTorch and Firedrake’, 2023, arXiv:2303.06871v3</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="funding">
+<h2>Funding<a class="headerlink" href="#funding" title="Link to this heading"></a></h2>
+<p>Early development work leading to tlm_adjoint was conducted as part of a U.K.
+Natural Environment Research Council funded project (NE/L005166/1). Further
+development has been conducted as part of a U.K. Engineering and Physical
+Sciences Research Council funded project (EP/R021600/1) and a Natural
+Environment Research Council funded project (NE/T001607/1).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dependencies.html" class="btn btn-neutral float-left" title="Dependencies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

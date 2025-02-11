@@ -1,0 +1,266 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.fixed_point`
+=================================
+
+.. py:module:: tlm_adjoint.fixed_point
+
+
+Module Contents
+---------------
+
+.. py:class:: CustomNormSq(eqs, *, norm_sqs=None, adj_norm_sqs=None)
+
+
+   
+   Defines the square of the norm of forward and adjoint solutions.
+
+   Callables are used to define squared norms for the forward and adjoint
+   solutions of equations. The total squared norm is then the sum of the
+   squares.
+
+   :arg eqs: A :class:`Sequence` of :class:`.Equation` objects.
+   :arg norm_sqs: A :class:`Sequence`. Each element is either a callable, or a
+       :class:`Sequence` of callables. The callables define the squared norm
+       associated with the corresponding components of the forward solution
+       for the corresponding :class:`.Equation` in `eqs`. Each callable
+       accepts a single variable and returns a :class:`float`. Defaults to the
+       square of the :math:`l_2` norm of the degrees of freedom vector.
+   :arg adj_norm_sqs: A :class:`Sequence`. Each element is either a callable,
+       or a :class:`Sequence` of callables. The callables define the squared
+       norm associated with the corresponding components of the adjoint
+       solution for the corresponding :class:`.Equation` in `eqs`. Each
+       callable accepts a single variable and returns a :class:`float`.
+       Defaults to the square of the :math:`l_2` norm of the degrees of
+       freedom vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: FixedPointSolver(eqs, solver_parameters, *, norm_sqs=None, adj_norm_sqs=None)
+
+
+
+
+   
+   A fixed-point solver. Solves the given equations in sequence until
+   either an absolute or relative tolerance is reached.
+
+   Derives tangent-linear and adjoint information using the approach described
+   in:
+
+       - Jean Charles Gilbert, 'Automatic differentiation and iterative
+         processes', Optimization Methods and Software, 1(1), pp. 13--21,
+         1992, doi: 10.1080/10556789208805503
+       - Bruce Christianson, 'Reverse accumulation and attractive fixed
+         points', Optimization Methods and Software, 3(4), pp. 311--326, 1994,
+         doi: 10.1080/10556789408805572
+
+   :arg eqs: A :class:`Sequence` of :class:`.Equation` objects. One forward
+       iteration consists of computing, in order, a forward solution for all
+       :class:`.Equation` objects.
+   :arg solver_parameters: A :class:`Mapping` defining solver parameters.
+       Parameters (a number of which are based on KrylovSolver parameters in
+       FEniCS 2017.2.0) are:
+
+           - absolute_tolerance: A :class:`float` defining the absolute
+             tolerance for a change in the solution in one iteration.
+             Required.
+           - relative_tolerance: A :class:`float` defining the relative
+             tolerance for a change in the solution in one iteration.
+             Required.
+           - maximum_iterations: An :class:`int` defining the maximum
+             permitted iterations. Defaults to 1000.
+           - nonzero_initial_guess: A :class:`bool` indicating whether to use
+             a non-zero initial guess in a forward solve. Defaults to `True`.
+           - adjoint_nonzero_initial_guess: A :class:`bool` indicating whether
+             to use a non-zero initial guess in an adjoint solve. Defaults to
+             `True`.
+
+   :arg norm_sqs: Defines the squared norm used to test for convergence in a
+       forward solve. See :class:`.CustomNormSq`.
+   :arg adj_norm_sqs: Defines the squared norm used to test for convergence in
+       an adjoint solve. See :class:`.CustomNormSq`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: drop_references()
+
+      
+      Drop references to variables which store values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: forward_solve(X, deps=None)
+
+      
+      Compute the forward solution.
+
+      Can assume that the currently active :class:`.EquationManager` is
+      paused.
+
+      :arg X: A variable or a :class:`Sequence` of variables storing the
+          solution. May define an initial guess, and should be set by this
+          method.
+      :arg deps: A :class:`tuple` of variables, defining values for
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_jacobian_solve(adj_X, nl_deps, B)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: subtract_adjoint_derivative_actions(adj_X, nl_deps, dep_Bs)
+
+      
+      Subtract terms from other adjoint right-hand-sides.
+
+      Can be overridden for an optimized implementation, but otherwise uses
+      :meth:`.Equation.adjoint_derivative_action`.
+
+      :arg adj_X: The adjoint solution. A variable or a :class:`Sequence` of
+          variables. Should not be modified.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg dep_Bs: A :class:`Mapping` whose items are `(dep_index, dep_B)`.
+          Each `dep_B` is an :class:`.AdjointRHS` which should be updated by
+          subtracting adjoint derivative information computed by
+          differentiating with respect to `self.dependencies()[dep_index]`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

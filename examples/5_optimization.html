@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Functional minimization &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Functional minimization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/5_optimization.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Functional-minimization">
+<h1>Functional minimization<a class="headerlink" href="#Functional-minimization" title="Link to this heading"></a></h1>
+<p>Gradient-based optimization algorithms attempt to use derivative information, for example as computed using the adjoint method, to accelerate the solution of optimization problems. A typical example is to seek the minimum of an objective cost functional, constrained using one or more partial differential equations. This notebook describes how to solve such partial differential equation constrained optimization problems using tlm_adjoint.</p>
+<p>This example makes use of tlm_adjoint with the <a class="reference external" href="https://firedrakeproject.org/">Firedrake</a> backend, and we assume real spaces and a real build of Firedrake throughout. The minimization problem is solved using the <a class="reference external" href="https://petsc.org/release/manual/tao/">Toolkit for Advanced Optimization (TAO)</a>.</p>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We first construct a partial differential equation constrained optimization problem where we know the answer – where we know the value of the control which minimizes the objective functional subject to the constraint that the forward problem is solved. To do this we consider the solution of the modified Helmholtz equation in the unit square domain,</p>
+<div class="math notranslate nohighlight">
+\[\alpha^2 \nabla^2 u - u = m \qquad \text{on} ~ \Omega = \left( 0, 1 \right)^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha \in \mathbb{R}\)</span>, subject to doubly periodic boundary conditions. We define an objective cost functional</p>
+<div class="math notranslate nohighlight">
+\[J \left( u, m \right) = \frac{1}{2} \int_\Omega \left( u - \tilde{u} \right)^2 + \frac{1}{2} \beta^2 \int_\Omega \left( m - \tilde{m} \right)^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tilde{u}\)</span> and <span class="math notranslate nohighlight">\(\tilde{m}\)</span> are given functions and <span class="math notranslate nohighlight">\(\beta \ne 0\)</span> is a real scalar. If we set</p>
+<div class="math notranslate nohighlight">
+\[\tilde{m} \left( x, y \right) = -\sin \left( 2 \pi x \right) \sin \left( 2 \pi y \right),\]</div>
+<div class="math notranslate nohighlight">
+\[\tilde{u} \left( x, y \right) = -\frac{1}{1 + 8 \pi^2 \alpha^2} m \left( x, y \right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> are Cartesian coordinates in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>, then <span class="math notranslate nohighlight">\(u = \tilde{u}\)</span> and <span class="math notranslate nohighlight">\(m = \tilde{m}\)</span> will be the minimum of <span class="math notranslate nohighlight">\(J\)</span> where the modified Helmholtz problem is solved.</p>
+<p>We consider a continuous Galerkin finite element discretization, seeking <span class="math notranslate nohighlight">\(u \in V\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V \qquad \alpha^2 \int_\Omega \nabla \zeta \cdot \nabla u + \int_\Omega \zeta u = -\int_\Omega \zeta m,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is a real continuous <span class="math notranslate nohighlight">\(P_1\)</span> finite element space whose elements satisfy the doubly periodic boundary conditions. We now define <span class="math notranslate nohighlight">\(\tilde{m} \in V\)</span> and <span class="math notranslate nohighlight">\(\tilde{u} \in V\)</span> via interpolation, at mesh vertices, of the functions given above.</p>
+<p>We first use Firedrake to solve the forward problem. We consider <span class="math notranslate nohighlight">\(\alpha = 0.1\)</span>, <span class="math notranslate nohighlight">\(\beta = 0.1\)</span>, and an ‘initial guess’ where <span class="math notranslate nohighlight">\(m = -1\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">tricontourf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">space</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">function_space</span><span class="p">()</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">mesh</span><span class="p">())</span>
+    <span class="n">test</span><span class="p">,</span> <span class="n">trial</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+    <span class="n">m_tilde</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_tilde&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+        <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">u_tilde</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_tilde&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="o">-</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">8.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">alpha</span><span class="p">))</span> <span class="o">*</span> <span class="n">m_tilde</span><span class="p">)</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+          <span class="o">==</span> <span class="o">-</span><span class="n">inner</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sor&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">1.0e-32</span><span class="p">,</span>
+                                <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-12</span><span class="p">})</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">addto</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">u_tilde</span><span class="p">,</span> <span class="n">u</span> <span class="o">-</span> <span class="n">u_tilde</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">addto</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">m_tilde</span><span class="p">,</span> <span class="n">m</span> <span class="o">-</span> <span class="n">m_tilde</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">m_tilde</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span>
+
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">PeriodicSquareMesh</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">m_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">m_tilde</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m_0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Inverse-problem">
+<h2>Inverse problem<a class="headerlink" href="#Inverse-problem" title="Link to this heading"></a></h2>
+<p>We now seek to solve the inverse problem: to find the <span class="math notranslate nohighlight">\(m \in V\)</span> which minimizes <span class="math notranslate nohighlight">\(J\)</span>, subject to the discretized modified Helmholtz problem being solved.</p>
+<p>In the following we use the Toolkit for Advanced Optimization (TAO) to solve the inverse problem. We use the Limited-Memory Variable Metric (LMVM) approach with an absolute tolerance of <span class="math notranslate nohighlight">\(10^{-10}\)</span>. Noting that the adjoint computed derivative is an element of the dual space <span class="math notranslate nohighlight">\(V^*\)</span>, we need to define an appropriate dual space inner product. Here we define an inner product using the inverse mass matrix, and use this to define both the initial Hessian inverse approximation, and the
+gradient norm.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">forward_J</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">M_solver</span> <span class="o">=</span> <span class="n">LinearSolver</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">),</span>
+                        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+                                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sor&quot;</span><span class="p">,</span>
+                                           <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">1.0e-32</span><span class="p">,</span>
+                                           <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-12</span><span class="p">})</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">M_inv_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+    <span class="n">M_solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deepcopy</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">y</span>
+
+
+<span class="n">tao_solver</span> <span class="o">=</span> <span class="n">TAOSolver</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">space</span><span class="p">,</span>
+                       <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tao_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lmvm&quot;</span><span class="p">,</span>
+                                          <span class="s2">&quot;tao_gatol&quot;</span><span class="p">:</span> <span class="mf">1.0e-10</span><span class="p">,</span>
+                                          <span class="s2">&quot;tao_grtol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                          <span class="s2">&quot;tao_gttol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+                       <span class="n">H_0_action</span><span class="o">=</span><span class="n">M_inv_action</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">m_0</span><span class="p">)</span>
+<span class="n">tao_solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tao_solver</span><span class="o">.</span><span class="n">tao</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">m_tilde</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.0e-12</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">tricontourf</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+tao_solver.tao.getIterationNumber()=7
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_5_optimization_3_1.png" src="../_images/examples_5_optimization_3_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_5_optimization_3_2.png" src="../_images/examples_5_optimization_3_2.png" />
+</div>
+</div>
+<p>We now test the inverse procedure by checking that it converges to the expected result, considering meshes with decreasing element size. We compute the <span class="math notranslate nohighlight">\(L^2\)</span> error in each case, and estimate the order of convergence by a power law fit between the error norms computed using subsequent pairs of meshes.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">20</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">error_norms</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">N</span> <span class="ow">in</span> <span class="n">Ns</span><span class="p">:</span>
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">PeriodicSquareMesh</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+    <span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">m_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+
+    <span class="n">M_solver</span> <span class="o">=</span> <span class="n">LinearSolver</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">),</span>
+                            <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+                                               <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sor&quot;</span><span class="p">,</span>
+                                               <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">1.0e-32</span><span class="p">,</span>
+                                               <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-12</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">M_inv_action</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+        <span class="n">M_solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deepcopy</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">y</span>
+
+    <span class="n">tao_solver</span> <span class="o">=</span> <span class="n">TAOSolver</span><span class="p">(</span><span class="n">forward_J</span><span class="p">,</span> <span class="n">space</span><span class="p">,</span>
+                           <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tao_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lmvm&quot;</span><span class="p">,</span>
+                                              <span class="s2">&quot;tao_gatol&quot;</span><span class="p">:</span> <span class="mf">1.0e-10</span><span class="p">,</span>
+                                              <span class="s2">&quot;tao_grtol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                              <span class="s2">&quot;tao_gttol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+                           <span class="n">H_0_action</span><span class="o">=</span><span class="n">M_inv_action</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">m_0</span><span class="p">)</span>
+    <span class="n">tao_solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tao_solver</span><span class="o">.</span><span class="n">tao</span><span class="o">.</span><span class="n">getIterationNumber</span><span class="p">()</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">m_tilde</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="n">m_error_norm</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">m_tilde</span><span class="p">,</span> <span class="n">m</span> <span class="o">-</span> <span class="n">m_tilde</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">N</span><span class="si">=}</span><span class="s2"> </span><span class="si">{</span><span class="n">m_error_norm</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">error_norms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_error_norm</span><span class="p">)</span>
+<span class="n">error_norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error_norms</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="n">orders</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">error_norms</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="n">error_norms</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Ns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="n">Ns</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">orders</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="p">(</span><span class="n">orders</span> <span class="o">&gt;</span> <span class="mf">1.99</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+tao_solver.tao.getIterationNumber()=7
+N=np.int64(20) m_error_norm=0.006304152669626421
+tao_solver.tao.getIterationNumber()=10
+N=np.int64(40) m_error_norm=0.0015825703856270482
+tao_solver.tao.getIterationNumber()=10
+N=np.int64(80) m_error_norm=0.0003960451269394697
+tao_solver.tao.getIterationNumber()=8
+N=np.int64(160) m_error_norm=9.903646649061314e-05
+orders=array([1.99403281, 1.99853293, 1.99963308])
+</pre></div></div>
+</div>
+<p>We find that we have close to second order convergence.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

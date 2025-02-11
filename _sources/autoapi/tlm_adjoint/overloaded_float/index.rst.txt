@@ -1,0 +1,642 @@
+:py:mod:`tlm_adjoint.overloaded_float`
+======================================
+
+.. py:module:: tlm_adjoint.overloaded_float
+
+.. autoapi-nested-parse::
+
+   This module defines types which allow for basic floating point level
+   algorithmic differentiation. The implementation is intended to be used for a
+   small number of calculations, for example after the calculation of a functional
+   obtained from a finite element model.
+
+   For example, if annotation and operator overloading is enabled
+
+   .. code-block:: python
+
+       import numpy as np
+
+       x = Float(np.pi, name='x')
+       y = x * np.sin(x)
+
+   will lead to annotation of equations associated with the floating point
+   calculations.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:function:: set_default_float_dtype(dtype)
+
+   
+   Set the default data type used by :class:`.SymbolicFloat` objects.
+
+   :arg dtype: The default data type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: FloatSpace(float_cls=None, *, dtype=None, comm=None)
+
+
+   
+   Defines the real or complex space.
+
+   :arg float_cls: The :class:`.SymbolicFloat` class, in particular used to
+       instantiate new variables in :func:`.space_new`. Defaults to
+       :class:`.SymbolicFloat`.
+   :arg dtype: The data type associated with the space. Typically
+       :class:`numpy.double` or :class:`numpy.cdouble`.
+   :arg comm: The communicator associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: dtype
+
+      
+      The data type associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: comm
+
+      
+      The communicator associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: float_cls
+
+      
+      The :class:`.SymbolicFloat` class associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: rdtype()
+
+      
+      The real data type associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: no_float_overloading(fn)
+
+   
+   Decorator to disable :class:`.OverloadedFloat` operator overloading.
+
+   :arg fn: A callable for which :class:`.OverloadedFloat` operator
+       overloading should be disabled.
+   :returns: A callable for which :class:`.OverloadedFloat` operator
+       overloading is disabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: paused_float_overloading()
+
+   
+   Construct a context manager which can be used to temporarily disable
+   :class:`.OverloadedFloat` operator overloading.
+
+   :returns: A context manager which can be used to temporarily disable
+       :class:`.OverloadedFloat` operator overloading.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: SymbolicFloat(value=0.0, *, name=None, space_type='primal', static=False, cache=None, dtype=None, comm=None)
+
+
+
+
+   
+   A :class:`sympy.core.symbol.Symbol` which is also a 'variable', defining
+   a scalar variable.
+
+   If constructing SymPy expressions then the :class:`.SymbolicFloat` class
+   should be used instead of the :class:`.OverloadedFloat` subclass, or else
+   :class:`.OverloadedFloat` operator overloading should be disabled.
+
+   :arg value: A :class:`numbers.Complex` or :class:`sympy.core.expr.Expr`
+       defining the initial value. If a :class:`sympy.core.expr.Expr` then, if
+       annotation or derivation and solution of tangent-linear equations is
+       enabled, an assignment is processed by the :class:`.EquationManager`
+       `manager`.
+   :arg name: A :class:`str` name for the :class:`.SymbolicFloat`.
+   :arg space_type: The space type for the :class:`.SymbolicFloat`.
+       `'primal'`, `'dual'`, `'conjugate'`, or `'conjugate_dual'`.
+   :arg static: Defines whether the :class:`.SymbolicFloat` is static, meaning
+       that it is stored by reference in checkpointing/replay, and an
+       associated tangent-linear variable is zero.
+   :arg cache: Defines whether results involving the :class:`.SymbolicFloat`
+       may be cached. Default `static`.
+   :arg dtype: The data type associated with the :class:`.SymbolicFloat`.
+       Typically :class:`numpy.double` or :class:`numpy.cdouble`.
+   :arg comm: The communicator associated with the :class:`.SymbolicFloat`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: value
+
+      
+      Return the current value associated with the
+      :class:`.SymbolicFloat`.
+
+      The value may also be accessed by casting using :class:`float` or
+      :class:`complex`.
+
+      :returns: The value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: new(value=0.0, *, name=None, static=False, cache=None)
+
+      
+      Return a new object, which same type and space type as this
+      :class:`.SymbolicFloat`.
+
+      :returns: The new :class:`.SymbolicFloat`.
+
+      Arguments are as for the :class:`.SymbolicFloat` constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: assign(y)
+
+      
+      :class:`.SymbolicFloat` assignment.
+
+      :arg y: A :class:`numbers.Complex` or :class:`sympy.core.expr.Expr`
+          defining the value.
+      :returns: The :class:`.SymbolicFloat`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: addto(y)
+
+      
+      :class:`.SymbolicFloat` in-place addition.
+
+      :arg y: A :class:`numbers.Complex` or :class:`sympy.core.expr.Expr`
+          defining the value to add.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+
+.. py:class:: OverloadedFloat(value=0.0, *, name=None, space_type='primal', static=False, cache=None, dtype=None, comm=None)
+
+
+
+
+   
+   A subclass of :class:`.SymbolicFloat` with operator overloading.
+
+   If constructing SymPy expressions then the :class:`.SymbolicFloat` class
+   should be used instead of the :class:`.OverloadedFloat` subclass, or else
+   :class:`.OverloadedFloat` operator overloading should be disabled.
+
+   For argument documentation see :class:`.SymbolicFloat`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:class:: Float(value=0.0, *, name=None, space_type='primal', static=False, cache=None, dtype=None, comm=None)
+
+
+
+
+   
+   A subclass of :class:`.SymbolicFloat` with operator overloading.
+
+   If constructing SymPy expressions then the :class:`.SymbolicFloat` class
+   should be used instead of the :class:`.OverloadedFloat` subclass, or else
+   :class:`.OverloadedFloat` operator overloading should be disabled.
+
+   For argument documentation see :class:`.SymbolicFloat`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+.. py:class:: FloatEquation(x, expr)
+
+
+
+
+   
+   Represents an assignment to a :class:`.SymbolicFloat` `x`,
+
+   .. math::
+
+       x = \mathcal{G} \left( y_1, y_2, \ldots \right),
+
+   for some :math:`\mathcal{G}` defined by a :class:`sympy.core.expr.Expr`.
+   The forward residual is defined
+
+   .. math::
+
+       \mathcal{F} \left( x, y_1, y_2, \ldots \right)
+           = x - \mathcal{G} \left( y_1, y_2, \ldots \right).
+
+   :arg x: A :class:`.SymbolicFloat` defining the forward solution :math:`x`
+   :arg expr: A :class:`sympy.core.expr.Expr` defining the right-hand-side.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: forward_solve(x, deps=None)
+
+      
+      Compute the forward solution.
+
+      Can assume that the currently active :class:`.EquationManager` is
+      paused.
+
+      :arg X: A variable or a :class:`Sequence` of variables storing the
+          solution. May define an initial guess, and should be set by this
+          method.
+      :arg deps: A :class:`tuple` of variables, defining values for
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_jacobian_solve(adj_x, nl_deps, b)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: subtract_adjoint_derivative_actions(adj_x, nl_deps, dep_Bs)
+
+      
+      Subtract terms from other adjoint right-hand-sides.
+
+      Can be overridden for an optimized implementation, but otherwise uses
+      :meth:`.Equation.adjoint_derivative_action`.
+
+      :arg adj_X: The adjoint solution. A variable or a :class:`Sequence` of
+          variables. Should not be modified.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg dep_Bs: A :class:`Mapping` whose items are `(dep_index, dep_B)`.
+          Each `dep_B` is an :class:`.AdjointRHS` which should be updated by
+          subtracting adjoint derivative information computed by
+          differentiating with respect to `self.dependencies()[dep_index]`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: to_float(y, *, name=None)
+
+   
+   Convert a variable to a :class:`.Float`.
+
+   :arg y: A scalar variable.
+   :arg name: A :class:`str` name.
+   :returns: The :class:`.SymbolicFloat`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

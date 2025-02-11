@@ -1,0 +1,385 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.adjoint`
+=============================
+
+.. py:module:: tlm_adjoint.adjoint
+
+
+Module Contents
+---------------
+
+.. py:class:: AdjointRHS(x)
+
+
+   
+   Adjoint equation right-hand-side component.
+
+   The right-hand-side of an adjoint equation, for an adjoint variable
+   associated with an operation computing a forward variable `x`.
+
+   :Parameters:
+
+       **x** : variable
+           The forward variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: b(*, copy=False)
+
+      
+      Access the adjoint right-hand-side.
+
+
+      :Parameters:
+
+          **copy** : bool
+              Whether to return a copy of the right-hand-side.
+
+
+
+      :Returns:
+
+          variable
+              The right-hand-side.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: sub(b)
+
+      
+      Subtract a term from the adjoint right-hand-side.
+
+
+      :Parameters:
+
+          **b** : object
+              The term to subtract.
+
+
+
+
+
+
+
+
+
+
+      .. seealso::
+
+          
+          :func:`.subtract_adjoint_derivative_action`
+              ..
+          
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AdjointEquationRHS(eq)
+
+
+
+
+   
+   Adjoint equation right-hand-side.
+
+   The right-hand-side of an adjoint equation, for adjoint variables
+   associated with an operation computing multiple forward variables.
+
+   :class:`Sequence` of :class:`.AdjointRHS` objects.
+
+   :Parameters:
+
+       **eq** : :class:`.Equation`
+           The adjoint right-hand-sides are associated with the operation defined
+           by this :class:`.Equation`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: b(*, copy=False)
+
+      
+      For the case where there is a single forward variable, return
+      the associated adjoint right-hand-side.
+
+
+      :Parameters:
+
+          **copy** : bool
+              Whether to return a copy of the right-hand-side.
+
+
+
+      :Returns:
+
+          variable
+              The right-hand-side.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: B(*, copy=False)
+
+      
+      Return adjoint right-hand-side components.
+
+
+      :Parameters:
+
+          **copy** : bool
+              Whether to return copies of the right-hand-side components.
+
+
+
+      :Returns:
+
+          tuple[variable, ...]
+              The right-hand-side components.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AdjointBlockRHS(block)
+
+
+
+
+   
+   Multiple adjoint equation right-hand-sides.
+
+   :class:`Sequence` of :class:`.AdjointEquationRHS` objects.
+
+   :Parameters:
+
+       **block** : Sequence[:class:`.Equation`, ...]
+           The adjoint right-hand-sides are associated with the operations defined
+           by these :class:`.Equation` objects.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: pop()
+
+      
+      Remove and return the last :class:`.AdjointEquationRHS`. Decreases
+      the length of this :class:`.AdjointBlockRHS` by one.
+
+
+
+
+
+      :Returns:
+
+          int
+              The index of the removed :class:`.AdjointEquationRHS`.
+
+          :class:`.AdjointEquationRHS`
+              The removed :class:`.AdjointEquationRHS`.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_empty()
+
+      
+      Return whether this :class:`.AdjointBlockRHS` has length zero.
+
+
+
+
+
+      :Returns:
+
+          bool
+              Whether this :class:`.AdjointBlockRHS` has length zero.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: AdjointModelRHS(blocks)
+
+
+
+
+   
+   Multiple blocks of adjoint right-hand-sides.
+
+   :class:`Mapping` from :class:`int` to :class:`.AdjointBlockRHS` objects.
+
+   :Parameters:
+
+       **blocks** : Sequence[Sequence[:class:`.Equation`, ...], ...] or            Mapping[int, Sequence[:class:`.Equation`, ...], ...]
+           The adjoint right-hand-sides are associated with the operations defined
+           by these blocks of :class:`.Equation` objects. Any trailing empty
+           :class:`.AdjointBlockRHS` objects are removed automatically.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: pop()
+
+      
+      Remove and return the last :class:`.AdjointEquationRHS` in the
+      last :class:`.AdjointBlockRHS` in this :class:`.AdjointModelRHS`. Then
+      remove any trailing empty :class:`.AdjointBlockRHS` objects.
+
+
+
+
+
+      :Returns:
+
+          **(n, i)** : tuple[int, int]
+              The removed right-hand-side is associated with :class:`.Equation`
+              `i` in block `n`.
+
+          :class:`.AdjointEquationRHS`
+              The removed :class:`.AdjointEquationRHS`.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_empty()
+
+      
+      Return whether this :class:`.AdjointModelRHS` has length zero.
+
+
+
+
+
+      :Returns:
+
+          bool
+              Whether this :class:`.AdjointModelRHS` has length zero.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

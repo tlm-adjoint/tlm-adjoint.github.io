@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.firedrake.solve &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.solve</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/firedrake/solve/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.firedrake.solve">
+<span id="tlm-adjoint-firedrake-solve"></span><h1><a class="reference internal" href="#module-tlm_adjoint.firedrake.solve" title="tlm_adjoint.firedrake.solve"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.solve</span></code></a><a class="headerlink" href="#module-tlm_adjoint.firedrake.solve" title="Link to this heading"></a></h1>
+<p>Finite element variational problem solution operations with Firedrake.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.EquationSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.solve.</span></span><span class="sig-name descname"><span class="pre">EquationSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjoint_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_adjoint_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_tlm_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_rhs_assembly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.EquationSolver" title="Link to this definition"></a></dt>
+<dd><p>Represents the solution of a finite element variational problem.</p>
+<p>Caching is based on the approach described in</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>J. R. Maddison and P. E. Farrell, ‘Rapid development and adjoining of
+transient finite element models’, Computer Methods in Applied
+Mechanics and Engineering, 276, 95–121, 2014, doi:
+10.1016/j.cma.2014.03.010</p></li>
+</ul>
+</div></blockquote>
+<p>The arguments <cite>eq</cite>, <cite>x</cite>, <cite>bcs</cite>, <cite>J</cite>, <cite>form_compiler_parameters</cite>, and
+<cite>solver_parameters</cite> are based on the interface for the DOLFIN
+<cite>dolfin.solve</cite> function (see e.g. FEniCS 2017.1.0).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eq</strong> – A <a class="reference external" href="https://fenics.readthedocs.io/projects/ufl/en/latest/api-doc/ufl.html#ufl.equation.Equation" title="(in Unified Form Language (UFL) v2021.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.equation.Equation</span></code></a> defining the finite element
+variational problem.</p></li>
+<li><p><strong>x</strong> – A <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a> defining the forward
+solution.</p></li>
+<li><p><strong>bcs</strong> – Dirichlet boundary conditions.</p></li>
+<li><p><strong>J</strong> – A <a class="reference external" href="https://fenics.readthedocs.io/projects/ufl/en/latest/api-doc/ufl.html#ufl.Form" title="(in Unified Form Language (UFL) v2021.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.Form</span></code></a> defining a Jacobian matrix approximation to use
+in a non-linear forward solve.</p></li>
+<li><p><strong>form_compiler_parameters</strong> – Form compiler parameters.</p></li>
+<li><p><strong>solver_parameters</strong> – Linear or non-linear solver parameters.</p></li>
+<li><p><strong>adjoint_solver_parameters</strong> – Linear solver parameters to use in an
+adjoint solve.</p></li>
+<li><p><strong>tlm_solver_parameters</strong> – Linear solver parameters to use when solving
+tangent-linear problems.</p></li>
+<li><p><strong>cache_jacobian</strong> – Whether to cache the forward Jacobian matrix and
+linear solver data. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver][‘cache_jacobian’]</cite>. If
+<cite>None</cite> then caching is autodetected.</p></li>
+<li><p><strong>cache_adjoint_jacobian</strong> – Whether to cache the adjoint Jacobian matrix
+and linear solver data. Defaults to <cite>cache_jacobian</cite>.</p></li>
+<li><p><strong>cache_tlm_jacobian</strong> – Whether to cache the Jacobian matrix and linear
+solver data when solving tangent-linear problems. Defaults to
+<cite>cache_jacobian</cite>.</p></li>
+<li><p><strong>cache_rhs_assembly</strong> – Whether to enable right-hand-side caching. If
+enabled then right-hand-side terms are divided into terms which are
+cached, terms which are converted into matrix multiplication by a
+cached matrix, and terms which are not cached. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver’][‘cache_rhs_assembly’]</cite>.</p></li>
+<li><p><strong>match_quadrature</strong> – Whether to set quadrature parameters consistently in
+the forward, adjoint, and tangent-linears. Defaults to
+<cite>parameters[‘tlm_adjoint’][‘EquationSolver’][‘match_quadrature’]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.EquationSolver.drop_references">
+<span class="sig-name descname"><span class="pre">drop_references</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.EquationSolver.drop_references" title="Link to this definition"></a></dt>
+<dd><p>Drop references to variables which store values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.EquationSolver.forward_solve">
+<span class="sig-name descname"><span class="pre">forward_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.EquationSolver.forward_solve" title="Link to this definition"></a></dt>
+<dd><p>Compute the forward solution.</p>
+<p>Can assume that the currently active <a class="reference internal" href="../../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> is
+paused.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables storing the
+solution. May define an initial guess, and should be set by this
+method.</p></li>
+<li><p><strong>deps</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of variables, defining values for
+dependencies. Only the elements corresponding to <cite>X</cite> may be
+modified. <cite>self.dependencies()</cite> should be used if not supplied.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.EquationSolver.subtract_adjoint_derivative_actions">
+<span class="sig-name descname"><span class="pre">subtract_adjoint_derivative_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_Bs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.EquationSolver.subtract_adjoint_derivative_actions" title="Link to this definition"></a></dt>
+<dd><p>Subtract terms from other adjoint right-hand-sides.</p>
+<p>Can be overridden for an optimized implementation, but otherwise uses
+<a class="reference internal" href="../../equation/index.html#tlm_adjoint.equation.Equation.adjoint_derivative_action" title="tlm_adjoint.equation.Equation.adjoint_derivative_action"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Equation.adjoint_derivative_action()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – The adjoint solution. A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+variables. Should not be modified.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining values for
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>dep_Bs</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> whose items are <cite>(dep_index, dep_B)</cite>.
+Each <cite>dep_B</cite> is an <a class="reference internal" href="../../adjoint/index.html#tlm_adjoint.adjoint.AdjointRHS" title="tlm_adjoint.adjoint.AdjointRHS"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdjointRHS</span></code></a> which should be updated by
+subtracting adjoint derivative information computed by
+differentiating with respect to <cite>self.dependencies()[dep_index]</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.EquationSolver.adjoint_jacobian_solve">
+<span class="sig-name descname"><span class="pre">adjoint_jacobian_solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adj_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nl_deps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.EquationSolver.adjoint_jacobian_solve" title="Link to this definition"></a></dt>
+<dd><p>Compute an adjoint solution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adj_X</strong> – Either <cite>None</cite>, or a variable or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+variables defining the initial guess for an iterative solve. May be
+modified or returned.</p></li>
+<li><p><strong>nl_deps</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining values for
+non-linear dependencies. Should not be modified.</p></li>
+<li><p><strong>B</strong> – The right-hand-side. A variable or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+variables storing the value of the right-hand-side. May be modified
+or returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A variable or <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables storing the
+value of the adjoint solution. May return <cite>None</cite> to indicate a
+value of zero.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.EquationSolver.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.EquationSolver.tangent_linear" title="Link to this definition"></a></dt>
+<dd><p>Derive an <a class="reference internal" href="../../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> corresponding to a tangent-linear
+operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">TangentLinearMap</span></code></a> storing values for
+tangent-linear variables.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <a class="reference internal" href="../../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>, corresponding to the tangent-linear
+operation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.LocalEquationSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.solve.</span></span><span class="sig-name descname"><span class="pre">LocalEquationSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form_compiler_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_adjoint_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_tlm_jacobian</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_rhs_assembly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_quadrature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.LocalEquationSolver" title="Link to this definition"></a></dt>
+<dd><p>Represents the solution of a linear finite element variational problem,
+for the case where the matrix is element-wise local block diagonal.</p>
+<p>Remaining arguments are passed to the <a class="reference internal" href="#tlm_adjoint.firedrake.solve.EquationSolver" title="tlm_adjoint.firedrake.solve.EquationSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationSolver</span></code></a> constructor.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.solve.LocalEquationSolver.tangent_linear">
+<span class="sig-name descname"><span class="pre">tangent_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tlm_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.solve.LocalEquationSolver.tangent_linear" title="Link to this definition"></a></dt>
+<dd><p>Derive an <a class="reference internal" href="../../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> corresponding to a tangent-linear
+operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tlm_map</strong> – A <a class="reference internal" href="../../tangent_linear/index.html#tlm_adjoint.tangent_linear.TangentLinearMap" title="tlm_adjoint.tangent_linear.TangentLinearMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">TangentLinearMap</span></code></a> storing values for
+tangent-linear variables.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An <a class="reference internal" href="../../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>, corresponding to the tangent-linear
+operation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

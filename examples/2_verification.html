@@ -1,0 +1,421 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifying derivative calculations &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Verifying derivative calculations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/2_verification.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Verifying-derivative-calculations">
+<h1>Verifying derivative calculations<a class="headerlink" href="#Verifying-derivative-calculations" title="Link to this heading"></a></h1>
+<p>This notebook describes the verification of derivative calculations using Taylor remainder convergence testing. A simple time-independent problem is considered, using tlm_adjoint with the <a class="reference external" href="https://firedrakeproject.org/">Firedrake</a> backend.</p>
+<p>The Taylor remainder convergence testing method is described in:</p>
+<ul class="simple">
+<li><p>P. E. Farrell, D. A. Ham, S. W. Funke, and M. E. Rognes, ‘Automated derivation of the adjoint of high-level transient finite element programs’, SIAM Journal on Scientific Computing 35(4), pp. C369–C393, 2013, doi: 10.1137/120873558</p></li>
+</ul>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We consider the solution of a linear time-independent partial differential equation, followed by the calculation of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the solution. Non-linearity is introduced by defining the right-hand-side of the problem to be a non-linear function of the control. We assume real spaces and a real build of Firedrake throughout.</p>
+<p>Specifically we consider the solution <span class="math notranslate nohighlight">\(u \in V\)</span> of</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V \qquad \int_\Omega u \zeta + \alpha^2 \int_\Omega \nabla u \cdot \nabla \zeta = \int_\Omega \left( \sin^2 m \right) \zeta,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is a real <span class="math notranslate nohighlight">\(P_1\)</span> continuous finite element space defining functions on the domain <span class="math notranslate nohighlight">\(\Omega = \left( 0, 1 \right)^2\)</span>, with <span class="math notranslate nohighlight">\(m \in V\)</span>. This corresponds to a discretization of the partial differential equation</p>
+<div class="math notranslate nohighlight">
+\[u - \alpha^2 \nabla^2 u = \sin^2 m \quad \text{on } \left( x, y \right) \in \left( 0, 1 \right)^2,\]</div>
+<p>subject to boundary conditions <span class="math notranslate nohighlight">\(\nabla u \cdot \hat{n} = 0\)</span> on the boundary, where <span class="math notranslate nohighlight">\(\hat{n}\)</span> is an outward unit normal.</p>
+<p>A simple implementation in Firedrake, with <span class="math notranslate nohighlight">\(m = e^x \sin \left( \pi x y \right)\)</span> and <span class="math notranslate nohighlight">\(\alpha = 0.2\)</span>, takes the form:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+<span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span>
+      <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+<span class="n">J</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Taylor-remainder-convergence-testing:-First-order">
+<h2>Taylor remainder convergence testing: First order<a class="headerlink" href="#Taylor-remainder-convergence-testing:-First-order" title="Link to this heading"></a></h2>
+<p>If we have a functional <span class="math notranslate nohighlight">\(J\)</span> depending on a control <span class="math notranslate nohighlight">\(m\)</span> then we have, given some perturbation direction <span class="math notranslate nohighlight">\(\zeta\)</span>, via Taylor expansion,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left| J \left( m + \varepsilon \zeta \right) - J \left( m \right) \right| = O \left( \varepsilon \right), \\\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\left| J \left( m + \varepsilon \zeta \right) - J \left( m \right) - \varepsilon \frac{dJ}{dm} \zeta \right| = O \left( \varepsilon^2 \right).\]</div>
+<p>That is, <span class="math notranslate nohighlight">\(\zeta\)</span> is some direction in the same space as <span class="math notranslate nohighlight">\(m\)</span>, which we choose, and then we control the perturbation amplitude using the scalar <span class="math notranslate nohighlight">\(\varepsilon\)</span>. The final term in the second absolute value is a directional derivative, which we can compute using the adjoint.</p>
+<p>This leads to a methodology for verifying a derivative computed using the adjoint method:</p>
+<ol class="arabic simple">
+<li><p>Choose a direction <span class="math notranslate nohighlight">\(\zeta\)</span>.</p></li>
+<li><p>Choose a number of different values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
+<li><p>See if we have second order convergence of the second of the above, to zero.</p></li>
+</ol>
+<p>This verifies only the directional derivative with a single direction, but if we wish we can choose a new direction and repeat the test.</p>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">taylor_test</span></code> function to perform the test for us. By default this generates a pseudorandom direction and chooses a number of values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>. It then computes the quantities on the left-hand-sides of the above equations, computes the orders of convergence between consecutive pairs of values for <span class="math notranslate nohighlight">\(\varepsilon\)</span>, and displays the results. It returns the <em>minimum</em> order computed for the second case, which in a successful verification should be close to two.</p>
+<p>Let’s compute a derivative using the adjoint method, and apply a Taylor remainder convergence test:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">33582866</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;tlm_adjoint&quot;</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span>
+          <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">J_val</span><span class="o">=</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dJ</span><span class="o">=</span><span class="n">dJ_dm</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mf">1.0e-3</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no adjoint   = [1.83675325e-04 9.18679773e-05 4.59415781e-05 2.29726877e-05
+ 1.14868187e-05]
+Orders,      no adjoint   = [0.99952386 0.99976165 0.99988076 0.99994036]
+Error norms, with adjoint = [1.21373327e-07 3.03720082e-08 7.59658226e-09 1.89959271e-09
+ 4.74953966e-10]
+Orders,      with adjoint = [1.9986372  1.99931991 1.99966037 1.99983053]
+</pre></div></div>
+</div>
+<p>The key changes here are:</p>
+<ul class="simple">
+<li><p>To define a <code class="docutils literal notranslate"><span class="pre">forward</span></code> function. <code class="docutils literal notranslate"><span class="pre">taylor_test</span></code> uses this to repeatedly rerun the forward with different values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>.</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">seed</span></code> to control the considered values of <span class="math notranslate nohighlight">\(\varepsilon\)</span>. If this is too large then the asymptotic orders of convergence may not be seen. If this is too small then the effect of roundoff or iterative solver tolerances may become too large.</p></li>
+<li><p>Seeding the NumPy pseudorandom number generator. The pseudorandom direction is generated using <code class="docutils literal notranslate"><span class="pre">numpy.random.random</span></code>, and we seed the pseudorandom number generator to improve reproducibility. We could alternatively supply a direction using the <code class="docutils literal notranslate"><span class="pre">dM</span></code> argument.</p></li>
+</ul>
+<p>We see the expected first and second orders of convergence.</p>
+</section>
+<section id="Taylor-remainder-convergence-testing:-Second-order">
+<h2>Taylor remainder convergence testing: Second order<a class="headerlink" href="#Taylor-remainder-convergence-testing:-Second-order" title="Link to this heading"></a></h2>
+<p>Including the next order term in the Taylor expansion leads to</p>
+<div class="math notranslate nohighlight">
+\[\left| J \left( m + \varepsilon \zeta \right) - J \left( m \right) - \varepsilon \frac{dJ}{dm} \zeta - \frac{1}{2} \varepsilon^2 \left[ \frac{d}{dm} \left( \frac{dJ}{dm} \zeta \right) \right] \zeta \right| = O \left( \varepsilon^3 \right).\]</div>
+<p>Let’s use this approach to test Hessian calculations using a <code class="docutils literal notranslate"><span class="pre">CachedHessian</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">19986557</span><span class="p">)</span>
+
+<span class="n">H</span> <span class="o">=</span> <span class="n">CachedHessian</span><span class="p">(</span><span class="n">J</span><span class="p">)</span>
+
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">J_val</span><span class="o">=</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ddJ</span><span class="o">=</span><span class="n">H</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mf">1.0e-3</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">2.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no adjoint   = [2.10559794e-04 1.05304003e-04 5.26580325e-05 2.63305245e-05
+ 1.31656394e-05]
+Orders,      no adjoint   = [0.9996697  0.99983476 0.99991736 0.99995867]
+Error norms, with adjoint = [9.17836045e-11 1.14560228e-11 1.43088134e-12 1.78880799e-13
+ 2.25105581e-14]
+Orders,      with adjoint = [3.00213019 3.00113033 2.99983359 2.99032481]
+</pre></div></div>
+</div>
+<p>We now see the expected first and <em>third</em> orders of convergence, although there is a suggestion of roundoff affecting the results for the smallest <span class="math notranslate nohighlight">\(\varepsilon\)</span>. Here the first order directional derivative is computed using a tangent-linear calculation, and the Hessian action on <span class="math notranslate nohighlight">\(\zeta\)</span> is computed by applying the adjoint method to the forward and tangent-linear calculations.</p>
+</section>
+<section id="Taylor-remainder-convergence-testing:-Higher-order">
+<h2>Taylor remainder convergence testing: Higher order<a class="headerlink" href="#Taylor-remainder-convergence-testing:-Higher-order" title="Link to this heading"></a></h2>
+<p>We can test the derivative of a directional derivative, if we substitute</p>
+<div class="math notranslate nohighlight">
+\[J \rightarrow K = \frac{dJ}{dm} \zeta_0,\]</div>
+<p>with some <em>new</em> direction <span class="math notranslate nohighlight">\(\zeta_0\)</span>, which we choose. That is, we use</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\left| K \left( m + \varepsilon \zeta \right) - K \left( m \right) \right| = O \left( \varepsilon \right), \\\end{split}\]</div>
+<div class="math notranslate nohighlight">
+\[\left| K \left( m + \varepsilon \zeta \right) - K \left( m \right) - \varepsilon \frac{dK}{dm} \zeta \right| = O \left( \varepsilon^2 \right),\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[K = \frac{dJ}{dm} \zeta_0.\]</div>
+<p>The new term</p>
+<div class="math notranslate nohighlight">
+\[\frac{dK}{dm} \zeta\]</div>
+<p>can be computed using either a higher order tangent-linear or higher-order adjoint calculation. This generalizes naturally to higher order, by replacing the functional with the directional derivative of a directional derivative.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">taylor_test_tlm</span></code> performs such verification tests, considering directional derivatives of a given order, and computing all derivatives using tangent-linear calculations. Each directional derivative requires a new direction to be chosen – by default pseudorandom directions are generated.</p>
+<p>Let’s apply this test up to fourth order:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">76149511</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">tlm_order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mf">1.0e-3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no tangent-linear   = [2.14011610e-04 1.07017190e-04 5.35114451e-05 2.67564355e-05
+ 1.33783961e-05]
+Orders,      no tangent-linear   = [0.99984651 0.99992316 0.99996156 0.99998077]
+Error norms, with tangent-linear = [4.55807684e-08 1.14053932e-08 2.85262116e-09 7.13314307e-10
+ 1.78348453e-10]
+Orders,      with tangent-linear = [1.99870907 1.99935611 1.99967835 1.99983921]
+Error norms, no tangent-linear   = [1.76713220e-04 8.84698206e-05 4.42631569e-05 2.21386331e-05
+ 1.10710793e-05]
+Orders,      no tangent-linear   = [0.99815267 0.99907905 0.9995402  0.99977027]
+Error norms, with tangent-linear = [4.52243872e-07 1.12911424e-07 2.82091088e-08 7.04993071e-09
+ 1.76218937e-09]
+Orders,      with tangent-linear = [2.00190949 2.00095847 2.00048011 2.00024011]
+Error norms, no tangent-linear   = [1.01396288e-03 5.06448981e-04 2.53090600e-04 1.26511730e-04
+ 6.32474607e-05]
+Orders,      no tangent-linear   = [1.001516   1.00076302 1.00038276 1.0001917 ]
+Error norms, with tangent-linear = [2.13811439e-06 5.36596213e-07 1.34407417e-07 3.36341442e-08
+ 8.41257242e-09]
+Orders,      with tangent-linear = [1.99443026 1.99722412 1.99861429 1.99930763]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+tsfc:WARNING Estimated quadrature degree 11 more than tenfold greater than any argument/coefficient degree (max 1)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Estimated quadrature degree 11 more than tenfold greater than any argument/coefficient degree (max 1)
+Error norms, no tangent-linear   = [0.00575594 0.00289012 0.0014481  0.00072481 0.00036259]
+Orders,      no tangent-linear   = [0.99392152 0.99697228 0.998489   0.99924522]
+Error norms, with tangent-linear = [4.85843576e-05 1.21408907e-05 3.03457070e-06 7.58561041e-07
+ 1.89630048e-07]
+Orders,      with tangent-linear = [2.00061762 2.00030993 2.00015525 2.00007769]
+</pre></div></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">taylor_test_tlm_adjoint</span></code> also performs such verification tests, but computes the highest order derivative information using the adjoint method.</p>
+<p>Let’s apply this test up to fourth order:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">74728054</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test_tlm_adjoint</span><span class="p">(</span><span class="n">forward</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">adjoint_order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mf">1.0e-3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no adjoint   = [1.96925244e-04 9.84831481e-05 4.92467146e-05 2.46246436e-05
+ 1.23126435e-05]
+Orders,      no adjoint   = [0.99969928 0.9998494  0.99992464 0.9999623 ]
+Error norms, with adjoint = [8.22009802e-08 2.05743897e-08 5.14661260e-09 1.28702985e-09
+ 3.21804463e-10]
+Orders,      with adjoint = [1.99830596 1.99915454 1.99957767 1.99978928]
+Error norms, no adjoint   = [6.06217536e-05 3.03568452e-05 1.51898950e-05 7.59781316e-06
+ 3.79962268e-06]
+Orders,      no adjoint   = [0.99781372 0.99890997 0.99945576 0.99972807]
+Error norms, with adjoint = [1.83663729e-07 4.58635021e-08 1.14593025e-08 2.86400287e-09
+ 7.15897848e-10]
+Orders,      with adjoint = [2.00164831 2.00082729 2.00041439 2.00020729]
+Error norms, no adjoint   = [1.77271516e-04 8.85216211e-05 4.42321703e-05 2.21089118e-05
+ 1.10526609e-05]
+Orders,      no adjoint   = [1.00185896 1.00093384 1.00046801 1.00023428]
+Error norms, with adjoint = [4.57678459e-07 1.14702543e-07 2.87109829e-08 7.18216294e-09
+ 1.79609276e-09]
+Orders,      with adjoint = [1.99643702 1.99822274 1.99911243 1.99955652]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+tsfc:WARNING Estimated quadrature degree 11 more than tenfold greater than any argument/coefficient degree (max 1)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Estimated quadrature degree 11 more than tenfold greater than any argument/coefficient degree (max 1)
+Error norms, no adjoint   = [2.68076588e-04 1.34645957e-04 6.74748172e-05 3.37753585e-05
+ 1.68971655e-05]
+Orders,      no adjoint   = [0.99347432 0.99674984 0.99837808 0.99918983]
+Error norms, with adjoint = [2.42982799e-06 6.07250783e-07 1.51786806e-07 3.79434582e-08
+ 9.48545874e-09]
+Orders,      with adjoint = [2.00048984 2.00024605 2.00012331 2.00006172]
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

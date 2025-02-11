@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.tlm_adjoint &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/tlm_adjoint/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.tlm_adjoint">
+<span id="tlm-adjoint-tlm-adjoint"></span><h1><a class="reference internal" href="#module-tlm_adjoint.tlm_adjoint" title="tlm_adjoint.tlm_adjoint"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.tlm_adjoint</span></code></a><a class="headerlink" href="#module-tlm_adjoint.tlm_adjoint" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.tlm_adjoint.</span></span><span class="sig-name descname"><span class="pre">EquationManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'memory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="Link to this definition"></a></dt>
+<dd><p>Core manager class.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Plays the role of an adjoint ‘tape’. Records forward equations as
+they are solved.</p></li>
+<li><p>Interacts with checkpointing schedules for adjoint checkpointing and
+forward replay.</p></li>
+<li><p>Derives and manages tangent-linear equations. Tangent-linear
+equations are processed as new forward equations, allowing higher
+order adjoint calculations.</p></li>
+<li><p>Handles variable reference dropping, e.g. handles the dropping of
+references to variables which store values, and their replacement
+with symbolic equivalents, after <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> objects holding
+those references have been destroyed. Internally the manager retains
+a reference to a <a class="reference internal" href="../alias/index.html#tlm_adjoint.alias.WeakAlias" title="tlm_adjoint.alias.WeakAlias"><code class="xref py py-class docutils literal notranslate"><span class="pre">WeakAlias</span></code></a> subclass so that the
+<a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> methods may be called after the original
+<a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> is destroyed.</p></li>
+</ul>
+</div></blockquote>
+<p>The manager processes forward equations (and tangent-linear equations) as
+they are solved. Equations are collected into ‘blocks’ of equations,
+corresponding to ‘steps’ in step-based checkpointing schedules. For
+checkpointing schedule configuration details see
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p>
+<p>The configuration of tangent-linears is defined by a tangent-linear tree.
+The root node of this tree corresponds to the forward. Following <span class="math notranslate nohighlight">\(n\)</span>
+edges from the root node leads to a node associated with an <span class="math notranslate nohighlight">\(n\)</span> th
+order tangent-linear. For tangent-linear configuration details see
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_tlm()</span></code></a>.</p>
+<p>On instantiation both equation annotation and tangent-linear derivation and
+solution are <em>disabled</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comm</strong> – The communicator associated with the manager.</p></li>
+<li><p><strong>cp_method</strong> – See <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p></li>
+<li><p><strong>cp_parameters</strong> – See <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.comm">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">comm</span></span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.comm" title="Link to this definition"></a></dt>
+<dd><p>The communicator associated with the manager.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">print</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.info" title="Link to this definition"></a></dt>
+<dd><p>Print manager state information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>info</strong> – A callable which accepts and prints a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.new">
+<span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.new" title="Link to this definition"></a></dt>
+<dd><p>Construct a new <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> sharing the communicator
+with this <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a>. By default the new
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> also shares the checkpointing schedule
+configuration with this <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a>, but this may be
+overridden with the arguments <cite>cp_method</cite> and <cite>cp_parameters</cite>.</p>
+<p>Both equation annotation and tangent-linear derivation and solution are
+<em>disabled</em> for the new <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cp_method</strong> – See <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p></li>
+<li><p><strong>cp_parameters</strong> – See
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.reset" title="Link to this definition"></a></dt>
+<dd><p>Reset the <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a>. Clears all recorded equations,
+and all configured tangent-linears.</p>
+<p>By default the <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a> <em>retains</em> its previous
+checkpointing schedule configuration, but this may be overridden with
+the arguments <cite>cp_method</cite> and <cite>cp_parameters</cite>.</p>
+<p>Both equation annotation and tangent-linear derivation and solution are
+<em>disabled</em> after calling this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cp_method</strong> – See <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p></li>
+<li><p><strong>cp_parameters</strong> – See
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_checkpointing()</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing">
+<span class="sig-name descname"><span class="pre">configure_checkpointing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cp_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cp_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_checkpointing" title="Link to this definition"></a></dt>
+<dd><p>Provide a new checkpointing schedule configuration.</p>
+<p>The checkpointing schedule type is defined by the argument <cite>cp_method</cite>,
+and detailed configuration options are provided by the <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code>
+argument <cite>cp_parameters</cite>.</p>
+<p><cite>cp_method</cite> values:</p>
+<blockquote>
+<div><ul>
+<li><p><cite>‘none’</cite>: No checkpointing. Can be used for tangent-linear only
+calculations. Options defined by <cite>cp_parameters</cite>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘drop_references’</cite>: Whether to automatically drop references
+to variables which store values. <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, optional,
+default <cite>False</cite>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><cite>‘memory’</cite>: Store all forward restart data and non-linear
+dependency data in memory. Options defined by <cite>cp_parameters</cite>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘drop_references’</cite>: Whether to automatically drop references
+to variables which store values. <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, optional,
+default <cite>False</cite>.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><cite>‘periodic_disk</cite>: Periodically store forward restart data on
+disk. Options defined by <cite>cp_parameters</cite>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘path’</cite>: Directory in which disk checkpoint data should be
+stored. <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional, default <cite>‘checkpoints~’</cite>.</p></li>
+<li><p><cite>‘format’</cite>: Disk storage format. Either <cite>‘pickle’</cite>, for
+data storage using the pickle module, or <cite>‘hdf5’</cite>, for data
+storage using the h5py library.</p></li>
+<li><p><cite>‘period’</cite>: Interval, in blocks, between storage of forward
+restart data. <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, required.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><cite>‘multistage’</cite>: Forward restart checkpointing with checkpoint
+distribution as described in:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Andreas Griewank and Andrea Walther, ‘Algorithm 799:
+revolve: an implementation of checkpointing for the reverse
+or adjoint mode of computational differentiation’, ACM
+Transactions on Mathematical Software, 26(1), pp. 19–45,
+2000, doi: 10.1145/347837.347846</p></li>
+</ul>
+</div></blockquote>
+<p>The memory/disk storage distribution is determined by an
+initial run of the checkpointing schedule, leading to a
+distribution equivalent to that in:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Philipp Stumm and Andrea Walther, ‘MultiStage approaches
+for optimal offline checkpointing’, SIAM Journal on
+Scientific Computing, 31(3), pp. 1946–1967, 2009, doi:
+10.1137/080718036</p></li>
+</ul>
+</div></blockquote>
+<p>Options defined by <cite>cp_parameters</cite>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘path’</cite>: Directory in which disk checkpoint data should be
+stored. <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional, default <cite>‘checkpoints~’</cite>.</p></li>
+<li><p><cite>‘format’</cite>: Disk storage format. Either <cite>‘pickle’</cite>, for
+data storage using the pickle module, or <cite>‘hdf5’</cite>, for data
+storage using the h5py library.</p></li>
+<li><p><cite>‘blocks’</cite>: The total number of blocks. <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>,
+required.</p></li>
+<li><p><cite>‘snaps_in_ram’</cite>: Maximum number of memory checkpoints.
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, optional, default 0.</p></li>
+<li><p><cite>‘snaps_on_disk’</cite>: Maximum number of disk checkpoints.
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, optional, default 0.</p></li>
+</ul>
+</div></blockquote>
+<p>The name ‘multistage’ originates from the corresponding
+<cite>strategy</cite> argument value for the
+<cite>dolfin_adjoint.solving.adj_checkpointing</cite> function in
+dolfin-adjoint (see e.g. version 2017.1.0). The parameter names
+<cite>snaps_in_ram</cite> and <cite>snaps_on_disk</cite> originate from the
+corresponding arguments for the
+<cite>dolfin_adjoint.solving.adj_checkpointing</cite> function in
+dolfin-adjoint (see e.g. version 2017.1.0).</p>
+</li>
+<li><p>A callable: A callable returning a <a class="reference internal" href="../checkpoint_schedules/schedule/index.html#tlm_adjoint.checkpoint_schedules.schedule.CheckpointSchedule" title="tlm_adjoint.checkpoint_schedules.schedule.CheckpointSchedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">CheckpointSchedule</span></code></a>.
+Options defined by <cite>cp_parameters</cite>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>‘path’</cite>: Directory in which disk checkpoint data should be
+stored. <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, optional, default <cite>‘checkpoints~’</cite>.</p></li>
+<li><p><cite>‘format’</cite>: Disk storage format. Either <cite>‘pickle’</cite>, for
+data storage using the pickle module, or <cite>‘hdf5’</cite>, for data
+storage using the h5py library.</p></li>
+<li><p>Other parameters are passed as keyword arguments to the
+callable.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm">
+<span class="sig-name descname"><span class="pre">configure_tlm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm" title="Link to this definition"></a></dt>
+<dd><p>Configure the tangent-linear tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> of <cite>(M_i, dM_i)</cite> pairs. <cite>M_i</cite> is a variable
+or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining a control. <cite>dM_i</cite> is a
+variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining a derivative
+direction. Identifies a node in the tree (and hence identifies a
+tangent-linear) corresponding to differentation, in order, with
+respect to the each control defined by <cite>M_i</cite> and with each
+direction defined by <cite>dM_i</cite>.</p></li>
+<li><p><strong>annotate</strong> – If <cite>True</cite> then enable annotation for the identified
+tangent-linear, and enable annotation for all tangent-linears on
+which it depends. If <cite>False</cite> then disable annotation for the
+identified tangent-linear, all tangent-linears which depend on it,
+and any newly added tangent-linears. Defaults to <cite>tlm</cite>.</p></li>
+<li><p><strong>tlm</strong> – If <cite>True</cite> then add (or retain) the identified tangent-linear,
+and add all tangent-linears on which it depends. If <cite>False</cite> then
+remove the identified tangent-linear, and remove all
+tangent-linears which depend on it.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.tlm_enabled">
+<span class="sig-name descname"><span class="pre">tlm_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.tlm_enabled" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether derivation and solution of tangent-linear equations
+is enabled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.var_tlm">
+<span class="sig-name descname"><span class="pre">var_tlm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.var_tlm" title="Link to this definition"></a></dt>
+<dd><p>Return a tangent-linear variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – A variable whose tangent-linear variable should be returned.
+Cannot not be a replacement.</p></li>
+<li><p><strong>args</strong> – Identifies the tangent-linear. See
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm" title="tlm_adjoint.tlm_adjoint.EquationManager.configure_tlm"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.configure_tlm()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The tangent-linear variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.function_tlm">
+<span class="sig-name descname"><span class="pre">function_tlm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.function_tlm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.annotation_enabled">
+<span class="sig-name descname"><span class="pre">annotation_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.annotation_enabled" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether recording of equations is enabled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.start" title="Link to this definition"></a></dt>
+<dd><p>Start recording of equations and derivation and solution of
+tangent-linear equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate</strong> – Whether recording of equations should be enabled.</p></li>
+<li><p><strong>tlm</strong> – Whether derivation and solution of tangent-linear equations
+should be enabled.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.stop" title="Link to this definition"></a></dt>
+<dd><p>Stop recording of equations and derivation and solution of
+tangent-linear equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate</strong> – Whether recording of equations should be disabled.</p></li>
+<li><p><strong>tlm</strong> – Whether derivation and solution of tangent-linear equations
+should be disabled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a> <cite>(annotation_state, tlm_state)</cite>.
+<cite>annotation_state</cite> is a <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> indicating whether recording
+of equations was enabled prior to the call to
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.stop" title="tlm_adjoint.tlm_adjoint.EquationManager.stop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.stop()</span></code></a>. <cite>tlm_state</cite> is a <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>
+indicating whether derivation and solution of tangent-linear
+equations was enabled prior to the call to
+<a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.stop" title="tlm_adjoint.tlm_adjoint.EquationManager.stop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.stop()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.paused">
+<span class="sig-name descname"><span class="pre">paused</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.paused" title="Link to this definition"></a></dt>
+<dd><p>Construct a context manager which can be used to temporarily disable
+recording of equations and derivation and solution of tangent-linear
+equations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate</strong> – Whether recording of equations should be temporarily
+disabled.</p></li>
+<li><p><strong>tlm</strong> – Whether derivation and solution of tangent-linear equations
+should be temporarily disabled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A context manager which can be used to temporarily disable
+recording of equations and derivation and solution of
+tangent-linear equations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.add_initial_condition">
+<span class="sig-name descname"><span class="pre">add_initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.add_initial_condition" title="Link to this definition"></a></dt>
+<dd><p>Process an ‘initial condition’ – a variable whose associated value
+is needed prior to solving an equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – A variable defining the initial condition.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.add_equation">
+<span class="sig-name descname"><span class="pre">add_equation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.add_equation" title="Link to this definition"></a></dt>
+<dd><p>Process an <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a> after it has been solved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eq</strong> – The <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.drop_references">
+<span class="sig-name descname"><span class="pre">drop_references</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.drop_references" title="Link to this definition"></a></dt>
+<dd><p>Drop references to variables which store values, referenced by
+objects which have been destroyed, and replace them symbolic
+equivalents.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.new_block">
+<span class="sig-name descname"><span class="pre">new_block</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.new_block" title="Link to this definition"></a></dt>
+<dd><p>End the current block of equations, and begin a new block. The
+blocks of equations correspond to the ‘steps’ in step-based
+checkpointing schedules.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.finalize" title="Link to this definition"></a></dt>
+<dd><p>End the final block of equations. Equations cannot be recorded, and
+new tangent-linear equations cannot be derived and solved, after a call
+to this method.</p>
+<p>Called by <a class="reference internal" href="#tlm_adjoint.tlm_adjoint.EquationManager.compute_gradient" title="tlm_adjoint.tlm_adjoint.EquationManager.compute_gradient"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.compute_gradient()</span></code></a>, and typically need
+not be called manually.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.tlm_adjoint.EquationManager.compute_gradient">
+<span class="sig-name descname"><span class="pre">compute_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Js</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_forward</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_adjoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prune_replay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_adjoint_degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_adjoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj_ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.tlm_adjoint.EquationManager.compute_gradient" title="Link to this definition"></a></dt>
+<dd><p>Core adjoint driver method.</p>
+<p>Compute the derivative of one or more functionals with respect to one
+or more controls, using an adjoint approach.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Js</strong> – A variable or a sequence of variables defining the functionals
+to differentiate.</p></li>
+<li><p><strong>M</strong> – A variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining the
+controls. Derivatives with respect to the controls are computed.</p></li>
+<li><p><strong>callback</strong> – <p>Diagnostic callback. A callable of the form</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">J_i</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="n">adj_X</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>with</p>
+<blockquote>
+<div><ul>
+<li><p><cite>J_i</cite>: An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> defining the index of the functional.</p></li>
+<li><p><cite>n</cite>: An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> definining the index of the block of
+equations.</p></li>
+<li><p><cite>i</cite>: An <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> defining the index of the considered
+equation in block <cite>n</cite>.</p></li>
+<li><p><cite>eq</cite>: The <a class="reference internal" href="../equation/index.html#tlm_adjoint.equation.Equation" title="tlm_adjoint.equation.Equation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Equation</span></code></a>, equation <cite>i</cite> in block <cite>n</cite>.</p></li>
+<li><p><cite>adj_X</cite>: The adjoint solution associated with equation <cite>i</cite> in
+block <cite>n</cite> for the <cite>J_i</cite> th functional. <cite>None</cite> indicates that
+the solution is zero or is not computed (due to an activity
+analysis). Otherwise a variable if <cite>eq</cite> has a single solution
+component, and a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables otherwise.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>prune_forward</strong> – Controls the activity analysis. Whether a forward
+traversal of the computational graph, tracing variables which
+depend on the controls, should be applied.</p></li>
+<li><p><strong>prune_adjoint</strong> – Controls the activity analysis. Whether a reverse
+traversal of the computational graph, tracing variables on which
+the functionals depend, should be applied.</p></li>
+<li><p><strong>prune_replay</strong> – Controls the activity analysis. Whether an activity
+analysis should be applied when solving forward equations during
+checkpointing/replay.</p></li>
+<li><p><strong>cache_adjoint_degree</strong> – Adjoint solutions can be cached and reused
+across adjoints where the solution is the same – e.g. first order
+adjoint solutions associated with the same functional and same
+block and equation indices are equal. A value of <cite>None</cite> indicates
+that caching should be applied at all degrees, a value of 0
+indicates that no caching should be applied, and any positive
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> indicates that caching should be applied for adjoints
+up to and including degree <cite>cache_adjoint_degree</cite>.</p></li>
+<li><p><strong>store_adjoint</strong> – Whether cached adjoint solutions should be retained
+after the call to this method. Can be used to cache and reuse first
+order adjoint solutions in multiple calls to this method.</p></li>
+<li><p><strong>adj_ics</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code>. Items are <cite>(x, value)</cite> where <cite>x</cite> is a
+variable or variable ID identifying a forward variable. The adjoint
+variable associated with the final equation solving for <cite>x</cite> is
+initialized to the value stored by the variable <cite>value</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>The conjugate of the derivatives. The return type depends on
+the type of <cite>Js</cite> and <cite>M</cite>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>Js</cite> is a variable and <cite>M</cite> is a variable, returns a variable
+storing the conjugate of the derivative.</p></li>
+<li><p>If <cite>Js</cite> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>, and <cite>M</cite> is a variable, returns
+a variable whose <span class="math notranslate nohighlight">\(i\)</span> th component stores the conjugate of
+the derivative of the <span class="math notranslate nohighlight">\(i\)</span> th functional.</p></li>
+<li><p>If <cite>Js</cite> is a variable and <cite>M</cite> is a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>, returns a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables whose <span class="math notranslate nohighlight">\(j\)</span> th component
+stores the conjugate of the derivative with respect to the
+<span class="math notranslate nohighlight">\(j\)</span> th control.</p></li>
+<li><p>If both <cite>Js</cite> and <cite>M</cite> are <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> objects, returns a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> whose <span class="math notranslate nohighlight">\(i\)</span> th component stores the
+conjugate of the derivatives of the <span class="math notranslate nohighlight">\(i\)</span> th functional.
+Each of these is a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables whose
+<span class="math notranslate nohighlight">\(j\)</span> th component stores the conjugate of the derivative
+with respect to the <span class="math notranslate nohighlight">\(j\)</span> th control.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

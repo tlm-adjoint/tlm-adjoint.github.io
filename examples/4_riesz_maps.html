@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizing derivatives &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Visualizing derivatives</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/4_riesz_maps.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Visualizing-derivatives">
+<h1>Visualizing derivatives<a class="headerlink" href="#Visualizing-derivatives" title="Link to this heading"></a></h1>
+<p>When we differentiate a functional with respect to a finite element discretized function in some discrete function space <span class="math notranslate nohighlight">\(V\)</span>, we do not obtain a function in <span class="math notranslate nohighlight">\(V\)</span>, but instead obtain an element of the associated dual space <span class="math notranslate nohighlight">\(V^*\)</span>. This notebook describes how a Riesz map can be used to construct a function, associated with the derivative, which can be visualized.</p>
+<p>This example makes use of tlm_adjoint with the <a class="reference external" href="https://firedrakeproject.org/">Firedrake</a> backend, and we assume real spaces and a real build of Firedrake throughout.</p>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We consider the solution <span class="math notranslate nohighlight">\(u \in V\)</span> of a discretization of the Poisson equation subject to homogeneous Dirichlet boundary conditions,</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V_0 \qquad \int_\Omega \nabla \zeta \cdot \nabla u = -\int_\Omega \zeta m,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is a real <span class="math notranslate nohighlight">\(P_1\)</span> continuous finite element space defining functions on the domain <span class="math notranslate nohighlight">\(\Omega = \left( 0, 1 \right)^2\)</span>, with <span class="math notranslate nohighlight">\(m \in V\)</span>, and where <span class="math notranslate nohighlight">\(V_0\)</span> consists of the functions in <span class="math notranslate nohighlight">\(V\)</span> which have zero trace. We define a functional</p>
+<div class="math notranslate nohighlight">
+\[J \left( u \right) = \int_\Omega \left( 1 - x \right)^4 u^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> denote Cartesian coordinates in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>.</p>
+<p>We first solve the forward problem for</p>
+<div class="math notranslate nohighlight">
+\[m = \mathcal{I} \left[ \sin \left( \pi x \right) \sin \left( 2 \pi y \right) \right],\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{I}\)</span> maps to an element of <span class="math notranslate nohighlight">\(V\)</span> through interpolation at mesh vertices.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">tricontourf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span><span class="p">,</span> <span class="n">trial</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">),</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="o">-</span><span class="n">inner</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J&quot;</span><span class="p">)</span>
+    <span class="n">J</span><span class="o">.</span><span class="n">assign</span><span class="p">(((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">J</span>
+
+
+<span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.0e-12</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">tricontourf</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+J.value=np.float64(9.711060188691796e-06)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_4_riesz_maps_1_1.png" src="../_images/examples_4_riesz_maps_1_1.png" />
+</div>
+</div>
+</section>
+<section id="First-order-adjoint">
+<h2>First order adjoint<a class="headerlink" href="#First-order-adjoint" title="Link to this heading"></a></h2>
+<p>We can differentiate a functional respect to <span class="math notranslate nohighlight">\(m\)</span> using <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code>. Specifically we compute the derivative of <span class="math notranslate nohighlight">\(\hat{J} = J \circ \hat{u}\)</span>, where <span class="math notranslate nohighlight">\(\hat{u}\)</span> is the function which maps from the control <span class="math notranslate nohighlight">\(m\)</span> to the solution to the discretized Poisson problem.</p>
+<p>When we compute a derivative of a functional with respect to a finite element discretized function using the adjoint method the result is not a function, but is instead a member of a dual space. Here we have <span class="math notranslate nohighlight">\(m \in V\)</span>, and the derivative of <span class="math notranslate nohighlight">\(\hat{J}\)</span> with respect to <span class="math notranslate nohighlight">\(m\)</span> is a member of the associated dual space <span class="math notranslate nohighlight">\(V^*\)</span>. In order to visualize this derivative we first need to map it to <span class="math notranslate nohighlight">\(V\)</span>. We can do this using a Riesz map. This is not uniquely defined, but here we
+choose to define a Riesz map using the <span class="math notranslate nohighlight">\(L^2\)</span> inner product.</p>
+<p>Being precise the function we visualize, <span class="math notranslate nohighlight">\(g^\sharp \in V\)</span>, is defined such that</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V \qquad \left. \frac{d \hat{J} \left( m + \alpha \zeta \right)}{d \alpha} \right|_{\alpha = 0} = \int_\Omega \zeta g^\sharp,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is a scalar.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+
+
+<span class="n">dJdm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">dJdm</span><span class="o">.</span><span class="n">riesz_representation</span><span class="p">(</span><span class="s2">&quot;L2&quot;</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$g^\sharp$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+J.value=np.float64(9.711060188691796e-06)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_4_riesz_maps_3_1.png" src="../_images/examples_4_riesz_maps_3_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_4_riesz_maps_3_2.png" src="../_images/examples_4_riesz_maps_3_2.png" />
+</div>
+</div>
+</section>
+<section id="Hessian-action">
+<h2>Hessian action<a class="headerlink" href="#Hessian-action" title="Link to this heading"></a></h2>
+<p>Next we seek to differentiate <span class="math notranslate nohighlight">\(\hat{J}\)</span> twice with respect to <span class="math notranslate nohighlight">\(m\)</span>. However the second derivative defines a <em>bilinear</em> operator. This can be represented as a matrix – a Hessian matrix – but the number of elements in this matrix is equal to the <em>square</em> of the number of degrees of freedom for <span class="math notranslate nohighlight">\(m\)</span>.</p>
+<p>Instead of computing the full second derivative we can compute its action on a given direction <span class="math notranslate nohighlight">\(\zeta \in V\)</span>. The degrees of freedom associated with the result define the action of the Hessian matrix on a vector – specifically the action of the Hessian matrix on the vector consisting of the degrees of freedom for <span class="math notranslate nohighlight">\(\zeta\)</span>.</p>
+<p>We do this in two stages. First we compute a directional derivative,</p>
+<div class="math notranslate nohighlight">
+\[\left. \frac{d \hat{J} \left( m + \alpha \zeta \right)}{d \alpha} \right|_{\alpha=0},\]</div>
+<p>computed using the tangent-linear method. We consider the case where <span class="math notranslate nohighlight">\(\zeta = 1\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+
+<span class="n">dJdm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dJdm_zeta</span><span class="o">.</span><span class="n">value</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+J.value=np.float64(9.711060188691796e-06)
+dJdm_zeta.value=np.float64(1.15806935648437e-06)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_4_riesz_maps_5_1.png" src="../_images/examples_4_riesz_maps_5_1.png" />
+</div>
+</div>
+<p>Next we compute the derivative of <em>this</em> derivative using the adjoint method.</p>
+<p>Again we need to remember that the result is a member of the dual space <span class="math notranslate nohighlight">\(V^*\)</span>, and is not a function, so we again use a Riesz map to visualize it. Here we use the same Riesz map as before, defined using the <span class="math notranslate nohighlight">\(L^2\)</span> inner product.</p>
+<p>Being precise the function we visualize, <span class="math notranslate nohighlight">\(h^\sharp \in V\)</span>, is defined such that</p>
+<div class="math notranslate nohighlight">
+\[\forall \chi \in V \qquad \left. \frac{\partial^2 \hat{J} \left( m + \alpha \zeta + \beta \chi \right)}{\partial \beta \partial \alpha} \right|_{\alpha = 0, \beta = 0} = \int_\Omega \chi h^\sharp,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\zeta \in V\)</span> defines the direction on which the action is computed, and <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span> are scalars.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d2Jdm2_zeta</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJdm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">d2Jdm2_zeta</span><span class="o">.</span><span class="n">riesz_representation</span><span class="p">(</span><span class="s2">&quot;L2&quot;</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$h^\sharp$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_4_riesz_maps_7_0.png" src="../_images/examples_4_riesz_maps_7_0.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

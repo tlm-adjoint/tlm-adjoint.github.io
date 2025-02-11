@@ -1,0 +1,1532 @@
+:py:mod:`tlm_adjoint.block_system`
+==================================
+
+.. py:module:: tlm_adjoint.block_system
+
+.. autoapi-nested-parse::
+
+   Mixed space linear algebra utilities.
+
+   Given a linear problem with a potentially singular matrix :math:`A`
+
+   .. math::
+
+       A u = b,
+
+   a :class:`.LinearSolver` instead solves the linear problem
+
+   .. math::
+
+       \left[ (I - M U (U^* M U)^{-1} U^*) A (I - V (V^* C V)^{-1} V^* C)
+           + M U S V^* C \right] u = (I - M U (U^* M U)^{-1} U^*) b.
+
+   Here
+
+       - :math:`U` is a full rank matrix whose columns span the left nullspace for
+         a modified system matrix :math:`\tilde{A}`.
+       - :math:`V` is a full rank matrix with the same number of columns as
+         :math:`U`, whose columns span the nullspace for :math:`\tilde{A}`.
+       - :math:`V^* C V` and :math:`S` are invertible matrices.
+       - :math:`M` is a Hermitian positive definite matrix.
+
+   Here the left nullspace for a matrix is defined to be the nullspace for its
+   Hermitian transpose, and the modified system matrix :math:`\tilde{A}` is
+   defined
+
+   .. math::
+
+       \tilde{A} = (I - M U (U^* M U)^{-1} U^*) A (I - V (V^* C V)^{-1} V^* C).
+
+   This has two primary use cases:
+
+       1. Where a matrix :math:`A` and right-hand-side :math:`b` are constructed
+          via finite element assembly on superspaces of the test space and trial
+          space. The typical example is in the application of homogeneous
+          essential Dirichlet boundary conditions.
+
+       2. Where the matrix :math:`A` is singular and :math:`b` is orthogonal to
+          the left nullspace of :math:`A`. Typically one would then choose
+          :math:`U` and :math:`V` so that their columns respectively span the left
+          nullspace and nullspace of :math:`A`, and the :class:`.LinearSolver`
+          then seeks a solution to the original problem subject to the linear
+          constraints :math:`V^* C u = 0`.
+
+   Spaces are defined via backend spaces or :class:`.TypedSpace` objects, and
+   :class:`Sequence` objects containing backend spaces, :class:`.TypedSpace`
+   objects, or similar :class:`Sequence` objects. Similarly variables are defined
+   via backend variables, or :class:`Sequence` objects containing backend
+   variables, or similar :class:`Sequence` objects. This defines a basic tree
+   structure which is useful e.g. when defining block matrices in terms of
+   sub-block matrices.
+
+   Elements of the tree are accessed in a consistent order using a depth first
+   search. Hence e.g.
+
+   .. code-block:: python
+
+       ((u_0, u_1), u_2)
+
+   and
+
+   .. code-block:: python
+
+       (u_0, u_1, u_2)
+
+   where `u_0`, `u_1`, and `u_2` are backend variables, are both valid
+   representations of a mixed space solution.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: TypedSpace(space, *, space_type=None)
+
+
+   
+   A space with an associated space type.
+
+
+   :Parameters:
+
+       **space** : space
+           The backend space.
+
+       **space_type** : str
+           The space type.
+
+   :Attributes:
+
+       **comm** : communicator
+           The communicator associated with the space.
+
+       **space** : space
+           The backend space.
+
+       **space_type** : str
+           The space type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: new()
+
+      
+      Create a new variable in the space.
+
+
+
+
+
+      :Returns:
+
+          variable
+              The new variable.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: MixedSpace(spaces)
+
+
+
+
+   
+   Used to map between different versions of a mixed space.
+
+   This class defines two representations for the space:
+
+       1. As a 'split space': A tree defining the mixed space. Stored using
+          :class:`.TypedSpace` and :class:`tuple` objects, each corresponding
+          to a node in the tree. :class:`.TypedSpace` objects correspond to
+          leaf nodes, and :class:`tuple` objects to other nodes in the tree.
+       2. As a 'flattened space': A :class:`Sequence` containing leaf nodes of
+          the split space with an ordering determined using a depth first
+          search.
+
+   Provides methods to allow data to be copied to and from a compatible
+   :class:`petsc4py.PETSc.Vec`. This allows, for example, the construction
+   (with Firedrake):
+
+   .. code-block:: python
+
+       u_0 = Function(space_0, name='u_0')
+       u_1 = Function(space_1, name='u_1')
+       u_2 = Function(space_2, name='u_2')
+
+       mixed_space = MixedSpace(((space_0, space_1), space_2))
+
+   and then data can be copied to a compatible :class:`petsc4py.PETSc.Vec` via
+
+   .. code-block:: python
+
+       mixed_space.to_petsc(u_petsc, ((u_0, u_1), u_2))
+
+   and from a compatible :class:`petsc4py.PETSc.Vec` via
+
+   .. code-block:: python
+
+       mixed_space.from_petsc(u_petsc, ((u_0, u_1), u_2))
+
+   :arg spaces: Defines the split space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: split_space
+
+      
+      The split space representation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: flattened_space
+
+      
+      The flattened space representation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tuple_sub(u)
+
+      
+      :arg u: An :class:`Iterable`.
+      :returns: A :class:`tuple` storing elements in `u` using the tree
+          structure of the split space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: new()
+
+      
+      :returns: A new element in the split space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: Nullspace
+
+
+
+
+   
+   Represents a nullspace and left nullspace for a square matrix.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_nullspace_transformation_lhs_right(x)
+      :abstractmethod:
+
+      
+      Apply the nullspace transformation associated with a matrix action
+      on :math:`x`,
+
+      .. math::
+
+          x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.
+
+      :arg x: Defines :math:`x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_nullspace_transformation_lhs_left(y)
+      :abstractmethod:
+
+      
+      Apply the left nullspace transformation associated with a matrix
+      action,
+
+      .. math::
+
+          y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.
+
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: constraint_correct_lhs(x, y)
+      :abstractmethod:
+
+      
+      Add the linear constraint term to :math:`y`,
+
+      .. math::
+
+          y \rightarrow y + M U S V^* C x.
+
+      :arg x: Defines :math:`x`.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_constraint_correct_soln(u, b)
+      :abstractmethod:
+
+      
+      Add the preconditioner linear constraint term to :math:`u`,
+
+      .. math::
+
+          u \rightarrow u + V \tilde{S}^{-1} U^* b,
+
+      with
+
+      .. math::
+
+          \tilde{S}^{-1} =
+              \left( V^* C V \right)^{-1}
+              S^{-1}
+              \left( U^* M U \right)^{-1}.
+
+      :arg u: Defines :math:`u`.
+      :arg b: Defines :math:`b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: correct_soln(x)
+
+      
+      Correct the linear system solution so that it is orthogonal to
+      space spanned by the columns of :math:`V`.
+
+      :arg x: The linear system solution, to be corrected.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pre_mult_correct_lhs(x)
+
+      
+      Apply the pre-left-multiplication nullspace transformation.
+
+      :arg x: Defines the vector on which the matrix action is computed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: post_mult_correct_lhs(x, y)
+
+      
+      Apply the post-left-multiplication nullspace transformation, and add
+      the linear constraint term.
+
+      :arg x: Defines the vector on which the matrix action is computed, and
+          used to add the linear constraint term. If `None` is supplied then
+          the linear constraint term is not added.
+      :arg y: Defines the result of the matrix action on `x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: correct_rhs(b)
+
+      
+      Correct the linear system right-hand-side so that it is orthogonal
+      to the space spanned by the columns of :math:`U`.
+
+      :arg b: The linear system right-hand-side, to be corrected.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_pre_mult_correct(b)
+
+      
+      Apply the pre-preconditioner-application nullspace transformation.
+
+      :arg b: Defines the vector on which the preconditioner action is
+          computed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_post_mult_correct(u, b)
+
+      
+      Apply the post-preconditioner-application left nullspace
+      transformation, and add the linear constraint term.
+
+      :arg u: Defines the result of the preconditioner action on `b`.
+      :arg b: Defines the vector on which the preconditioner action is
+          computed, and used to add the linear constraint term. If `None` is
+          supplied then the linear constraint term is not added.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: NoneNullspace
+
+
+
+
+   
+   An empty nullspace and left nullspace.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_nullspace_transformation_lhs_right(x)
+
+      
+      Apply the nullspace transformation associated with a matrix action
+      on :math:`x`,
+
+      .. math::
+
+          x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.
+
+      :arg x: Defines :math:`x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_nullspace_transformation_lhs_left(y)
+
+      
+      Apply the left nullspace transformation associated with a matrix
+      action,
+
+      .. math::
+
+          y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.
+
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: constraint_correct_lhs(x, y)
+
+      
+      Add the linear constraint term to :math:`y`,
+
+      .. math::
+
+          y \rightarrow y + M U S V^* C x.
+
+      :arg x: Defines :math:`x`.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_constraint_correct_soln(u, b)
+
+      
+      Add the preconditioner linear constraint term to :math:`u`,
+
+      .. math::
+
+          u \rightarrow u + V \tilde{S}^{-1} U^* b,
+
+      with
+
+      .. math::
+
+          \tilde{S}^{-1} =
+              \left( V^* C V \right)^{-1}
+              S^{-1}
+              \left( U^* M U \right)^{-1}.
+
+      :arg u: Defines :math:`u`.
+      :arg b: Defines :math:`b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: BlockNullspace(nullspaces)
+
+
+
+
+   
+   Nullspaces for a square :class:`.BlockMatrix`.
+
+   :arg nullspaces: A :class:`.Nullspace` or a :class:`Sequence` of
+       :class:`.Nullspace` objects defining the nullspace. `None` indicates a
+       :class:`.NoneNullspace`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: apply_nullspace_transformation_lhs_right(x)
+
+      
+      Apply the nullspace transformation associated with a matrix action
+      on :math:`x`,
+
+      .. math::
+
+          x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.
+
+      :arg x: Defines :math:`x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: apply_nullspace_transformation_lhs_left(y)
+
+      
+      Apply the left nullspace transformation associated with a matrix
+      action,
+
+      .. math::
+
+          y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.
+
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: constraint_correct_lhs(x, y)
+
+      
+      Add the linear constraint term to :math:`y`,
+
+      .. math::
+
+          y \rightarrow y + M U S V^* C x.
+
+      :arg x: Defines :math:`x`.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: pc_constraint_correct_soln(u, b)
+
+      
+      Add the preconditioner linear constraint term to :math:`u`,
+
+      .. math::
+
+          u \rightarrow u + V \tilde{S}^{-1} U^* b,
+
+      with
+
+      .. math::
+
+          \tilde{S}^{-1} =
+              \left( V^* C V \right)^{-1}
+              S^{-1}
+              \left( U^* M U \right)^{-1}.
+
+      :arg u: Defines :math:`u`.
+      :arg b: Defines :math:`b`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: Matrix(arg_space, action_space)
+
+
+   
+   Represents a matrix defining a mapping
+   :math:`A` mapping :math:`V \rightarrow W`.
+
+   :arg arg_space: Defines the space :math:`V`.
+   :arg action_space: Defines the space :math:`W`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: arg_space
+
+      
+      The space defining :math:`V`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:property:: action_space
+
+      
+      The space defining :math:`W`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: mult(x, y)
+
+      
+      Compute :math:`y = A x`.
+
+      :arg x: Defines :math:`x`. Should not be modified.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: mult_add(x, y)
+
+      
+      Add :math:`A x` to :math:`y`.
+
+      :arg x: Defines :math:`x`. Should not be modified.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: MatrixFreeMatrix(arg_space, action_space, mult)
+
+
+
+
+   
+   Represents a matrix defining a mapping
+   :math:`A` mapping :math:`V \rightarrow W`.
+
+   :arg arg_space: Defines the space :math:`V`.
+   :arg action_space: Defines the space :math:`W`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: mult(x, y)
+
+      
+      Compute :math:`y = A x`.
+
+      :arg x: Defines :math:`x`. Should not be modified.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: BlockMatrix(arg_space, action_space, blocks=None)
+
+
+
+
+   
+   A matrix defining a mapping :math:`A` mapping :math:`V \rightarrow W`,
+   where :math:`V` and :math:`W` are defined by mixed spaces.
+
+   :arg arg_space: Defines the space :math:`V`.
+   :arg action_space: Defines the space :math:`W`.
+   :arg block: A :class:`Mapping` defining the blocks of the matrix. Items are
+       `((i, j), block)` where the block in the `i` th and `j` th column is
+       defined by `block`. Each `block` is a
+       :class:`tlm_adjoint.block_system.Matrix`, or `None` to indicate a zero
+       block.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: mult_add(x, y)
+
+      
+      Add :math:`A x` to :math:`y`.
+
+      :arg x: Defines :math:`x`. Should not be modified.
+      :arg y: Defines :math:`y`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: LinearSolver(A, *, nullspace=None, solver_parameters=None, pc_fn=None, comm=None)
+
+
+   
+   Solver for a linear system
+
+   .. math::
+
+       A u = b,
+
+   using PETSc.
+
+   :arg A: A :class:`tlm_adjoint.block_system.Matrix` defining :math:`A`.
+   :arg nullspace: A :class:`.Nullspace` or a :class:`Sequence` of
+       :class:`.Nullspace` objects defining the nullspace and left nullspace
+       of :math:`A`. `None` indicates a :class:`.NoneNullspace`.
+   :arg solver_parameters: A :class:`Mapping` defining Krylov solver
+       parameters.
+   :arg pc_fn: Defines the application of a preconditioner. A callable
+
+       .. code-block:: python
+
+           def pc_fn(u, b):
+
+       The preconditioner is applied to `b`, and the result stored in `u`.
+       Defaults to an identity.
+   :arg comm: Communicator.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: ksp
+
+      
+      The :class:`petsc4py.PETSc.KSP` used to solve the linear problem.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: solve(u, b, *, correct_initial_guess=True, correct_solution=True)
+
+      
+      Solve the linear system.
+
+      :arg u: Defines the solution :math:`u`.
+      :arg b: Defines the right-hand-side :math:`b`.
+      :arg correct_initial_guess: Whether to apply a nullspace correction to
+          the initial guess.
+      :arg correct_solution: Whether to apply a nullspace correction to
+          the solution.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: Eigensolver(A, B=None, *, B_inv=None, nullspace=None, solver_parameters=None, comm=None)
+
+
+   
+   Solver for an eigenproblem
+
+   .. math::
+
+       A v = \lambda B v
+
+   using SLEPc.
+
+   :arg A: A :class:`tlm_adjoint.block_system.Matrix` defining :math:`A`.
+   :arg B: A :class:`tlm_adjoint.block_system.Matrix` defining :math:`B`. If
+       supplied then a generalized eigenproblem is solved. Otherwise a
+       standard eigenproblem (with :math:`B` equal to an identity) is solved.
+   :arg B_inv: A :class:`tlm_adjoint.block_system.Matrix` defining the inverse
+       of :math:`B`.
+   :arg nullspace: A :class:`.Nullspace` or a :class:`Sequence` of
+       :class:`.Nullspace` objects defining the nullspace and left nullspace
+       of :math:`A` and :math:`B`. `None` indicates a :class:`.NoneNullspace`.
+   :arg solver_parameters: A :class:`Mapping` defining solver parameters.
+   :arg comm: Communicator.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: eps
+
+      
+      The :class:`slepc4py.SLEPc.EPS` used to solve the eigenproblem.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_hermitian_and_positive()
+
+      
+      :returns: Whether the eigenproblem is Hermitian with positive
+          semi-definite :math:`B`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: solve()
+
+      
+      Solve the eigenproblem.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: eigenvalues()
+
+      
+      Return converged eigenvalues.
+
+      :returns: A :class:`numpy.ndarray` containing eigenvalues.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: eigenpairs()
+
+      
+      Return converged eigenpairs.
+
+      :returns: A :class:`tuple` `(Lam, V)`, where
+
+          - `Lam` is a :class:`numpy.ndarray` containing eigenvalues.
+          - `V` is a :class:`Sequence` of length two :class:`tuple` objects,
+            `(v_r, v_i)`, defining corresponding eigenvectors. Each
+            eigenvectors is defined by `v_r + 1.0j v_i`. `v_i` is `None`,
+            to indicate a value of zero, for Hermitian eigenvalue problems
+            or with a complex PETSc build.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: B_orthonormality_test()
+
+      
+      Test :math:`B` orthonormality of the eigenvectors for a Hermitian
+      eigenvalue problem.
+
+      :returns: :math:`\left| V^* B V - I \right|_\infty` where
+          :math:`V` is the matrix whose columns are the eigenvectors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: MatrixFunctionSolver(A, *, nullspace=None, solver_parameters=None, comm=None)
+
+
+   
+   Matrix function action evaluation
+
+   .. math::
+
+       v = f ( A ) u
+
+   using SLEPc.
+
+   :arg A: A :class:`tlm_adjoint.block_system.Matrix` defining :math:`A`.
+   :arg nullspace: A :class:`.Nullspace` or a :class:`Sequence` of
+       :class:`.Nullspace` objects defining the nullspace and left nullspace
+       of :math:`A` and :math:`B`. `None` indicates a :class:`.NoneNullspace`.
+   :arg solver_parameters: A :class:`Mapping` defining solver parameters.
+   :arg comm: Communicator.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: mfn
+
+      
+      The :class:`slepc4py.SLEPc.MFN` used to compute the matrix function
+      action.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: solve(u, v)
+
+      
+      Compute the matrix function action.
+
+      :arg u: Defines the argument :math:`u`.
+      :arg v: Defines the result :math:`v`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

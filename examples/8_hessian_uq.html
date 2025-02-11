@@ -1,0 +1,964 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hessian-based uncertainty quantification &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Hessian-based uncertainty quantification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/8_hessian_uq.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Hessian-based-uncertainty-quantification">
+<h1>Hessian-based uncertainty quantification<a class="headerlink" href="#Hessian-based-uncertainty-quantification" title="Link to this heading"></a></h1>
+<p><strong>Author:</strong> James R. Maddison</p>
+<p>This notebook describes the use of tlm_adjoint for Hessian-based uncertainty quantification. The approach is based on the method described in</p>
+<ul class="simple">
+<li><p>Tobin Isaac, Noemi Petra, Georg Stadler, and Omar Ghattas, ‘Scalable and efficient algorithms for the propagation of uncertainty from data through inference to prediction for large-scale problems, with application to flow of the Antarctic ice sheet’, Journal of Computational Physics, 296, pp. 348–368, 2015, doi: 10.1016/j.jcp.2015.04.047</p></li>
+</ul>
+<p>We assume real spaces and a real build of Firedrake throughout.</p>
+<section id="Uncertainty-quantification-problem">
+<h2>Uncertainty quantification problem<a class="headerlink" href="#Uncertainty-quantification-problem" title="Link to this heading"></a></h2>
+<p>We consider the advection-diffusion equation in the unit square domain</p>
+<div class="math notranslate nohighlight">
+\[\partial_t u + \nabla^\perp m \cdot \nabla u = \kappa \nabla^2 u,\]</div>
+<p>for some real and positive <span class="math notranslate nohighlight">\(\kappa\)</span> and subject to doubly periodic boundary conditions. We consider a continuous Galerkin finite element discretization in space and an implicit midpoint rule discretization in time, seeking <span class="math notranslate nohighlight">\(u_{n + 1} \in V\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V \qquad \int_\Omega \zeta u_{n + 1} + \Delta t \int_\Omega \zeta \nabla^\perp m \cdot \nabla \left[ \frac{1}{2} ( u_n + u_{n + 1}) \right]
+    + \kappa \Delta t \int_\Omega \nabla \zeta \cdot \nabla \left[ \frac{1}{2} ( u_n + u_{n + 1}) \right] = \int_\Omega \zeta u_n,\]</div>
+<p>with timestep size <span class="math notranslate nohighlight">\(\Delta t\)</span> and given some suitable discrete initial condition <span class="math notranslate nohighlight">\(u_0 \in V\)</span>. Here <span class="math notranslate nohighlight">\(V\)</span> is a real continuous <span class="math notranslate nohighlight">\(P_1\)</span> finite element space whose elements satisfy the doubly periodic boundary conditions, and after discretizing we have <span class="math notranslate nohighlight">\(m \in V\)</span>. For a given value of <span class="math notranslate nohighlight">\(m\)</span> we let <span class="math notranslate nohighlight">\(\hat{u}_N ( m )\)</span> denote the solution obtained after <span class="math notranslate nohighlight">\(N\)</span> timesteps. Given an observation for <span class="math notranslate nohighlight">\(\hat{u}_N ( t )\)</span>, <span class="math notranslate nohighlight">\(u_{obs} \in V\)</span>, we seek to infer
+information about the control <span class="math notranslate nohighlight">\(m\)</span>. Here we are specifically seeking to infer the transport, defined in terms of a stream function <span class="math notranslate nohighlight">\(m\)</span>, which transports the solution from <span class="math notranslate nohighlight">\(u_0\)</span> to <span class="math notranslate nohighlight">\(u_{obs}\)</span> in time <span class="math notranslate nohighlight">\(T\)</span>.</p>
+<p>We first need to model the observational error. For a given value of the control <span class="math notranslate nohighlight">\(m\)</span> we treat observations are being realizations of a Gaussian random variable, with mean given by <span class="math notranslate nohighlight">\(\hat{u}_N ( m )\)</span>, and with known covariance. Specifically we define a density <span class="math notranslate nohighlight">\(p ( u_{obs} | m )\)</span> whose negative logarithm is (up to a normalization term which is neglected here)</p>
+<div class="math notranslate nohighlight">
+\[-\ln p ( u_{obs} | m ) = \frac{1}{2} R_{obs}^{-1} ( u_{obs} - \hat{u}_N ( m ), u_{obs} - \hat{u}_N ( m ) ).\]</div>
+<p><span class="math notranslate nohighlight">\(R_{obs}^{-1}\)</span> is a bilinear and symmetric positive definite observational inverse covariance operator. Here we choose <span class="math notranslate nohighlight">\(R_{obs}^{-1}\)</span> by defining</p>
+<div class="math notranslate nohighlight">
+\[R_{obs}^{-1} ( q_i, q_j ) = \int_\Omega q_j \mathcal{L}_{\sigma_R,d_R}^2 ( q_i ),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{L}_{\sigma,d} : V \rightarrow V\)</span> is defined by</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V \qquad \frac{1}{\sqrt{4 \pi \sigma^2}} \left[ \frac{1}{d} \int_\Omega \zeta q + d \int_\Omega \nabla \zeta \cdot \nabla q \right] = \int_\Omega \zeta \mathcal{L}_{\sigma,d} \left( q \right).\]</div>
+<p>In the continuous and <span class="math notranslate nohighlight">\(\Omega = \mathbb{R}^2\)</span> case <span class="math notranslate nohighlight">\(R_{obs}\)</span> then defines a covariance operator with single point variance <span class="math notranslate nohighlight">\(\sigma_R^2\)</span> and autocorrelation length scale <span class="math notranslate nohighlight">\(d_R\)</span> (see Lindgren et al 2011, doi: 10.1111/j.1467-9868.2011.00777.x).</p>
+<p>We next introduce a prior for the control. We consider a Gaussian prior with mean zero and with known covariance. Specifically we define a prior density <span class="math notranslate nohighlight">\(p ( m )\)</span> whose negative logarithm is (again up to a normalization term)</p>
+<div class="math notranslate nohighlight">
+\[-\ln p ( m ) = \frac{1}{2} B^{-1} ( m, m ).\]</div>
+<p><span class="math notranslate nohighlight">\(B^{-1}\)</span> is a bilinear and symmetric positive definite observational inverse covariance operator. Here we choose <span class="math notranslate nohighlight">\(B^{-1}\)</span> by defining</p>
+<div class="math notranslate nohighlight">
+\[B^{-1} ( q_i, q_j ) = \int_\Omega q_j \mathcal{L}_{\sigma_B,d_B}^2 ( q_i ).\]</div>
+<p>Now applying Bayes theorem we obtain a posterior density whose negative logarithm is (up to a normalization term)</p>
+<div class="math notranslate nohighlight">
+\[-\ln p ( m | u_{obs} ) = \frac{1}{2} R_{obs}^{-1} ( u_{obs} - \hat{u}_N ( m ), u_{obs} - \hat{u}_N ( m ) ) + \frac{1}{2} B^{-1} ( m, m ).\]</div>
+<p>We have made a number of modelling choices, but subject to these choices the posterior density now completely describes the information we have about the control after being supplied with an observation <span class="math notranslate nohighlight">\(u_{obs}\)</span>. The challenge is that the posterior is defined in a high dimensional space, and is in general not Gaussian. To simplify the problem we <em>approximate</em> the posterior with a Gaussian, and specifically make the approximation (up to a normalization term)</p>
+<div class="math notranslate nohighlight">
+\[-\ln p ( m | u_{obs} ) \approx \frac{1}{2} \Gamma_{post}^{-1} ( m - m_{MAP}, m - m_{MAP} ).\]</div>
+<p>The mean of the Gaussian approximation is set equal to the posterior density maximizer (the Maximum A Posteriori estimate), <span class="math notranslate nohighlight">\(m_{map}\)</span>. The inverse covariance of the Gaussian approximation, <span class="math notranslate nohighlight">\(\Gamma_{post}^{-1}\)</span>, is set equal to the Hessian, <span class="math notranslate nohighlight">\(H\)</span>, of the negative log posterior density <span class="math notranslate nohighlight">\(-\ln p ( m | u_{obs} )\)</span>, defined by differentiating twice with respect to <span class="math notranslate nohighlight">\(m\)</span> and evaluated at the posterior density maximizer.</p>
+<p>Unfortunately in order to quantify uncertainty we require information about the <em>covariance</em>, and not the <em>inverse covariance</em>. Specifically if we have a linear observational operator <span class="math notranslate nohighlight">\(q \in V^*\)</span> then our estimate for the variance associated with <span class="math notranslate nohighlight">\(q ( m )\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[\sigma^2_q \approx \Gamma_{post} ( q, q ) = H^{-1} ( q, q ),\]</div>
+<p>which requires access to information about the Hessian <em>inverse</em>.</p>
+<p>In the following we use two approaches to gain access to this information.</p>
+<ol class="arabic simple">
+<li><p>A low rank update approximation. We approximate the Hessian inverse using a low rank update to the prior covariance, using the methodology of Isaac et al 2015, doi: 10.1016/j.jcp.2015.04.047.</p></li>
+<li><p>By computing the Hessian inverse action using a Krylov method, preconditioned using the low rank update approximation.</p></li>
+</ol>
+<p>To solve this problem we need several pieces:</p>
+<ol class="arabic simple">
+<li><p>A differentiable solver for the forward problem. We will construct this using Firedrake with tlm_adjoint.</p></li>
+<li><p>To find the posterior maximizer. We will use gradient-based optimization using TAO.</p></li>
+<li><p>To find a low rank update approximation for the Hessian inverse. We will find this using a partial eigenspectrum obtained using SLEPc.</p></li>
+<li><p>To compute the Hessian inverse action. We will compute this using a Krylov method using PETSc, preconditioned using the partial eigenspectrum.</p></li>
+</ol>
+</section>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We first implement the forward model using Firedrake with tlm_adjoint.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">firedrake.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">tricontourf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">PeriodicUnitSquareMesh</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="s2">&quot;crossed&quot;</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">1.0e-3</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">N</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">sigma_R</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.03</span><span class="p">)</span>
+<span class="n">d_R</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">sigma_B</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.025</span><span class="p">)</span>
+<span class="n">d_B</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">u_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+    <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.4</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="mf">0.08</span><span class="p">)))</span>
+<span class="n">u_obs</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_obs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+    <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.6</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="mf">0.08</span><span class="p">)))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">L</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+          <span class="o">==</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">))</span>
+          <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">d</span><span class="p">)</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">),</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">u</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">L_inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">))</span>
+          <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">d</span><span class="p">)</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">d</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+          <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">u</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">R_inv_term</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">L_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_R</span><span class="p">,</span> <span class="n">d_R</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">LL_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_R</span><span class="p">,</span> <span class="n">d_R</span><span class="p">,</span> <span class="n">L_q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_mismatch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">LL_q</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">R_inv_action</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">L_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_R</span><span class="p">,</span> <span class="n">d_R</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">LL_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_R</span><span class="p">,</span> <span class="n">d_R</span><span class="p">,</span> <span class="n">L_q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">LL_q</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B_inv_term</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">L_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_B</span><span class="p">,</span> <span class="n">d_B</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">LL_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_B</span><span class="p">,</span> <span class="n">d_B</span><span class="p">,</span> <span class="n">L_q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_prior&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">LL_q</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B_inv_action</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">L_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_B</span><span class="p">,</span> <span class="n">d_B</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">LL_q</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">sigma_B</span><span class="p">,</span> <span class="n">d_B</span><span class="p">,</span> <span class="n">L_q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">LL_q</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B_action</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">q</span><span class="p">,</span>
+          <span class="n">u</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="n">Li_q</span> <span class="o">=</span> <span class="n">L_inv</span><span class="p">(</span><span class="n">sigma_B</span><span class="p">,</span> <span class="n">d_B</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+    <span class="n">LiLi_q</span> <span class="o">=</span> <span class="n">L_inv</span><span class="p">(</span><span class="n">sigma_B</span><span class="p">,</span> <span class="n">d_B</span><span class="p">,</span> <span class="n">Li_q</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">LiLi_q</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">u_np1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_np1&quot;</span><span class="p">)</span>
+    <span class="n">u_n</span> <span class="o">=</span> <span class="n">u_0</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deepcopy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">perp</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">)),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">u_n</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">perp</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> <span class="n">grad</span><span class="p">(</span><span class="n">u_n</span><span class="p">)),</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">kappa</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">u_n</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span>
+                        <span class="n">u_np1</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                                                  <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">})</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+        <span class="n">u_n</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_np1</span><span class="p">)</span>
+
+    <span class="n">u_mismatch</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_mismatch&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">u_n</span> <span class="o">-</span> <span class="n">u_obs</span><span class="p">)</span>
+    <span class="n">J_mismatch</span> <span class="o">=</span> <span class="n">R_inv_term</span><span class="p">(</span><span class="n">u_mismatch</span><span class="p">)</span>
+    <span class="n">J_prior</span> <span class="o">=</span> <span class="n">B_inv_term</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J_mismatch</span><span class="p">,</span> <span class="n">J_prior</span><span class="p">,</span> <span class="n">J_mismatch</span> <span class="o">+</span> <span class="n">J_prior</span><span class="p">,</span> <span class="n">u_np1</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s first visualize the initial condition <span class="math notranslate nohighlight">\(u_0\)</span> and the observation <span class="math notranslate nohighlight">\(u_{obs}\)</span> taken a time <span class="math notranslate nohighlight">\(T\)</span> later.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_output</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1.0e-12</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">tricontourf</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eps</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u_0</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$u_0$&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u_obs</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$u_</span><span class="si">{obs}</span><span class="s2">$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_8_hessian_uq_3_0.png" src="../_images/examples_8_hessian_uq_3_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_8_hessian_uq_3_1.png" src="../_images/examples_8_hessian_uq_3_1.png" />
+</div>
+</div>
+</section>
+<section id="Quantities-of-interest">
+<h2>Quantities of interest<a class="headerlink" href="#Quantities-of-interest" title="Link to this heading"></a></h2>
+<p>In the following discussion we seek to quantify uncertainties in <em>quantities of interest</em>. These are defined using linear functionals, say <span class="math notranslate nohighlight">\(q \in V^*\)</span>. Given some value of the control <span class="math notranslate nohighlight">\(m\)</span>, <span class="math notranslate nohighlight">\(q ( m )\)</span> is the value of the quantity of interest. Moreover, given the Maximum A Posteriori estimate <span class="math notranslate nohighlight">\(m_{map}\)</span> for the control (the posterior density maximizer), the estimate for the posterior mean of the quantity of interest is given by</p>
+<div class="math notranslate nohighlight">
+\[\mu_{q,posterior} \approx q ( m_{map} ).\]</div>
+<p>To obtain uncertainty estimates we need a covariance operator. Note that a covariance operator, say <span class="math notranslate nohighlight">\(\Gamma_{post}\)</span>, is a bilinear operator, <span class="math notranslate nohighlight">\(\Gamma_{post} : V^* \times V^* \rightarrow \mathbb{R}\)</span>. It takes the linear functionals we use to obtain values for two quantities of interest, and gives us a value for a covariance between them. In particular the estimate for the posterior uncertainty in a single quantity of interest, defined by a linear functional <span class="math notranslate nohighlight">\(q \in V^*\)</span>, is</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{q,posterior} \approx \sqrt{ \Gamma_{post} ( q, q ) } = \sqrt{ H^{-1} ( q, q ) }.\]</div>
+</section>
+<section id="Finding-the-posterior-maximizer">
+<h2>Finding the posterior maximizer<a class="headerlink" href="#Finding-the-posterior-maximizer" title="Link to this heading"></a></h2>
+<p>We now find the posterior density maximizer, which corresponds to seeking a minimum of the negative log posterior density. We solve this problem using the Toolkit for Advanced Optimization (TAO), with the Limited-Memory Variable Metric (LMVM) approach. This is a gradient-based approach, so let’s first verify the adjoint using Taylor verification.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+    <span class="mf">0.06</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m_0</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m_0</span><span class="p">)</span>
+<span class="n">dm</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dm&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+    <span class="n">sin</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)[</span><span class="mi">2</span><span class="p">],</span> <span class="n">m_0</span><span class="p">,</span> <span class="n">J_val</span><span class="o">=</span><span class="n">J</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dJ</span><span class="o">=</span><span class="n">dJ</span><span class="p">,</span> <span class="n">dM</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mf">1.0e-6</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">1.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no adjoint   = [1.53027865e-04 7.39407643e-05 3.63270898e-05 1.80027218e-05
+ 8.96115500e-06]
+Orders,      no adjoint   = [1.04935252 1.02532416 1.01283075 1.00645844]
+Error norms, with adjoint = [1.02926724e-05 2.57316785e-06 6.43291602e-07 1.60822709e-07
+ 4.02054503e-08]
+Orders,      with adjoint = [2.00000013 2.00000081 2.00000172 2.00000815]
+</pre></div></div>
+</div>
+<p>Next we solve the optimization problem. The considered problem seeks to infer the transport in the advection-diffusion equation, in terms of a stream function. Initially the tracer is concentrated on the left, and the observation taken a time <span class="math notranslate nohighlight">\(T\)</span> later has the tracer moved to the right. The variable <code class="docutils literal notranslate"><span class="pre">m_0</span></code>, which will define our initial guess for the optimization, is set so that the velocity at the center has approximately the correct magnitude for this transport.</p>
+<p>As usual we need to define an appropriate inner product associated with derivatives. Here the prior defines a natural inner product – specifically we can use the prior covariance, <span class="math notranslate nohighlight">\(B\)</span>, to define an inner product for the dual space <span class="math notranslate nohighlight">\(V^*\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">TAOSolver</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)[</span><span class="mi">2</span><span class="p">],</span> <span class="n">space</span><span class="p">,</span> <span class="n">H_0_action</span><span class="o">=</span><span class="n">B_action</span><span class="p">,</span>
+                      <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tao_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lmvm&quot;</span><span class="p">,</span>
+                                         <span class="s2">&quot;tao_gatol&quot;</span><span class="p">:</span> <span class="mf">1.0e-5</span><span class="p">,</span>
+                                         <span class="s2">&quot;tao_grtol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                         <span class="s2">&quot;tao_gttol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                         <span class="s2">&quot;tao_monitor&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+
+<span class="n">m_map</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m_map&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">m_0</span><span class="p">)</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">m_map</span><span class="p">)</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J_mismatch</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">u_map</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m_map</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  Iteration information for _tlm_adjoint__Tao_0xc4000003_0_ solve.
+  0 TAO,  Function value: 142.531,  Residual: 252.076
+  1 TAO,  Function value: 75.6093,  Residual: 78.5923
+  2 TAO,  Function value: 68.3955,  Residual: 48.098
+  3 TAO,  Function value: 64.8572,  Residual: 33.5383
+  4 TAO,  Function value: 60.3369,  Residual: 27.2206
+  5 TAO,  Function value: 58.3236,  Residual: 25.1547
+  6 TAO,  Function value: 56.863,  Residual: 15.66
+  7 TAO,  Function value: 56.2613,  Residual: 23.2133
+  8 TAO,  Function value: 56.0512,  Residual: 29.4124
+  9 TAO,  Function value: 55.5922,  Residual: 25.9102
+ 10 TAO,  Function value: 54.986,  Residual: 29.7655
+ 11 TAO,  Function value: 54.6658,  Residual: 27.5321
+ 12 TAO,  Function value: 54.0866,  Residual: 31.1733
+ 13 TAO,  Function value: 53.6629,  Residual: 27.9583
+ 14 TAO,  Function value: 53.4698,  Residual: 24.8065
+ 15 TAO,  Function value: 53.1749,  Residual: 22.2047
+ 16 TAO,  Function value: 53.0568,  Residual: 22.6377
+ 17 TAO,  Function value: 52.6485,  Residual: 17.693
+ 18 TAO,  Function value: 52.3048,  Residual: 20.5252
+ 19 TAO,  Function value: 51.9384,  Residual: 18.2042
+ 20 TAO,  Function value: 51.6112,  Residual: 12.7694
+ 21 TAO,  Function value: 51.2598,  Residual: 16.009
+ 22 TAO,  Function value: 50.8641,  Residual: 13.3265
+ 23 TAO,  Function value: 50.6379,  Residual: 13.2171
+ 24 TAO,  Function value: 50.4164,  Residual: 15.321
+ 25 TAO,  Function value: 49.9947,  Residual: 10.4495
+ 26 TAO,  Function value: 49.7759,  Residual: 9.19296
+ 27 TAO,  Function value: 49.6278,  Residual: 13.802
+ 28 TAO,  Function value: 49.5019,  Residual: 10.8119
+ 29 TAO,  Function value: 49.4283,  Residual: 11.1461
+ 30 TAO,  Function value: 49.3206,  Residual: 11.6553
+ 31 TAO,  Function value: 49.2344,  Residual: 13.5738
+ 32 TAO,  Function value: 49.0752,  Residual: 12.4629
+ 33 TAO,  Function value: 48.9742,  Residual: 12.9785
+ 34 TAO,  Function value: 48.8608,  Residual: 9.69846
+ 35 TAO,  Function value: 48.7065,  Residual: 12.143
+ 36 TAO,  Function value: 48.653,  Residual: 11.1146
+ 37 TAO,  Function value: 48.5809,  Residual: 14.2326
+ 38 TAO,  Function value: 48.5129,  Residual: 13.3145
+ 39 TAO,  Function value: 48.4525,  Residual: 13.0799
+ 40 TAO,  Function value: 48.3492,  Residual: 8.95482
+ 41 TAO,  Function value: 48.3188,  Residual: 10.6709
+ 42 TAO,  Function value: 48.2868,  Residual: 9.38934
+ 43 TAO,  Function value: 48.2554,  Residual: 8.40332
+ 44 TAO,  Function value: 48.2185,  Residual: 8.02572
+ 45 TAO,  Function value: 48.1992,  Residual: 7.70232
+ 46 TAO,  Function value: 48.1456,  Residual: 5.1021
+ 47 TAO,  Function value: 48.1372,  Residual: 5.88148
+ 48 TAO,  Function value: 48.1283,  Residual: 5.77235
+ 49 TAO,  Function value: 48.1185,  Residual: 6.27168
+ 50 TAO,  Function value: 48.1009,  Residual: 7.03941
+ 51 TAO,  Function value: 48.0807,  Residual: 6.32074
+ 52 TAO,  Function value: 48.0587,  Residual: 5.77033
+ 53 TAO,  Function value: 48.0507,  Residual: 5.9735
+ 54 TAO,  Function value: 48.0441,  Residual: 6.11227
+ 55 TAO,  Function value: 48.0354,  Residual: 5.9437
+ 56 TAO,  Function value: 48.0288,  Residual: 5.77922
+ 57 TAO,  Function value: 48.0038,  Residual: 4.15742
+ 58 TAO,  Function value: 47.9882,  Residual: 5.2115
+ 59 TAO,  Function value: 47.9825,  Residual: 5.35641
+ 60 TAO,  Function value: 47.9765,  Residual: 5.38986
+ 61 TAO,  Function value: 47.9743,  Residual: 5.33913
+ 62 TAO,  Function value: 47.969,  Residual: 5.18917
+ 63 TAO,  Function value: 47.943,  Residual: 1.76783
+ 64 TAO,  Function value: 47.9422,  Residual: 1.92053
+ 65 TAO,  Function value: 47.9411,  Residual: 2.04986
+ 66 TAO,  Function value: 47.9398,  Residual: 1.97927
+ 67 TAO,  Function value: 47.9388,  Residual: 1.80429
+ 68 TAO,  Function value: 47.9366,  Residual: 1.57006
+ 69 TAO,  Function value: 47.9339,  Residual: 0.475357
+ 70 TAO,  Function value: 47.9335,  Residual: 0.33338
+ 71 TAO,  Function value: 47.9327,  Residual: 0.651869
+ 72 TAO,  Function value: 47.932,  Residual: 0.578996
+ 73 TAO,  Function value: 47.9312,  Residual: 0.507469
+ 74 TAO,  Function value: 47.9306,  Residual: 0.39863
+ 75 TAO,  Function value: 47.9302,  Residual: 0.319103
+ 76 TAO,  Function value: 47.93,  Residual: 0.313146
+ 77 TAO,  Function value: 47.9296,  Residual: 0.254428
+ 78 TAO,  Function value: 47.9294,  Residual: 0.251318
+ 79 TAO,  Function value: 47.9293,  Residual: 0.245813
+ 80 TAO,  Function value: 47.9292,  Residual: 0.21433
+ 81 TAO,  Function value: 47.929,  Residual: 0.220371
+ 82 TAO,  Function value: 47.9289,  Residual: 0.177634
+ 83 TAO,  Function value: 47.9288,  Residual: 0.174963
+ 84 TAO,  Function value: 47.9287,  Residual: 0.178319
+ 85 TAO,  Function value: 47.9286,  Residual: 0.191331
+ 86 TAO,  Function value: 47.9286,  Residual: 0.182096
+ 87 TAO,  Function value: 47.9285,  Residual: 0.163242
+ 88 TAO,  Function value: 47.9284,  Residual: 0.148827
+ 89 TAO,  Function value: 47.9283,  Residual: 0.174567
+ 90 TAO,  Function value: 47.9282,  Residual: 0.147905
+ 91 TAO,  Function value: 47.9282,  Residual: 0.132948
+ 92 TAO,  Function value: 47.9281,  Residual: 0.147412
+ 93 TAO,  Function value: 47.9281,  Residual: 0.153246
+ 94 TAO,  Function value: 47.928,  Residual: 0.142848
+ 95 TAO,  Function value: 47.928,  Residual: 0.122535
+ 96 TAO,  Function value: 47.9279,  Residual: 0.0834194
+ 97 TAO,  Function value: 47.9279,  Residual: 0.107939
+ 98 TAO,  Function value: 47.9279,  Residual: 0.0762585
+ 99 TAO,  Function value: 47.9278,  Residual: 0.0819795
+100 TAO,  Function value: 47.9278,  Residual: 0.0840937
+101 TAO,  Function value: 47.9278,  Residual: 0.0689404
+102 TAO,  Function value: 47.9278,  Residual: 0.0541431
+103 TAO,  Function value: 47.9278,  Residual: 0.0663468
+104 TAO,  Function value: 47.9278,  Residual: 0.0484867
+105 TAO,  Function value: 47.9278,  Residual: 0.045401
+106 TAO,  Function value: 47.9278,  Residual: 0.0331168
+107 TAO,  Function value: 47.9278,  Residual: 0.0414855
+108 TAO,  Function value: 47.9278,  Residual: 0.0321411
+109 TAO,  Function value: 47.9278,  Residual: 0.0333852
+110 TAO,  Function value: 47.9278,  Residual: 0.0253775
+111 TAO,  Function value: 47.9278,  Residual: 0.0276427
+112 TAO,  Function value: 47.9278,  Residual: 0.0246038
+113 TAO,  Function value: 47.9278,  Residual: 0.0212976
+114 TAO,  Function value: 47.9278,  Residual: 0.0176099
+115 TAO,  Function value: 47.9278,  Residual: 0.0234908
+116 TAO,  Function value: 47.9277,  Residual: 0.0195269
+117 TAO,  Function value: 47.9277,  Residual: 0.0195515
+118 TAO,  Function value: 47.9277,  Residual: 0.0147668
+119 TAO,  Function value: 47.9277,  Residual: 0.0140406
+120 TAO,  Function value: 47.9277,  Residual: 0.0196471
+121 TAO,  Function value: 47.9277,  Residual: 0.0141066
+122 TAO,  Function value: 47.9277,  Residual: 0.0152511
+123 TAO,  Function value: 47.9277,  Residual: 0.0134685
+124 TAO,  Function value: 47.9277,  Residual: 0.0123951
+125 TAO,  Function value: 47.9277,  Residual: 0.0122123
+126 TAO,  Function value: 47.9277,  Residual: 0.0094902
+127 TAO,  Function value: 47.9277,  Residual: 0.00801
+128 TAO,  Function value: 47.9277,  Residual: 0.00915635
+129 TAO,  Function value: 47.9277,  Residual: 0.010036
+130 TAO,  Function value: 47.9277,  Residual: 0.00843599
+131 TAO,  Function value: 47.9277,  Residual: 0.00597544
+132 TAO,  Function value: 47.9277,  Residual: 0.00627831
+133 TAO,  Function value: 47.9277,  Residual: 0.00565721
+134 TAO,  Function value: 47.9277,  Residual: 0.00453639
+135 TAO,  Function value: 47.9277,  Residual: 0.00475772
+136 TAO,  Function value: 47.9277,  Residual: 0.0042917
+137 TAO,  Function value: 47.9277,  Residual: 0.00380307
+138 TAO,  Function value: 47.9277,  Residual: 0.00379156
+139 TAO,  Function value: 47.9277,  Residual: 0.00279111
+140 TAO,  Function value: 47.9277,  Residual: 0.00249391
+141 TAO,  Function value: 47.9277,  Residual: 0.00259602
+142 TAO,  Function value: 47.9277,  Residual: 0.00220737
+143 TAO,  Function value: 47.9277,  Residual: 0.00267611
+144 TAO,  Function value: 47.9277,  Residual: 0.00177509
+145 TAO,  Function value: 47.9277,  Residual: 0.00171059
+146 TAO,  Function value: 47.9277,  Residual: 0.0017233
+147 TAO,  Function value: 47.9277,  Residual: 0.00151372
+148 TAO,  Function value: 47.9277,  Residual: 0.00138971
+149 TAO,  Function value: 47.9277,  Residual: 0.001482
+150 TAO,  Function value: 47.9277,  Residual: 0.00117255
+151 TAO,  Function value: 47.9277,  Residual: 0.00145642
+152 TAO,  Function value: 47.9277,  Residual: 0.00110994
+153 TAO,  Function value: 47.9277,  Residual: 0.000840458
+154 TAO,  Function value: 47.9277,  Residual: 0.000998263
+155 TAO,  Function value: 47.9277,  Residual: 0.000825243
+156 TAO,  Function value: 47.9277,  Residual: 0.000684567
+157 TAO,  Function value: 47.9277,  Residual: 0.0007538
+158 TAO,  Function value: 47.9277,  Residual: 0.000828911
+159 TAO,  Function value: 47.9277,  Residual: 0.000572778
+160 TAO,  Function value: 47.9277,  Residual: 0.000585657
+161 TAO,  Function value: 47.9277,  Residual: 0.000589801
+162 TAO,  Function value: 47.9277,  Residual: 0.000538613
+163 TAO,  Function value: 47.9277,  Residual: 0.000491709
+164 TAO,  Function value: 47.9277,  Residual: 0.000529918
+165 TAO,  Function value: 47.9277,  Residual: 0.000453533
+166 TAO,  Function value: 47.9277,  Residual: 0.000519699
+167 TAO,  Function value: 47.9277,  Residual: 0.000291751
+168 TAO,  Function value: 47.9277,  Residual: 0.000361911
+169 TAO,  Function value: 47.9277,  Residual: 0.000325335
+170 TAO,  Function value: 47.9277,  Residual: 0.000232697
+171 TAO,  Function value: 47.9277,  Residual: 0.000317886
+172 TAO,  Function value: 47.9277,  Residual: 0.000249638
+173 TAO,  Function value: 47.9277,  Residual: 0.000214059
+174 TAO,  Function value: 47.9277,  Residual: 0.000248203
+175 TAO,  Function value: 47.9277,  Residual: 0.000141242
+176 TAO,  Function value: 47.9277,  Residual: 0.000168058
+177 TAO,  Function value: 47.9277,  Residual: 0.000171106
+178 TAO,  Function value: 47.9277,  Residual: 0.000134217
+179 TAO,  Function value: 47.9277,  Residual: 0.000138645
+180 TAO,  Function value: 47.9277,  Residual: 0.000153022
+181 TAO,  Function value: 47.9277,  Residual: 0.000107386
+182 TAO,  Function value: 47.9277,  Residual: 0.000102133
+183 TAO,  Function value: 47.9277,  Residual: 8.35358e-05
+184 TAO,  Function value: 47.9277,  Residual: 8.80215e-05
+185 TAO,  Function value: 47.9277,  Residual: 0.000106023
+186 TAO,  Function value: 47.9277,  Residual: 7.38508e-05
+187 TAO,  Function value: 47.9277,  Residual: 6.72666e-05
+188 TAO,  Function value: 47.9277,  Residual: 5.57236e-05
+189 TAO,  Function value: 47.9277,  Residual: 6.79148e-05
+190 TAO,  Function value: 47.9277,  Residual: 5.54815e-05
+191 TAO,  Function value: 47.9277,  Residual: 4.55044e-05
+192 TAO,  Function value: 47.9277,  Residual: 5.13068e-05
+193 TAO,  Function value: 47.9277,  Residual: 4.66711e-05
+194 TAO,  Function value: 47.9277,  Residual: 4.95998e-05
+195 TAO,  Function value: 47.9277,  Residual: 3.7866e-05
+196 TAO,  Function value: 47.9277,  Residual: 3.65109e-05
+197 TAO,  Function value: 47.9277,  Residual: 3.82517e-05
+198 TAO,  Function value: 47.9277,  Residual: 3.5131e-05
+199 TAO,  Function value: 47.9277,  Residual: 3.20019e-05
+200 TAO,  Function value: 47.9277,  Residual: 3.44756e-05
+201 TAO,  Function value: 47.9277,  Residual: 2.70557e-05
+202 TAO,  Function value: 47.9277,  Residual: 3.03911e-05
+203 TAO,  Function value: 47.9277,  Residual: 2.71093e-05
+204 TAO,  Function value: 47.9277,  Residual: 2.05683e-05
+205 TAO,  Function value: 47.9277,  Residual: 1.97085e-05
+206 TAO,  Function value: 47.9277,  Residual: 1.99219e-05
+207 TAO,  Function value: 47.9277,  Residual: 1.8137e-05
+208 TAO,  Function value: 47.9277,  Residual: 1.77297e-05
+209 TAO,  Function value: 47.9277,  Residual: 1.48771e-05
+210 TAO,  Function value: 47.9277,  Residual: 1.77043e-05
+211 TAO,  Function value: 47.9277,  Residual: 1.34647e-05
+212 TAO,  Function value: 47.9277,  Residual: 1.41654e-05
+213 TAO,  Function value: 47.9277,  Residual: 9.37271e-06
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(True, True)
+</pre></div></div>
+</div>
+<p>Let’s plot the result.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J_mismatch</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">u_map</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m_map</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">plot_output</span><span class="p">(</span><span class="n">m_map</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$m_</span><span class="si">{map}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plot_output</span><span class="p">(</span><span class="n">u_map</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;$\hat</span><span class="si">{u}</span><span class="s2"> ( m_</span><span class="si">{map}</span><span class="s2"> )$&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_8_hessian_uq_9_0.png" src="../_images/examples_8_hessian_uq_9_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_8_hessian_uq_9_1.png" src="../_images/examples_8_hessian_uq_9_1.png" />
+</div>
+</div>
+</section>
+<section id="Computing-uncertainty-estimates:-Low-rank-update-approximation">
+<h2>Computing uncertainty estimates: Low rank update approximation<a class="headerlink" href="#Computing-uncertainty-estimates:-Low-rank-update-approximation" title="Link to this heading"></a></h2>
+<p>We next seek to use Hessian information to quantify the uncertainty in the result of the inference. We use a low-rank update approximation using the methodology of Isaac et al 2015, doi: 10.1016/j.jcp.2015.04.047.</p>
+<p>In this approach we consider the mismatch Hessian, <span class="math notranslate nohighlight">\(H_{mismatch}\)</span>, obtained by differentiating</p>
+<div class="math notranslate nohighlight">
+\[J_{mismatch} = \frac{1}{2} R_{obs}^{-1} ( u_{obs} - \hat{u}_N ( m ), u_{obs} - \hat{u}_N ( m ) ),\]</div>
+<p>twice with respect to the control <span class="math notranslate nohighlight">\(m\)</span>. i.e.</p>
+<div class="math notranslate nohighlight">
+\[H_{mismatch} = H - B^{-1}.\]</div>
+<p>We seek eigenpairs <span class="math notranslate nohighlight">\(\lambda_k \in \mathbb{R}\)</span>, <span class="math notranslate nohighlight">\(v_k \in V\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[H_{mismatch} \left( v_k, \cdot \right) = \lambda_k B^{-1} \left( v_k, \cdot \right),\]</div>
+<p>where the eigenvectors are <span class="math notranslate nohighlight">\(B^{-1}\)</span>-orthonormal</p>
+<div class="math notranslate nohighlight">
+\[B^{-1} ( v_k, v_l ) = \delta_{k,l}.\]</div>
+<p>This leads directly to an expression for a low-rank update approximation for the Hessian inverse, expressed as a low rank update to the prior covariance (equation (20) of Isaac et al 2015, doi: 10.1016/j.jcp.2015.04.047),</p>
+<div class="math notranslate nohighlight">
+\[H^{-1} ( q_i, q_j ) \approx B ( q_i, q_j ) - \sum_k \frac{\lambda_k}{1 + \lambda_k} q_i ( v_k ) q_j ( v_k ),\]</div>
+<p>which we use to approximate the posterior covariance.</p>
+<p>We first perform a higher order Taylor verification using the mismatch Hessian.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">H_mismatch</span> <span class="o">=</span> <span class="n">CachedHessian</span><span class="p">(</span><span class="n">J_mismatch</span><span class="p">)</span>
+
+<span class="n">dm</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dm&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+    <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="mf">0.08</span><span class="p">)))</span>
+<span class="n">min_order</span> <span class="o">=</span> <span class="n">taylor_test</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_map</span><span class="p">,</span> <span class="n">J_val</span><span class="o">=</span><span class="n">J_mismatch</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">ddJ</span><span class="o">=</span><span class="n">H_mismatch</span><span class="p">,</span> <span class="n">dM</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mf">1.0e-4</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">min_order</span> <span class="o">&gt;</span> <span class="mf">2.99</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Error norms, no adjoint   = [0.00379075 0.00214381 0.00113403 0.00058255 0.00029516]
+Orders,      no adjoint   = [0.82230944 0.91871228 0.96100471 0.98088892]
+Error norms, with adjoint = [4.71842950e-07 5.92286109e-08 7.41905819e-09 9.28147120e-10
+ 1.15956090e-10]
+Orders,      with adjoint = [2.99394059 2.99698629 2.99881065 3.00077491]
+</pre></div></div>
+</div>
+<p>We now use SLEPc, seeking the 20 eigenpairs whose eigenvalues have largest magnitude.</p>
+<p>Note: There is a notational clash here! Conventially the prior inverse covariance is denoted <span class="math notranslate nohighlight">\(B^{-1}\)</span>, but here we use this on the right-hand-side of a generalized eigenproblem, where the associated matrix is <em>also</em> conventially notated <span class="math notranslate nohighlight">\(B\)</span>. Here the <code class="docutils literal notranslate"><span class="pre">B_action</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">HessianEigensolver</span></code> constructor is set equal to <code class="docutils literal notranslate"><span class="pre">B_inv_action</span></code> in the call, and the <code class="docutils literal notranslate"><span class="pre">B_inv_action</span></code> argument is set equal to <code class="docutils literal notranslate"><span class="pre">B_action</span></code>!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">esolver</span> <span class="o">=</span> <span class="n">HessianEigensolver</span><span class="p">(</span>
+    <span class="n">H_mismatch</span><span class="p">,</span> <span class="n">m_map</span><span class="p">,</span> <span class="n">B_action</span><span class="o">=</span><span class="n">B_inv_action</span><span class="p">,</span> <span class="n">B_inv_action</span><span class="o">=</span><span class="n">B_action</span><span class="p">,</span>
+    <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;eps_type&quot;</span><span class="p">:</span> <span class="s2">&quot;krylovschur&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_gen_hermitian&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_largest_magnitude&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_nev&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_conv_rel&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_tol&quot;</span><span class="p">:</span> <span class="mf">1.0e-14</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_purify&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                       <span class="s2">&quot;eps_monitor&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+<span class="n">esolver</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  Eigenvalue approximations and residual norms for _tlm_adjoint__EPS_0xc4000007_0_ solve.
+  1 EPS nconv=10 first unconverged value (error) 208.222 (1.53942626e-13)
+  2 EPS nconv=16 first unconverged value (error) 118.459 (3.82528711e-14)
+  3 EPS nconv=20 first unconverged value (error) 87.915 (2.00950343e-14)
+</pre></div></div>
+</div>
+<p>Let’s plot the eigenvalues.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lam</span> <span class="o">=</span> <span class="n">esolver</span><span class="o">.</span><span class="n">eigenvalues</span><span class="p">()</span>
+<span class="k">assert</span> <span class="p">(</span><span class="n">lam</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">esolver</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">lam</span><span class="p">,</span> <span class="s2">&quot;k-&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">esolver</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Eigenvalue index&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Eigenvalue&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0, 0.5, &#39;Eigenvalue&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_8_hessian_uq_15_1.png" src="../_images/examples_8_hessian_uq_15_1.png" />
+</div>
+</div>
+<p>Each eigenvalue indicates some information, added by the observation, over the prior. Specifically each eigenvector <span class="math notranslate nohighlight">\(v_k \in V\)</span> has an associated dual space element defined by the prior inverse covariance, <span class="math notranslate nohighlight">\(q_{v_k} = B^{-1} ( v_k, \cdot ) \in V^*\)</span>. If we have an observation for a quantitity of interest defined by a linear functional equal to a (non-zero) multiple of this associated dual space element, and if the posterior were Gaussian, then the associated variance decreases by a
+factor of one plus the eigenvalue when we add the observation. That is, under the Gaussian approximation, we have</p>
+<div class="math notranslate nohighlight">
+\[\frac{\sigma^2_{q_{v_k},posterior}}{\sigma^2_{q_{v_k},prior}} = \frac{1}{1 + \lambda_k},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma^2_{q_{v_k},posterior}\)</span> and <span class="math notranslate nohighlight">\(\sigma^2_{q_{v_k},prior}\)</span> are respectively the posterior and prior variance associated with <span class="math notranslate nohighlight">\(q_{v_k}\)</span>, and where <span class="math notranslate nohighlight">\(\lambda_k\)</span> is the associated eigenvalue.</p>
+<p>Having retained only <span class="math notranslate nohighlight">\(20\)</span> eigenpairs, the smallest eigenvalue obtained is quite a bit bigger than one. This means we might expect to be missing quite a bit of information available in the Hessian if we use a low rank update approximation using only these <span class="math notranslate nohighlight">\(20\)</span> eigenpairs. We’ll return to this issue later.</p>
+<p>The linear functional associated with computing the average <span class="math notranslate nohighlight">\(x\)</span>-component of the velocity for <span class="math notranslate nohighlight">\(0.4 &lt; y &lt; 0.6\)</span>, <span class="math notranslate nohighlight">\(q_u \in V^*\)</span>, satisfies</p>
+<div class="math notranslate nohighlight">
+\[q_u ( \zeta ) = -\frac{1}{\int_\Omega \mathcal{I}} \int_\Omega \mathcal{I} \partial_y \zeta,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{I}\)</span> is one where <span class="math notranslate nohighlight">\(0.4 &lt; y &lt; 0.6\)</span> and zero elsewhere. We can use this to evaluate an estimate for the posterior mean of this quantity,</p>
+<div class="math notranslate nohighlight">
+\[\mu_{q_u,posterior} \approx q_u ( m_{map} ).\]</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">I</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Discontinuous Lagrange&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span>
+    <span class="n">conditional</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">conditional</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">q_u</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">Constant</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">I</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)))</span> <span class="o">*</span> <span class="n">I</span> <span class="o">*</span> <span class="n">test</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">assemble</span><span class="p">(</span><span class="n">q_u</span><span class="p">(</span><span class="n">m_map</span><span class="p">))</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+assemble(q_u(m_map))=0.26603362165200495
+</pre></div></div>
+</div>
+<p>The associated posterior uncertainty estimate is then</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{q_u,posterior} \approx \sqrt{H_{approx}^{-1} ( q_u, q_u )}.\]</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigma_u</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">q_u</span><span class="p">(</span><span class="n">esolver</span><span class="o">.</span><span class="n">spectral_approximation_solve</span><span class="p">(</span><span class="n">q_u</span><span class="p">))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sigma_u</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+sigma_u=0.049826943093325984
+</pre></div></div>
+</div>
+<p>We can compare this with the prior uncertainty,</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{q_u,prior} = \sqrt{ B ( q_u, q_u ) }.\]</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigma_prior_q_u</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">q_u</span><span class="p">(</span><span class="n">B_action</span><span class="p">(</span><span class="n">q_u</span><span class="p">))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sigma_prior_q_u</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+sigma_prior_q_u=0.06809389996419146
+</pre></div></div>
+</div>
+<p>i.e. we estimate that the observation has reduced the uncertainty in our estimate for <span class="math notranslate nohighlight">\(q_u( m )\)</span> by about 25%.</p>
+</section>
+<section id="Computing-uncertainty-estimates:-Full-Hessian-inverse">
+<h2>Computing uncertainty estimates: Full Hessian inverse<a class="headerlink" href="#Computing-uncertainty-estimates:-Full-Hessian-inverse" title="Link to this heading"></a></h2>
+<p>We have made a number of assumptions in order to define the inference problem, but given the problem we have used only two approximations in the uncertainty estimate itself: the local Gaussian assumption (making use of the Hessian), and the low rank update approximation for the Hessian inverse. We now remove the second of these approximations using a Krylov solver, using PETSc. Since we already have an <em>approximation</em> for the Hessian inverse, we can use this to construct a preconditioner in the
+calculation of a Hessian inverse action.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">H</span> <span class="o">=</span> <span class="n">CachedHessian</span><span class="p">(</span><span class="n">J</span><span class="p">)</span>
+
+<span class="n">ksp</span> <span class="o">=</span> <span class="n">HessianLinearSolver</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">m_map</span><span class="p">,</span> <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+                                                       <span class="s2">&quot;ksp_atol&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                                       <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="mf">1.0e-7</span><span class="p">,</span>
+                                                       <span class="s2">&quot;ksp_monitor&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                          <span class="n">pc_fn</span><span class="o">=</span><span class="n">esolver</span><span class="o">.</span><span class="n">spectral_pc_fn</span><span class="p">())</span>
+<span class="n">H_inv_q_u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;H_inv_q_u&quot;</span><span class="p">)</span>
+<span class="n">ksp</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">H_inv_q_u</span><span class="p">,</span> <span class="n">q_u</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+  Residual norms for _tlm_adjoint__KSP_0xc4000009_0_ solve.
+  0 KSP Residual norm 9.901063940612e-03
+  1 KSP Residual norm 3.846887396923e-03
+  2 KSP Residual norm 2.959402172924e-03
+  3 KSP Residual norm 1.718696050315e-03
+  4 KSP Residual norm 1.325055699763e-03
+  5 KSP Residual norm 1.122277413445e-03
+  6 KSP Residual norm 9.690002941905e-04
+  7 KSP Residual norm 8.439140190241e-04
+  8 KSP Residual norm 3.525862866587e-04
+  9 KSP Residual norm 5.477244753569e-04
+ 10 KSP Residual norm 3.121835833383e-04
+ 11 KSP Residual norm 3.134450820882e-04
+ 12 KSP Residual norm 2.941740579930e-04
+ 13 KSP Residual norm 1.381997473824e-04
+ 14 KSP Residual norm 2.289384303399e-04
+ 15 KSP Residual norm 1.076096378952e-04
+ 16 KSP Residual norm 5.271734235858e-05
+ 17 KSP Residual norm 5.616047775553e-05
+ 18 KSP Residual norm 5.265159239080e-05
+ 19 KSP Residual norm 2.521783658860e-05
+ 20 KSP Residual norm 1.637758855716e-05
+ 21 KSP Residual norm 3.058528737786e-05
+ 22 KSP Residual norm 1.532049998254e-05
+ 23 KSP Residual norm 7.979585813705e-06
+ 24 KSP Residual norm 1.027004717719e-05
+ 25 KSP Residual norm 5.229044836309e-06
+ 26 KSP Residual norm 6.839842962128e-06
+ 27 KSP Residual norm 4.015886996091e-06
+ 28 KSP Residual norm 4.402673928099e-06
+ 29 KSP Residual norm 3.292276914745e-06
+ 30 KSP Residual norm 2.419410043024e-06
+ 31 KSP Residual norm 9.394867583164e-07
+ 32 KSP Residual norm 1.217609278977e-06
+ 33 KSP Residual norm 2.039049206921e-06
+ 34 KSP Residual norm 9.341725889835e-07
+ 35 KSP Residual norm 2.811449319662e-07
+ 36 KSP Residual norm 4.402614113737e-07
+ 37 KSP Residual norm 2.961624710683e-07
+ 38 KSP Residual norm 1.687143968444e-07
+ 39 KSP Residual norm 1.890661648698e-07
+ 40 KSP Residual norm 9.740610911599e-08
+ 41 KSP Residual norm 8.977497357935e-08
+ 42 KSP Residual norm 7.347374434350e-08
+ 43 KSP Residual norm 6.582416229412e-08
+ 44 KSP Residual norm 5.382757249658e-08
+ 45 KSP Residual norm 6.341360847130e-08
+ 46 KSP Residual norm 3.470665801808e-08
+ 47 KSP Residual norm 3.227599902138e-08
+ 48 KSP Residual norm 1.958410568715e-08
+ 49 KSP Residual norm 2.301198958079e-08
+ 50 KSP Residual norm 1.846709667676e-08
+ 51 KSP Residual norm 1.827263291620e-08
+ 52 KSP Residual norm 1.189008861456e-08
+ 53 KSP Residual norm 1.077867596364e-08
+ 54 KSP Residual norm 7.471548333104e-09
+ 55 KSP Residual norm 7.808925136195e-09
+ 56 KSP Residual norm 7.444404082607e-09
+ 57 KSP Residual norm 4.851473640139e-09
+ 58 KSP Residual norm 3.990201734499e-09
+ 59 KSP Residual norm 3.497153443461e-09
+ 60 KSP Residual norm 3.159027163400e-09
+ 61 KSP Residual norm 2.518510686472e-09
+ 62 KSP Residual norm 1.782610592870e-09
+ 63 KSP Residual norm 1.313695279622e-09
+ 64 KSP Residual norm 1.090144383730e-09
+ 65 KSP Residual norm 6.928084128271e-10
+</pre></div></div>
+</div>
+<p>Let’s double check that we solved the linear system.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">residual</span> <span class="o">=</span> <span class="n">Cofunction</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">dual</span><span class="p">())</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+    <span class="n">H</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="n">m_map</span><span class="p">,</span> <span class="n">H_inv_q_u</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">q_u</span><span class="p">)</span>
+<span class="n">q_u_norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">q_u</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">residual_norm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">residual</span><span class="o">.</span><span class="n">dat</span><span class="o">.</span><span class="n">data_ro</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">residual_norm</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">q_u_norm</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">residual_norm</span> <span class="o">/</span> <span class="n">q_u_norm</span> <span class="o">&lt;</span> <span class="mf">1.0e-4</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+residual_norm / q_u_norm=np.float64(1.608633886866077e-05)
+</pre></div></div>
+</div>
+<p>Our new uncertainty estimate, using the full Hessian, is</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sigma_u</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">assemble</span><span class="p">(</span><span class="n">q_u</span><span class="p">(</span><span class="n">H_inv_q_u</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sigma_u</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+sigma_u=0.031200525962623942
+</pre></div></div>
+</div>
+<p>This reveals that our partial eigenspectrum estimate did indeed miss quite a bit of relevant information available in the Hessian. In fact with the full Hessian we estimate a reduction in uncertainty of about 55%.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

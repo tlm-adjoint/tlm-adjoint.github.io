@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.firedrake.block_system &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.block_system</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/autoapi/tlm_adjoint/firedrake/block_system/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.firedrake.block_system">
+<span id="tlm-adjoint-firedrake-block-system"></span><h1><a class="reference internal" href="#module-tlm_adjoint.firedrake.block_system" title="tlm_adjoint.firedrake.block_system"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.firedrake.block_system</span></code></a><a class="headerlink" href="#module-tlm_adjoint.firedrake.block_system" title="Link to this heading"></a></h1>
+<p>Firedrake specific extensions to <a class="reference internal" href="../../block_system/index.html#module-tlm_adjoint.block_system" title="tlm_adjoint.block_system"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.block_system</span></code></a>.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.ConstantNullspace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">ConstantNullspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.ConstantNullspace" title="Link to this definition"></a></dt>
+<dd><p>Nullspace and left nullspace spanned by the vector of ones.</p>
+<p>Here <span class="math notranslate nohighlight">\(V = U\)</span>, <span class="math notranslate nohighlight">\(U\)</span> is a single column matrix whose elements are
+ones, <span class="math notranslate nohighlight">\(C = M\)</span>, and <span class="math notranslate nohighlight">\(M\)</span> is an identity matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>alpha</strong><span class="classifier">scalar</span></dt><dd><p>Defines the linear constraint matrix <span class="math notranslate nohighlight">\(S = \left( \alpha / N
+\right)\)</span> where <span class="math notranslate nohighlight">\(N\)</span> is the length of the vector of ones.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.ConstantNullspace.apply_nullspace_transformation_lhs_right">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.ConstantNullspace.apply_nullspace_transformation_lhs_right" title="Link to this definition"></a></dt>
+<dd><p>Apply the nullspace transformation associated with a matrix action
+on <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.ConstantNullspace.apply_nullspace_transformation_lhs_left">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.ConstantNullspace.apply_nullspace_transformation_lhs_left" title="Link to this definition"></a></dt>
+<dd><p>Apply the left nullspace transformation associated with a matrix
+action,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.ConstantNullspace.constraint_correct_lhs">
+<span class="sig-name descname"><span class="pre">constraint_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.ConstantNullspace.constraint_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Add the linear constraint term to <span class="math notranslate nohighlight">\(y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow y + M U S V^* C x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.ConstantNullspace.pc_constraint_correct_soln">
+<span class="sig-name descname"><span class="pre">pc_constraint_correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.ConstantNullspace.pc_constraint_correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Add the preconditioner linear constraint term to <span class="math notranslate nohighlight">\(u\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[u \rightarrow u + V \tilde{S}^{-1} U^* b,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\tilde{S}^{-1} =
+    \left( V^* C V \right)^{-1}
+    S^{-1}
+    \left( U^* M U \right)^{-1}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.UnityNullspace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">UnityNullspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.UnityNullspace" title="Link to this definition"></a></dt>
+<dd><p>Nullspace and left nullspace spanned by the unity-valued function.</p>
+<p>Here <span class="math notranslate nohighlight">\(V = U\)</span>, <span class="math notranslate nohighlight">\(U\)</span> is a single column matrix containing the
+degree-of-freedom vector for the unity-valued function, <span class="math notranslate nohighlight">\(C = M\)</span>,
+and <span class="math notranslate nohighlight">\(M\)</span> is the mass matrix.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>space</strong><span class="classifier"><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.functionspaceimpl.WithGeometry" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.functionspaceimpl.WithGeometry</span></code></a></span></dt><dd><p>A scalar-valued function space containing the unity-valued function.</p>
+</dd>
+<dt><strong>alpha</strong><span class="classifier">scalar</span></dt><dd><p>Defines the linear constraint matrix <span class="math notranslate nohighlight">\(S = \alpha \left( U^* M U
+\right)^{-1}\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.UnityNullspace.apply_nullspace_transformation_lhs_right">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.UnityNullspace.apply_nullspace_transformation_lhs_right" title="Link to this definition"></a></dt>
+<dd><p>Apply the nullspace transformation associated with a matrix action
+on <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.UnityNullspace.apply_nullspace_transformation_lhs_left">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.UnityNullspace.apply_nullspace_transformation_lhs_left" title="Link to this definition"></a></dt>
+<dd><p>Apply the left nullspace transformation associated with a matrix
+action,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.UnityNullspace.constraint_correct_lhs">
+<span class="sig-name descname"><span class="pre">constraint_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.UnityNullspace.constraint_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Add the linear constraint term to <span class="math notranslate nohighlight">\(y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow y + M U S V^* C x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.UnityNullspace.pc_constraint_correct_soln">
+<span class="sig-name descname"><span class="pre">pc_constraint_correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.UnityNullspace.pc_constraint_correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Add the preconditioner linear constraint term to <span class="math notranslate nohighlight">\(u\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[u \rightarrow u + V \tilde{S}^{-1} U^* b,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\tilde{S}^{-1} =
+    \left( V^* C V \right)^{-1}
+    S^{-1}
+    \left( U^* M U \right)^{-1}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.DirichletBCNullspace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">DirichletBCNullspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bcs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.DirichletBCNullspace" title="Link to this definition"></a></dt>
+<dd><p>Nullspace and left nullspace associated with homogeneous Dirichlet
+boundary conditions.</p>
+<p>Here <span class="math notranslate nohighlight">\(V = U\)</span>, <span class="math notranslate nohighlight">\(U\)</span> is a zero-one matrix with exactly one
+non-zero per column corresponding to one boundary condition
+degree-of-freedom, <span class="math notranslate nohighlight">\(C = M\)</span>, and <span class="math notranslate nohighlight">\(M\)</span> is an identity matrix.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>bcs</strong><span class="classifier"><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.bcs.DirichletBC" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.bcs.DirichletBC</span></code></a> or             Sequence[<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.bcs.DirichletBC" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.bcs.DirichletBC</span></code></a>, …]</span></dt><dd><p>Homogeneous Dirichlet boundary conditions.</p>
+</dd>
+<dt><strong>alpha</strong><span class="classifier">scalar</span></dt><dd><p>Defines the linear constraint matrix <span class="math notranslate nohighlight">\(S = \alpha M\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.DirichletBCNullspace.apply_nullspace_transformation_lhs_right">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_right</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.DirichletBCNullspace.apply_nullspace_transformation_lhs_right" title="Link to this definition"></a></dt>
+<dd><p>Apply the nullspace transformation associated with a matrix action
+on <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x \rightarrow (I - V (V^* C V)^{-1} V^* C) x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.DirichletBCNullspace.apply_nullspace_transformation_lhs_left">
+<span class="sig-name descname"><span class="pre">apply_nullspace_transformation_lhs_left</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.DirichletBCNullspace.apply_nullspace_transformation_lhs_left" title="Link to this definition"></a></dt>
+<dd><p>Apply the left nullspace transformation associated with a matrix
+action,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow (I - M U (U^* M U)^{-1} U^*) y.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.DirichletBCNullspace.constraint_correct_lhs">
+<span class="sig-name descname"><span class="pre">constraint_correct_lhs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.DirichletBCNullspace.constraint_correct_lhs" title="Link to this definition"></a></dt>
+<dd><p>Add the linear constraint term to <span class="math notranslate nohighlight">\(y\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[y \rightarrow y + M U S V^* C x.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.DirichletBCNullspace.pc_constraint_correct_soln">
+<span class="sig-name descname"><span class="pre">pc_constraint_correct_soln</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.DirichletBCNullspace.pc_constraint_correct_soln" title="Link to this definition"></a></dt>
+<dd><p>Add the preconditioner linear constraint term to <span class="math notranslate nohighlight">\(u\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[u \rightarrow u + V \tilde{S}^{-1} U^* b,\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\tilde{S}^{-1} =
+    \left( V^* C V \right)^{-1}
+    S^{-1}
+    \left( U^* M U \right)^{-1}.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>u</strong> – Defines <span class="math notranslate nohighlight">\(u\)</span>.</p></li>
+<li><p><strong>b</strong> – Defines <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.PETScMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">PETScMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.PETScMatrix" title="Link to this definition"></a></dt>
+<dd><p>A <a class="reference internal" href="../../block_system/index.html#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> associated with a
+<a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.matrix.Matrix" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.matrix.Matrix</span></code></a> <span class="math notranslate nohighlight">\(A\)</span> defining a mapping
+<span class="math notranslate nohighlight">\(V \rightarrow W\)</span>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>A</strong><span class="classifier"><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.matrix.Matrix" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.matrix.Matrix</span></code></a></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.PETScMatrix.mult_add">
+<span class="sig-name descname"><span class="pre">mult_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.PETScMatrix.mult_add" title="Link to this definition"></a></dt>
+<dd><p>Add <span class="math notranslate nohighlight">\(A x\)</span> to <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Defines <span class="math notranslate nohighlight">\(x\)</span>. Should not be modified.</p></li>
+<li><p><strong>y</strong> – Defines <span class="math notranslate nohighlight">\(y\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.form_matrix">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">form_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.form_matrix" title="Link to this definition"></a></dt>
+<dd><p>Construct a <a class="reference internal" href="#tlm_adjoint.firedrake.block_system.PETScMatrix" title="tlm_adjoint.firedrake.block_system.PETScMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">PETScMatrix</span></code></a> associated with a given sesquilinear
+form.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>a</strong><span class="classifier"><a class="reference external" href="https://fenics.readthedocs.io/projects/ufl/en/latest/api-doc/ufl.html#ufl.Form" title="(in Unified Form Language (UFL) v2021.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ufl.Form</span></code></a></span></dt><dd><p>Defines the sesquilinear form.</p>
+</dd>
+<dt><strong>args, kwargs</strong></dt><dd><p>Passed to the <a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.assemble.assemble" title="(in Firedrake v0.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">firedrake.assemble.assemble()</span></code></a> function.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#tlm_adjoint.firedrake.block_system.PETScMatrix" title="tlm_adjoint.firedrake.block_system.PETScMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">PETScMatrix</span></code></a>.</dt><dd><p><a class="reference internal" href="#tlm_adjoint.firedrake.block_system.PETScMatrix" title="tlm_adjoint.firedrake.block_system.PETScMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">PETScMatrix</span></code></a> defined by the assembled sesquilinear form.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.BlockMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">BlockMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.BlockMatrix" title="Link to this definition"></a></dt>
+<dd><p>A matrix defining a mapping <span class="math notranslate nohighlight">\(A\)</span> mapping <span class="math notranslate nohighlight">\(V \rightarrow W\)</span>,
+where <span class="math notranslate nohighlight">\(V\)</span> and <span class="math notranslate nohighlight">\(W\)</span> are defined by mixed spaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg_space</strong> – Defines the space <span class="math notranslate nohighlight">\(V\)</span>.</p></li>
+<li><p><strong>action_space</strong> – Defines the space <span class="math notranslate nohighlight">\(W\)</span>.</p></li>
+<li><p><strong>block</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining the blocks of the matrix. Items are
+<cite>((i, j), block)</cite> where the block in the <cite>i</cite> th and <cite>j</cite> th column is
+defined by <cite>block</cite>. Each <cite>block</cite> is a
+<a class="reference internal" href="../../block_system/index.html#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a>, or <cite>None</cite> to indicate a zero
+block.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.LinearSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">LinearSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.LinearSolver" title="Link to this definition"></a></dt>
+<dd><p>Solver for a linear system</p>
+<div class="math notranslate nohighlight">
+\[A u = b,\]</div>
+<p>using PETSc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> – A <a class="reference internal" href="../../block_system/index.html#tlm_adjoint.block_system.Matrix" title="tlm_adjoint.block_system.Matrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlm_adjoint.block_system.Matrix</span></code></a> defining <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>nullspace</strong> – A <a class="reference internal" href="../../block_system/index.html#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+<a class="reference internal" href="../../block_system/index.html#tlm_adjoint.block_system.Nullspace" title="tlm_adjoint.block_system.Nullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">Nullspace</span></code></a> objects defining the nullspace and left nullspace
+of <span class="math notranslate nohighlight">\(A\)</span>. <cite>None</cite> indicates a <a class="reference internal" href="../../block_system/index.html#tlm_adjoint.block_system.NoneNullspace" title="tlm_adjoint.block_system.NoneNullspace"><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneNullspace</span></code></a>.</p></li>
+<li><p><strong>solver_parameters</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code> defining Krylov solver
+parameters.</p></li>
+<li><p><strong>pc_fn</strong> – <p>Defines the application of a preconditioner. A callable</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">pc_fn</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>The preconditioner is applied to <cite>b</cite>, and the result stored in <cite>u</cite>.
+Defaults to an identity.</p>
+</p></li>
+<li><p><strong>comm</strong> – Communicator.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.WhiteNoiseSampler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.firedrake.block_system.</span></span><span class="sig-name descname"><span class="pre">WhiteNoiseSampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precondition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mfn_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ksp_solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.WhiteNoiseSampler" title="Link to this definition"></a></dt>
+<dd><p>White noise sampling.</p>
+<p>Utility class for drawing independent spatial white noise samples.
+Generates a sample using</p>
+<div class="math notranslate nohighlight">
+\[X = M^{-1} \Xi^{-T} \sqrt{ \Xi^T M \Xi } Z,\]</div>
+<p>where</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(M\)</span> is the mass matrix.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Xi\)</span> is a preconditioner.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Z\)</span> is a vector whose elements are independent standard
+Gaussian samples.</p></li>
+</ul>
+</div></blockquote>
+<p>The matrix square root is computed using SLEPc.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>space</strong><span class="classifier"><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.functionspaceimpl.WithGeometry" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.functionspaceimpl.WithGeometry</span></code></a></span></dt><dd><p>The function space.</p>
+</dd>
+<dt><strong>rng</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code></a></span></dt><dd><p>Pseudorandom number generator.</p>
+</dd>
+<dt><strong>precondition</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></dt><dd><p>If <cite>True</cite> then <span class="math notranslate nohighlight">\(\Xi\)</span> is set equal to the inverse of the
+(principal) square root of the diagonal of <span class="math notranslate nohighlight">\(M\)</span>. Otherwise it is
+set equal to the identity.</p>
+</dd>
+<dt><strong>M</strong><span class="classifier"><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.matrix.Matrix" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.matrix.Matrix</span></code></a></span></dt><dd><p>Mass matrix. Constructed by finite element assembly if not supplied.</p>
+</dd>
+<dt><strong>mfn_solver_parameters</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></span></dt><dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">slepc4py.SLEPc.MFN</span></code> solver parameters, used for the matrix
+square root action.</p>
+</dd>
+<dt><strong>ksp_solver_parameters</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></span></dt><dd><p>Solver parameters, used for <span class="math notranslate nohighlight">\(M^{-1}\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>space</strong><span class="classifier"><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.functionspaceimpl.WithGeometry" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.functionspaceimpl.WithGeometry</span></code></a></span></dt><dd><p>The function space.</p>
+</dd>
+<dt><strong>rng</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator" title="(in NumPy v2.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.random.Generator</span></code></a></span></dt><dd><p>Pseudorandom number generator.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.WhiteNoiseSampler.dual_sample">
+<span class="sig-name descname"><span class="pre">dual_sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.WhiteNoiseSampler.dual_sample" title="Link to this definition"></a></dt>
+<dd><p>Generate a new sample in the dual space.</p>
+<p>The result is given by</p>
+<div class="math notranslate nohighlight">
+\[X = \Xi^{-T} \sqrt{ \Xi^T M \Xi } Z.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.cofunction.Cofunction" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.cofunction.Cofunction</span></code></a></dt><dd><p>The sample.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.firedrake.block_system.WhiteNoiseSampler.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.firedrake.block_system.WhiteNoiseSampler.sample" title="Link to this definition"></a></dt>
+<dd><p>Generate a new sample.</p>
+<p>The result is given by</p>
+<div class="math notranslate nohighlight">
+\[X = M^{-1} \Xi^{-T} \sqrt{ \Xi^T M \Xi } Z.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference external" href="https://www.firedrakeproject.org/firedrake.html#firedrake.function.Function" title="(in Firedrake v0.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">firedrake.function.Function</span></code></a></dt><dd><p>The sample.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

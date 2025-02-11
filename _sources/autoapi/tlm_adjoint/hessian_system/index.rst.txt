@@ -1,0 +1,265 @@
+:py:mod:`tlm_adjoint.hessian_system`
+====================================
+
+.. py:module:: tlm_adjoint.hessian_system
+
+.. autoapi-nested-parse::
+
+   Hessian matrix utilities.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: HessianLinearSolver(H, M, *args, **kwargs)
+
+
+
+
+   
+   Solver for linear systems involving a Hessian matrix.
+
+   Solves the linear system
+
+   .. math::
+
+       H u = b
+
+   for :math:`u` using PETSc.
+
+   :Parameters:
+
+       **H** : :class:`.Hessian`
+           Defines :math:`H`.
+
+       **M** : variable or Sequence[variable, ...]
+           Defines the control and its value.
+
+       **args, kwargs**
+           Passed to the :class:`tlm_adjoint.block_system.LinearSolver`
+           constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: solve(u, b, *args, **kwargs)
+
+      
+      Solve a linear system involving a Hessian matrix.
+
+      Solves the linear system
+
+      .. math::
+
+          H u = b
+
+      for :math:`u`.
+
+      :Parameters:
+
+          **u** : variable or Sequence[variable, ...]
+              The solution :math:`u`. Also defines the initial guess.
+
+          **b** : variable or Sequence[variable, ...]
+              The conjugate of the right-hand-side :math:`b`.
+
+          **args, kwargs**
+              Passed to the :meth:`tlm_adjoint.block_system.LinearSolver.solve`
+              method.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: HessianEigensolver(H, M, B_action, B_inv_action, *args, **kwargs)
+
+
+
+
+   
+   Solver for generalized eigenproblems involving a Hessian matrix.
+
+   Solves the eigenproblem
+
+   .. math::
+
+       H v = \lambda B v
+
+   using SLEPc.
+
+   :Parameters:
+
+       **H** : :class:`.Hessian`
+           Defines :math:`H`.
+
+       **M** : variable or Sequence[variable, ...]
+           Defines the control and its value.
+
+       **B_action** : callable
+           Accepts one or more variables as arguments, defining the direction, and
+           returns a variable or a :class:`Sequence` of variables defining the
+           conjugate of the action of :math:`B` on this direction. Arguments
+           should not be modified.
+
+       **B_inv_action** : callable
+           Accepts one or more variables as arguments, defining the direction, and
+           returns a variable or a :class:`Sequence` of variables defining the
+           action of :math:`B^{-1}` on the conjugate of this direction. Arguments
+           should not be modified.
+
+       **args, kwargs**
+           Passed to the :class:`.Eigensolver` constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: spectral_approximation_solve(b)
+
+      
+      :math:`(H + B)^{-1}` action approximation.
+
+      Computes an approximation for
+
+      .. math ::
+
+          (H + B)^{-1} b
+
+      where :math:`H` and :math:`B` define the eigenproblem solved by this
+      :class:`.HessianEigensolver`. The approximation is constructed using
+      a partial eigenspectrum -- see
+      :meth:`.HessianEigensolver.spectral_pc_fn`.
+
+      :Parameters:
+
+          **b** : variable or Sequence[variable, ...]
+              The conjugate of the right-hand-side :math:`b`.
+
+
+
+      :Returns:
+
+          variable or tuple[variable, ...]
+              The approximation for the action on :math:`b`.
+
+
+
+
+
+
+
+      .. seealso::
+
+          
+          :meth:`.HessianEigensolver.spectral_pc_fn`
+              ..
+          
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: spectral_pc_fn()
+
+      
+      Construct a partial eigenspectrum preconditioner.
+
+      Constructs a matrix preconditioner using a partial eigenspectrum.
+      Specifically for a matrix
+
+      .. math::
+
+          C = H + B,
+
+      where :math:`H` and :math:`B` define the eigenproblem solved by this
+      :class:`.HessianEigensolver`, the approximation is defined via
+
+      .. math::
+
+          C^{-1} \approx B^{-1}
+              - V \Lambda \left( I + \Lambda \right)^{-1} V^*
+
+      where
+
+      .. math::
+
+          H V = B V \Lambda,
+
+      and where :math:`\Lambda` is a diagonal matrix and :math:`V` has
+      :math:`B`-orthonormal columns, :math:`V^* B V = I`.
+
+      This low rank update approximation for the Hessian matrix inverse is
+      described in
+
+          - Tobin Isaac, Noemi Petra, Georg Stadler, and Omar Ghattas,
+            'Scalable and efficient algorithms for the propagation of
+            uncertainty from data through inference to prediction for
+            large-scale problems, with application to flow of the Antarctic
+            ice sheet', Journal of Computational Physics, 296, pp. 348--368,
+            2015, doi: 10.1016/j.jcp.2015.04.047
+
+      See in particular their equation (20).
+
+
+
+
+      :Returns:
+
+          callable
+              Suitable for use as the `pc_fn` argument to
+              :meth:`.HessianLinearSolver.solve`.
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

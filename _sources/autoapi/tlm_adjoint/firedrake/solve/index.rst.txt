@@ -1,0 +1,290 @@
+:py:mod:`tlm_adjoint.firedrake.solve`
+=====================================
+
+.. py:module:: tlm_adjoint.firedrake.solve
+
+.. autoapi-nested-parse::
+
+   Finite element variational problem solution operations with Firedrake.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: EquationSolver(eq, x, bcs=None, *, J=None, form_compiler_parameters=None, solver_parameters=None, adjoint_solver_parameters=None, tlm_solver_parameters=None, cache_jacobian=None, cache_adjoint_jacobian=None, cache_tlm_jacobian=None, cache_rhs_assembly=None, match_quadrature=None)
+
+
+
+
+   
+   Represents the solution of a finite element variational problem.
+
+   Caching is based on the approach described in
+
+       - J. R. Maddison and P. E. Farrell, 'Rapid development and adjoining of
+         transient finite element models', Computer Methods in Applied
+         Mechanics and Engineering, 276, 95--121, 2014, doi:
+         10.1016/j.cma.2014.03.010
+
+   The arguments `eq`, `x`, `bcs`, `J`, `form_compiler_parameters`, and
+   `solver_parameters` are based on the interface for the DOLFIN
+   `dolfin.solve` function (see e.g. FEniCS 2017.1.0).
+
+   :arg eq: A :class:`ufl.equation.Equation` defining the finite element
+       variational problem.
+   :arg x: A :class:`firedrake.function.Function` defining the forward
+       solution.
+   :arg bcs: Dirichlet boundary conditions.
+   :arg J: A :class:`ufl.Form` defining a Jacobian matrix approximation to use
+       in a non-linear forward solve.
+   :arg form_compiler_parameters: Form compiler parameters.
+   :arg solver_parameters: Linear or non-linear solver parameters.
+   :arg adjoint_solver_parameters: Linear solver parameters to use in an
+       adjoint solve.
+   :arg tlm_solver_parameters: Linear solver parameters to use when solving
+       tangent-linear problems.
+   :arg cache_jacobian: Whether to cache the forward Jacobian matrix and
+       linear solver data. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver]['cache_jacobian']`. If
+       `None` then caching is autodetected.
+   :arg cache_adjoint_jacobian: Whether to cache the adjoint Jacobian matrix
+       and linear solver data. Defaults to `cache_jacobian`.
+   :arg cache_tlm_jacobian: Whether to cache the Jacobian matrix and linear
+       solver data when solving tangent-linear problems. Defaults to
+       `cache_jacobian`.
+   :arg cache_rhs_assembly: Whether to enable right-hand-side caching. If
+       enabled then right-hand-side terms are divided into terms which are
+       cached, terms which are converted into matrix multiplication by a
+       cached matrix, and terms which are not cached. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver']['cache_rhs_assembly']`.
+   :arg match_quadrature: Whether to set quadrature parameters consistently in
+       the forward, adjoint, and tangent-linears. Defaults to
+       `parameters['tlm_adjoint']['EquationSolver']['match_quadrature']`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: drop_references()
+
+      
+      Drop references to variables which store values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: forward_solve(x, deps=None)
+
+      
+      Compute the forward solution.
+
+      Can assume that the currently active :class:`.EquationManager` is
+      paused.
+
+      :arg X: A variable or a :class:`Sequence` of variables storing the
+          solution. May define an initial guess, and should be set by this
+          method.
+      :arg deps: A :class:`tuple` of variables, defining values for
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: subtract_adjoint_derivative_actions(adj_x, nl_deps, dep_Bs)
+
+      
+      Subtract terms from other adjoint right-hand-sides.
+
+      Can be overridden for an optimized implementation, but otherwise uses
+      :meth:`.Equation.adjoint_derivative_action`.
+
+      :arg adj_X: The adjoint solution. A variable or a :class:`Sequence` of
+          variables. Should not be modified.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg dep_Bs: A :class:`Mapping` whose items are `(dep_index, dep_B)`.
+          Each `dep_B` is an :class:`.AdjointRHS` which should be updated by
+          subtracting adjoint derivative information computed by
+          differentiating with respect to `self.dependencies()[dep_index]`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_jacobian_solve(adj_x, nl_deps, b)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: LocalEquationSolver(eq, x, *, form_compiler_parameters=None, cache_jacobian=None, cache_adjoint_jacobian=None, cache_tlm_jacobian=None, cache_rhs_assembly=None, match_quadrature=None)
+
+
+
+
+   
+   Represents the solution of a linear finite element variational problem,
+   for the case where the matrix is element-wise local block diagonal.
+
+   Remaining arguments are passed to the :class:`.EquationSolver` constructor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

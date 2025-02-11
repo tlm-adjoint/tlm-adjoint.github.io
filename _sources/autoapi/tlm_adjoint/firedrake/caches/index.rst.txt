@@ -1,0 +1,351 @@
+:py:mod:`tlm_adjoint.firedrake.caches`
+======================================
+
+.. py:module:: tlm_adjoint.firedrake.caches
+
+.. autoapi-nested-parse::
+
+   This module implements finite element assembly and linear solver data
+   caching.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:class:: AssemblyCache
+
+
+
+
+   
+   A :class:`.Cache` for finite element assembly data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: assemble(form, *, bcs=None, form_compiler_parameters=None, linear_solver_parameters=None, replace_map=None)
+
+      
+      Perform finite element assembly and cache the result, or return a
+      previously cached result.
+
+      :arg form: The :class:`ufl.Form` to assemble.
+      :arg bcs: Dirichlet boundary conditions.
+      :arg form_compiler_parameters: Form compiler parameters.
+      :arg linear_solver_parameters: Linear solver parameters. Required for
+          assembly parameters which appear in the linear solver parameters.
+      :arg replace_map: A :class:`Mapping` defining a map from symbolic
+          variables to values.
+      :returns: A :class:`tuple` `(value_ref, value)`, where `value` is the
+          result of the finite element assembly, and `value_ref` is a
+          :class:`.CacheRef` storing a reference to `value`.
+
+              - For an arity zero or arity one form `value_ref` stores the
+                assembled value.
+              - For an arity two form `value_ref` is a tuple `(A, b_bc)`. `A`
+                is the assembled matrix, and `b_bc` is a boundary condition
+                right-hand-side term which should be added after assembling a
+                right-hand-side with homogeneous boundary conditions applied.
+                `b_bc` may be `None` to indicate that this term is zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: LinearSolverCache
+
+
+
+
+   
+   A :class:`.Cache` for linear solver data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: linear_solver(form, *, bcs=None, form_compiler_parameters=None, linear_solver_parameters=None, replace_map=None, assembly_cache=None)
+
+      
+      Construct a linear solver and cache the result, or return a
+      previously cached result.
+
+      :arg form: An arity two :class:`ufl.Form`, defining the matrix.
+      :arg bcs: Dirichlet boundary conditions.
+      :arg form_compiler_parameters: Form compiler parameters.
+      :arg linear_solver_parameters: Linear solver parameters.
+      :arg replace_map: A :class:`Mapping` defining a map from symbolic
+          variables to values.
+      :arg assembly_cache: :class:`.AssemblyCache` to use for finite element
+          assembly. Defaults to `assembly_cache()`.
+      :returns: A :class:`tuple` `(value_ref, value)`. `value` is a tuple
+          `(solver, A, b_bc)`, where `solver` is the linear solver, `A` is
+          the assembled matrix, and `b_bc` is a boundary condition
+          right-hand-side term which should be added after assembling a
+          right-hand-side with homogeneous boundary conditions applied.
+          `b_bc` may be `None` to indicate that this term is zero.
+          `value_ref` is a :class:`.CacheRef` storing a reference to `value`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: LocalSolverCache
+
+
+
+
+   
+   A :class:`.Cache` for element-wise local block diagonal linear solver
+   data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: local_solver(form, *, form_compiler_parameters=None, replace_map=None)
+
+      
+      Compute data for an element-wise local block diagonal linear
+      solver and cache the result, or return a previously cached result.
+
+      :arg form: An arity two :class:`ufl.Form`, defining the element-wise
+          local block diagonal matrix.
+      :arg form_compiler_parameters: Form compiler parameters.
+      :arg replace_map: A :class:`Mapping` defining a map from symbolic
+          variables to values.
+      :returns: A :class:`tuple` `(value_ref, value)`. `value` is a
+          `tlm_adjoint.firedrake.backend_interface.LocalSolver` and
+          `value_ref` is a :class:`.CacheRef` storing a reference to
+          `value`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: assembly_cache()
+
+   
+   :returns: The default :class:`.AssemblyCache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: set_assembly_cache(assembly_cache)
+
+   
+   Set the default :class:`.AssemblyCache`.
+
+   :arg assembly_cache: The new default :class:`.AssemblyCache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: linear_solver_cache()
+
+   
+   :returns: The default :class:`.LinearSolverCache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: set_linear_solver_cache(linear_solver_cache)
+
+   
+   Set the default :class:`.LinearSolverCache`.
+
+   :arg linear_solver_cache: The new default :class:`.LinearSolverCache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: local_solver_cache()
+
+   
+   :returns: The default :class:`.LocalSolverCache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: set_local_solver_cache(local_solver_cache)
+
+   
+   Set the default :class:`.LocalSolverCache`.
+
+   :arg local_solver_cache: The new default :class:`.LocalSolverCache`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

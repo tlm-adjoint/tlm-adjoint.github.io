@@ -1,0 +1,465 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.storage`
+=============================
+
+.. py:module:: tlm_adjoint.storage
+
+
+Module Contents
+---------------
+
+.. py:class:: Storage(x, key, *, save=False)
+
+
+
+
+   
+   Used to save and load a forward solution value.
+
+   With `save=True` the first forward solve saves the value of `x`. With
+   `save=False`, or on any subsequent forward solve, the value of the forward
+   solution is loaded into `x`.
+
+   When processed by the :class:`.EquationManager` this is equivalent to an
+   assignment
+
+   .. math::
+
+       x = x_\text{value},
+
+   where :math:`x_\text{value}` is the value which is saved or loaded. The
+   forward residual is defined
+
+   .. math::
+
+       \mathcal{F} \left( x \right) = x - x_\text{value}.
+
+   This is an abstract base class. Information required to save and load data
+   is provided by overloading abstract methods. This class does *not* inherit
+   from :class:`abc.ABC`, so that methods may be implemented as needed.
+
+   :arg x: A variable defining the forward solution, whose value is saved or
+       loaded.
+   :arg key: A :class:`str` key for the saved or loaded data.
+   :arg save: If `True` then the first forward solve saves the value of `x`.
+       If `False` then the first forward solve loads the value of `x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: key
+
+      
+      The key associated with saved or loaded data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: is_saved()
+      :abstractmethod:
+
+      
+      Return whether a value can be loaded.
+
+      :returns: `True` if a value can be loaded, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: load(x)
+      :abstractmethod:
+
+      
+      Load data, storing the result in `x`.
+
+      :arg x: A variable in which the loaded data is stored.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: save(x)
+      :abstractmethod:
+
+      
+      Save the value of `x`.
+
+      :arg x: A variable whose value should be saved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: forward_solve(x, deps=None)
+
+      
+      Compute the forward solution.
+
+      Can assume that the currently active :class:`.EquationManager` is
+      paused.
+
+      :arg X: A variable or a :class:`Sequence` of variables storing the
+          solution. May define an initial guess, and should be set by this
+          method.
+      :arg deps: A :class:`tuple` of variables, defining values for
+          dependencies. Only the elements corresponding to `X` may be
+          modified. `self.dependencies()` should be used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: adjoint_jacobian_solve(adj_x, nl_deps, b)
+
+      
+      Compute an adjoint solution.
+
+      :arg adj_X: Either `None`, or a variable or :class:`Sequence` of
+          variables defining the initial guess for an iterative solve. May be
+          modified or returned.
+      :arg nl_deps: A :class:`Sequence` of variables defining values for
+          non-linear dependencies. Should not be modified.
+      :arg B: The right-hand-side. A variable or :class:`Sequence` of
+          variables storing the value of the right-hand-side. May be modified
+          or returned.
+      :returns: A variable or :class:`Sequence` of variables storing the
+          value of the adjoint solution. May return `None` to indicate a
+          value of zero.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: tangent_linear(tlm_map)
+
+      
+      Derive an :class:`.Equation` corresponding to a tangent-linear
+      operation.
+
+      :arg tlm_map: A :class:`.TangentLinearMap` storing values for
+          tangent-linear variables.
+      :returns: An :class:`.Equation`, corresponding to the tangent-linear
+          operation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: MemoryStorage(x, d, key, *, save=False)
+
+
+
+
+   
+   A :class:`.Storage` which stores the value in memory.
+
+   :arg x: A variable defining the forward solution, whose value is saved or
+       loaded.
+   :arg d: A :class:`dict` in which data is stored with key `key`.
+   :arg key: A :class:`str` key for the saved or loaded data.
+   :arg save: If `True` then the first forward solve saves the value of `x`.
+       If `False` then the first forward solve loads the value of `x`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: is_saved()
+
+      
+      Return whether a value can be loaded.
+
+      :returns: `True` if a value can be loaded, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: load(x)
+
+      
+      Load data, storing the result in `x`.
+
+      :arg x: A variable in which the loaded data is stored.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: save(x)
+
+      
+      Save the value of `x`.
+
+      :arg x: A variable whose value should be saved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: HDF5Storage(x, h, key, *, save=False)
+
+
+
+
+   
+   A :class:`.Storage` which stores the value on disk using the h5py
+   library.
+
+   :arg x: A variable defining the forward solution, whose value is saved or
+       loaded.
+   :arg h: An :class:`h5py.File`.
+   :arg key: A :class:`str` key for the saved or loaded data.
+   :arg save: If `True` then the first forward solve saves the value of `x`.
+       If `False` then the first forward solve loads the value of `x`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: is_saved()
+
+      
+      Return whether a value can be loaded.
+
+      :returns: `True` if a value can be loaded, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: load(x)
+
+      
+      Load data, storing the result in `x`.
+
+      :arg x: A variable in which the loaded data is stored.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: save(x)
+
+      
+      Save the value of `x`.
+
+      :arg x: A variable whose value should be saved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

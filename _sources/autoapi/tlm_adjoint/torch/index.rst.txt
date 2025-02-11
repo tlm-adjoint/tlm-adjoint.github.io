@@ -1,0 +1,129 @@
+:py:mod:`tlm_adjoint.torch`
+===========================
+
+.. py:module:: tlm_adjoint.torch
+
+.. autoapi-nested-parse::
+
+   Interface with PyTorch.
+
+   Can be used to embed models, differentiated by tlm_adjoint, within a PyTorch
+   calculation. Follows the same principles as described in
+
+       - Nacime Bouziani and David A. Ham, 'Physics-driven machine learning models
+         coupling PyTorch and Firedrake', 2023, arXiv:2303.06871v3
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+.. py:function:: to_torch_tensors(X, *args, **kwargs)
+
+   
+   Convert one or more variables to :class:`torch.Tensor` objects.
+
+
+   :Parameters:
+
+       **X** : variable or Sequence[variable, ...]
+           Variables to be converted.
+
+       **args, kwargs**
+           Passed to :func:`torch.tensor`.
+
+
+
+   :Returns:
+
+       tuple[variable, ...]
+           The converted variables.
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: from_torch_tensors(X, X_t)
+
+   
+   Copy data from PyTorch tensors into variables.
+
+
+   :Parameters:
+
+       **X** : variable or Sequence[variable, ...]
+           Output.
+
+       **X_t** : Sequence[:class:`torch.Tensor`, ...]
+           Input.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: torch_wrapped(forward, space, *, manager=None, clear_caches=True)
+
+   
+   Wrap a model, differentiated using tlm_adjoint, so that it can be used
+   with PyTorch.
+
+
+   :Parameters:
+
+       **forward** : callable
+           Accepts one or more variable arguments, and returns a variable or
+           :class:`Sequence` of variables.
+
+       **space** : space or Sequence[space, ...]
+           Defines the spaces for input arguments.
+
+       **manager** : :class:`.EquationManager`
+           Used to create an internal manager via :meth:`.EquationManager.new`.
+           `manager()` is used if not supplied.
+
+       **clear_caches** : bool
+           Whether to clear caches before a call of `forward`.
+
+
+
+   :Returns:
+
+       callable
+           A version of `forward` with :class:`torch.Tensor` inputs and outputs.
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

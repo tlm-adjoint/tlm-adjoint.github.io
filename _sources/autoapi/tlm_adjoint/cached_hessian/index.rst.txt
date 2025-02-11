@@ -1,0 +1,152 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.cached_hessian`
+====================================
+
+.. py:module:: tlm_adjoint.cached_hessian
+
+
+Module Contents
+---------------
+
+.. py:class:: CachedHessian(J, *, manager=None, cache_adjoint=True)
+
+
+
+
+   
+   Represents a Hessian associated with a given forward. Uses a cached
+   forward calculation.
+
+
+   :Parameters:
+
+       **J** : variable
+           Defines the functional.
+
+       **manager** : :class:`.EquationManager`
+           The :class:`.EquationManager` used to record the forward. Must have
+           recorded the forward calculation with `'memory'` checkpointing,
+           with automatic dropping of variable references disabled. `manager()` is
+           used if not supplied.
+
+       **cache_adjoint** : bool
+           Whether to cache the first order adjoint.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: action(M, dM, M0=None)
+
+      
+      As described in :meth:`.Hessian.action`, using a cached forward
+      calculation.
+
+
+
+
+
+
+
+
+
+
+
+      .. warning::
+
+          `M` defines the control, but does not define its value. The value of
+          the control used is as for the recorded forward calculation. `M0` is
+          unused.
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: CachedGaussNewton(X, R_inv_action, B_inv_action=None, *, manager=None)
+
+
+
+
+   
+   Represents a Gauss-Newton approximation to a Hessian associated with a
+   given forward. Uses a cached forward calculation.
+
+
+   :Parameters:
+
+       **X** : variable or Sequence[variable, ...]
+           Defines the state.
+
+       **R_inv_action** : callable
+           See :class:`.GaussNewton`.
+
+       **B_inv_action** : callable
+           See :class:`.GaussNewton`.
+
+       **manager** : :class:`.EquationManager`
+           The :class:`.EquationManager` used to record the forward. Must have
+           recorded the forward calculation with `'memory'` checkpointing,
+           with automatic dropping of variable references disabled. `manager()` is
+           used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:method:: action(M, dM, M0=None)
+
+      
+      As described in :meth:`.GaussNewton.action`, using a cached forward
+      calculation.
+
+
+
+
+
+
+
+
+
+
+
+      .. warning::
+
+          `M` defines the control, but does not define its value. The value of
+          the control used is as for the recorded forward calculation. `M0` is
+          unused.
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

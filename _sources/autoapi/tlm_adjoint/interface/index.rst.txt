@@ -1,0 +1,1861 @@
+:py:mod:`tlm_adjoint.interface`
+===============================
+
+.. py:module:: tlm_adjoint.interface
+
+.. autoapi-nested-parse::
+
+   This module defines an interface for interaction with backend data types.
+   This is implemented via runtime binding of mixins. The
+   :class:`.VariableInterface` adds methods to 'variables' which can be used to
+   interact with backend variables. The :class:`.SpaceInterface` adds methods to
+   'spaces' which define the vector spaces in which those 'variables' are defined.
+
+   The extra methods are accessed using the callables defined in this module
+   (which also handle some extra details, e.g. related to cache invalidation and
+   space type checking). Typically these are prefixed with `space_` for spaces and
+   `var_` for variables.
+
+   The interface distinguishes between original backend 'variables', which both
+   define symbolic variables and store values, and replacement 'variables', which
+   define the same variables but which need not store values.
+
+   Variables have an associated 'space type', which indicates e.g. if the variable
+   is 'primal', meaning a member on an originating vector space, or 'conjugate
+   dual', meaning a member of the corresponding antidual space of antilinear
+   functionals from the originating vector space. Variables can also be 'dual',
+   meaning a member of the dual space of linear functionals, or 'conjugate',
+   meaning a member of a space defined by a conjugate operator from the primal
+   space. This conjugate operator is defined by complex conjugation of the vector
+   of degrees of freedom, and could e.g. correspond to complex conjugation of a
+   finite element discretized function.
+
+   The space type associated with a variable is defined relative to an originating
+   vector space (e.g. a finite element discrete function space). A 'relative space
+   type' is defined relative to one of the 'primal', 'conjugate', 'dual', or
+   'conjugate dual' spaces. For example the primal space associated with the dual
+   space is the dual space, and the dual space associated with the dual space is
+   the primal space.
+
+   This module defines a default communicator `DEFAULT_COMM`.
+
+   ..
+       !! processed by numpydoc !!
+
+
+Module Contents
+---------------
+
+
+
+.. py:function:: comm_dup_cached(comm, *, key=None)
+
+   
+   Return an internal duplicated communicator with key `key`.
+
+   :arg comm: A communicator. Defines the base communicator.
+   :arg key: The key.
+   :returns: An internal duplicated communicator. May be `comm` itself. Freed
+       when the original base communicator is freed.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: garbage_cleanup(comm=None)
+
+   
+   Call `petsc4py.PETSc.garbage_cleanup(comm)` for a communicator, and any
+   communicators duplicated from it using :func:`.comm_dup_cached`.
+
+   :arg comm: A communicator. Defaults to `DEFAULT_COMM`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: add_interface(obj, interface_cls, attrs=None)
+
+   
+   Attach a mixin `interface_cls`, defining an interface, to `obj`.
+
+   :arg obj: An object to which the mixin should be attached.
+   :arg interface_cls: A subclass of :class:`.SpaceInterface` or
+       :class:`.VariableInterface` defining the interface.
+   :arg attrs: A :class:`Mapping` defining any attributes. Used to set an
+       attribute `_tlm_adjoint__space_interface_attrs` (for a
+       :class:`.SpaceInterface`) or `_tlm_adjoint__var_interface_attrs`
+       (for a :class:`.VariableInterface`).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: SpaceInterface
+
+
+   
+   A mixin defining an interface for spaces. Space types do not inherit
+   from this class -- instead an interface is defined by a
+   :class:`.SpaceInterface` subclass, and methods are bound dynamically at
+   runtime using :func:`.add_interface`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: is_space(space)
+
+   
+   Return whether `space` is a space -- i.e. has had a
+   :class:`.SpaceInterface` attached.
+
+   :arg space: An arbitrary :class:`object`.
+   :returns: `True` if `space` is a space, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_comm(space)
+
+   
+   :arg space: A space.
+   :returns: The communicator associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_default_space_type(space)
+
+   
+   :arg space: A space.
+   :returns: The default space type associated with the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_dtype(space)
+
+   
+   :arg space: A space.
+   :returns: The data type associated with the space. Typically
+       :class:`numpy.double` or :class:`numpy.cdouble`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_id(space)
+
+   
+   Return a unique :class:`int` ID associated with a space.
+
+   :arg space: The space.
+   :returns: The unique :class:`int` ID.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_eq(space, other)
+
+   
+   :arg space: The space.
+   :arg other: A second space, to compare to space.
+   :returns: Whether the two spaces are equal.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_local_size(space)
+
+   
+   Return the process local number of degrees of freedom associated with
+   a variable in a space. This is the number of 'owned' degrees of freedom.
+
+   :arg x: The space.
+   :returns: The process local number of degrees of freedom for a variable in
+       the space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_global_size(space)
+
+   
+   Return the global number of degrees of freedom associated with a
+   variable in a space. This is the total number of 'owned' degrees of
+   freedom, summed across all processes.
+
+   :arg x: The space.
+   :returns: The global number of degrees of freedom for a variable in the
+       space.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_local_indices(space)
+
+   
+   Return the indices of process local degrees of freedom associated with
+   a variable in a space.
+
+   :arg x: The space.
+   :returns: An :class:`slice`, yielding the indices of the process local
+       elements.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: space_new(space, *, name=None, space_type=None, static=False, cache=None)
+
+   
+   Return a new variable.
+
+   :arg space: The space.
+   :arg name: A :class:`str` name for the variable.
+   :arg space_type: The space type for the new variable. `'primal'`, `'dual'`,
+       `'conjugate'`, or `'conjugate_dual'`. Defaults to
+       `space_default_space_type(space)`.
+   :arg static: Defines whether the new variable is static, meaning that it is
+       stored by reference in checkpointing/replay, and an associated
+       tangent-linear variable is zero.
+   :arg cache: Defines whether results involving the new variable may be
+       cached. Default `static`.
+   :returns: The new variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: relative_space_type(space_type, rel_space_type)
+
+   
+   Return a relative space type. For example if `space_type` is `'dual'`
+   and `rel_space_type` is `'conjugate_dual'`, this returns `'conjugate'`.
+
+   :arg space_type: An input space type. One of `'primal'`, `'conjugate'`,
+       `'dual'`, or `'conjugate_dual'`.
+   :arg rel_space_type: The relative space type to return. One of `'primal'`,
+       `'conjugate'`, `'dual'`, or `'conjugate_dual'`.
+   :returns: A space type relative to `space_type`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: conjugate_space_type(space_type)
+
+   
+   Defines a map
+
+       - `'primal'` :math:`\rightarrow` `'conjugate'`
+       - `'conjugate'` :math:`\rightarrow` `'primal'`
+       - `'dual'` :math:`\rightarrow` `'conjugate_dual'`
+       - `'conjugate_dual'` :math:`\rightarrow` `'dual'`
+
+   :returns: The space type conjugate to `space_type`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: dual_space_type(space_type)
+
+   
+   Defines a map
+
+       - `'primal'` :math:`\rightarrow` `'dual'`
+       - `'conjugate'` :math:`\rightarrow` `'conjugate_dual'`
+       - `'dual'` :math:`\rightarrow` `'primal'`
+       - `'conjugate_dual'` :math:`\rightarrow` `'conjugate'`
+
+   :returns: The space type dual to `space_type`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: conjugate_dual_space_type(space_type)
+
+   
+   Defines a map
+
+       - `'primal'` :math:`\rightarrow` `'conjugate_dual'`
+       - `'conjugate'` :math:`\rightarrow` `'dual'`
+       - `'dual'` :math:`\rightarrow` `'conjugate'`
+       - `'conjugate_dual'` :math:`\rightarrow` `'primal'`
+
+   :returns: The space type conjugate dual to `space_type`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: no_space_type_checking(fn)
+
+   
+   Decorator to disable space type checking.
+
+   :arg fn: A callable for which space type checking should be disabled.
+   :returns: A callable for which space type checking is disabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: paused_space_type_checking()
+
+   
+   Construct a context manager which can be used to temporarily disable
+   space type checking.
+
+   :returns: A context manager which can be used to temporarily disable
+       space type checking.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:exception:: SpaceTypeError
+
+
+
+
+   
+   Raised when an unexpected space type is encountered with space type
+   checking enabled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: check_space_type(x, space_type)
+
+   
+   Check that a variable has a given space type.
+
+   Raises a :class:`.SpaceTypeError` if the check fails and space type
+   checking is enabled.
+
+   :arg x: A variable, whose space type should be checked.
+   :arg space_type: The space type. One of `'primal'`, `'conjugate'`,
+       `'dual'`, or `'conjugate_dual'`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: check_space_types(x, y, *, rel_space_type='primal')
+
+   
+   Check that `x` and `y` have compatible space types.
+
+   Raises a :class:`.SpaceTypeError` if the check fails and space type
+   checking is enabled.
+
+   :arg x: A variable.
+   :arg y: A variable.
+   :arg rel_space_type: Check that the space type of `x` is `rel_space_type`
+       relative to `y`. For example if `rel_space_type='dual'`, and the
+       space type of `y` is `'conjugate_dual'`, checks that the space type of
+       `x` is `'conjugate'`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: check_space_types_conjugate(x, y)
+
+   
+   Check that `x` has space type conjugate to the space type for `y`.
+
+   Raises a :class:`.SpaceTypeError` if the check fails and space type
+   checking is enabled.
+
+   :arg x: A variable.
+   :arg y: A variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: check_space_types_dual(x, y)
+
+   
+   Check that `x` has space type dual to the space type for `y`.
+
+   Raises a :class:`.SpaceTypeError` if the check fails and space type
+   checking is enabled.
+
+   :arg x: A variable.
+   :arg y: A variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: check_space_types_conjugate_dual(x, y)
+
+   
+   Check that `x` has space type conjugate dual to the space type for `y`.
+
+   Raises a :class:`.SpaceTypeError` if the check fails and space type
+   checking is enabled.
+
+   :arg x: A variable.
+   :arg y: A variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: VariableInterface
+
+
+   
+   A mixin defining an interface for variables. Variables types do not
+   inherit from this class -- instead an interface is defined by a
+   :class:`.VariableInterface` subclass, and methods are bound dynamically at
+   runtime using :func:`.add_interface`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: is_var(x)
+
+   
+   Return whether `x` is a variable -- i.e. has had a
+   :class:`.VariableInterface` added.
+
+   :arg x: An arbitrary :class:`object`.
+   :returns: `True` if `x` is a variable, and `False` otherwise.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_comm(x)
+
+   
+   :arg x: A variable.
+   :returns: The communicator associated with the variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_space(x)
+
+   
+   :arg x: A variable.
+   :returns: The space associated with the variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_space_type(x, *, rel_space_type='primal')
+
+   
+   Return the space type of a variable.
+
+   :arg x: The variable.
+   :arg rel_space_type: If supplied then return a space type relative to the
+       variable space type. One of `'primal'`, `'conjugate'`, `'dual'`, or
+       `'conjugate_dual'`.
+   :returns: The space type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_dtype(x)
+
+   
+   :arg x: A variable.
+   :returns: The data type associated with the variable. Typically
+       :class:`numpy.double` or :class:`numpy.cdouble`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_id(x)
+
+   
+   Return a unique :class:`int` ID associated with a variable.
+
+   Note that two variables share the same ID if they represent the same
+   symbolic variable -- for example if one variable represents both a variable
+   and stores a value, and a second the same variable with no value (i.e. is a
+   'replacement'), then the two variables share the same ID.
+
+   :arg x: The variable.
+   :returns: The :class:`int` ID.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_name(x)
+
+   
+   :arg x: A variable.
+   :returns: The :class:`str` name of the variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_state(x)
+
+   
+   Return the value of the state counter for a variable. Updated when the
+   value of the variable changes.
+
+   :arg x: The variable.
+   :returns: The :class:`int` state value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_lock_state(x)
+
+   
+   Lock the state of a variable.
+
+   :arg x: The variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: VariableStateLockDictionary(*args, **kwargs)
+
+
+
+
+   
+   A dictionary-like class. If a value is a variable and not a replacement
+   then the variable state is 'locked' so that a state update, with the lock
+   active, will raise an exception.
+
+   State locks are automatically released when the
+   :class:`.VariableStateLockDictionary` is destroyed. Consequently objects of
+   this type should be used with caution. In particular object destruction via
+   the garbage collector may lead to non-deterministic release of the state
+   lock.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_locked(*X)
+
+   
+   Construct a context manager which can be used to temporarily lock the
+   state of one or more variables.
+
+   :arg X: A :class:`tuple` of variables.
+   :returns: A context manager which can be used to temporarily lock the state
+       of the variables in `X`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_update_state(*X)
+
+   
+   Ensure that variable state is updated, and check for cache invalidation.
+   May delegate updating of the state to a backend library.
+
+   :arg X: A :class:`tuple` of variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_is_static(x)
+
+   
+   Return whether a variable is flagged as 'static'. A static variable
+   is stored by reference in checkpointing/replay, and the associated
+   tangent-linear variable is zero.
+
+   :arg x: The variable.
+   :returns: Whether the variable is flagged as static.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_is_cached(x)
+
+   
+   Return whether results involving this variable may be cached.
+
+   :arg x: The variable.
+   :returns: Whether results involving the variable may be cached.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_caches(x)
+
+   
+   Return the :class:`.Caches` associated with a variable.
+
+   :arg x: The variable.
+   :returns: The :class:`.Caches` associated with the variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_update_caches(*X, value=None)
+
+   
+   Check for cache invalidation associated with a possible change in value.
+
+   :arg X: A :class:`tuple` of variables whose value may have changed.
+   :arg value: A variable or a :class:`Sequence` of variables defining the
+       possible new values. `X` is used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_zero(x)
+
+   
+   Zero a variable.
+
+   :arg x: The variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_assign(x, y)
+
+   
+   Perform an assignment `x = y`.
+
+   :arg x: A variable.
+   :arg y: A variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_axpy(y, alpha, x, /)
+
+   
+   Perform an in-place addition `y += alpha * x`.
+
+   :arg y: A variable.
+   :arg alpha: A scalar.
+   :arg x: A variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_inner(x, y)
+
+   
+   Compute the :math:`l_2` inner product of the degrees of freedom vectors
+   associated with `x` and `y`. By convention if `y` is in the conjugate dual
+   space associated with `x`, this returns the complex conjugate of the
+   functional associated with `y` evaluated at `x`.
+
+   :arg x: A variable.
+   :arg y: A variable.
+   :returns: The result of the inner product.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_linf_norm(x)
+
+   
+   Compute the :math:`l_\infty` norm of the degrees of freedom vector
+   associated with a variable.
+
+   :arg x: The variable.
+   :returns: The :math:`l_\infty` norm of the degrees of freedom vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_local_size(x)
+
+   
+   Return the process local number of degrees of freedom associated with
+   a variable. This is the number of 'owned' degrees of freedom.
+
+   :arg x: The variable.
+   :returns: The process local number of degrees of freedom for the variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_global_size(x)
+
+   
+   Return the global number of degrees of freedom associated with a
+   variable. This is the total number of 'owned' degrees of freedom, summed
+   across all processes.
+
+   :arg x: The variable.
+   :returns: The global number of degrees of freedom for the variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_local_indices(x)
+
+   
+   Return the indices of process local degrees of freedom associated with
+   a variable.
+
+   :arg x: The variable.
+   :returns: An :class:`slice`, yielding the indices of the process local
+       elements.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_get_values(x)
+
+   
+   Return a copy of the process local degrees of freedom vector associated
+   with a variable.
+
+   :arg x: The variable.
+   :returns: A :class:`numpy.ndarray` containing a copy of the degrees of
+       freedom.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_set_values(x, values)
+
+   
+   Set the process local degrees of freedom vector associated with a
+   variable.
+
+   :arg x: The variable.
+   :arg values: A :class:`numpy.ndarray` containing the degrees of freedom
+       values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_to_petsc(x, vec)
+
+   
+   Copy values from a variable into a :class:`petsc4py.PETSc.Vec`.
+
+   Does not update the :class:`petsc4py.PETSc.Vec` ghost.
+
+   :Parameters:
+
+       **x** : variable
+           The input variable.
+
+       **vec** : :class:`petsc4py.PETSc.Vec`
+           The output :class:`petsc4py.PETSc.Vec`. The ghost is not updated.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_from_petsc(x, vec)
+
+   
+   Copy values from a :class:`petsc4py.PETSc.Vec` into a variable.
+
+
+   :Parameters:
+
+       **x** : variable
+           The output variable.
+
+       **vec** : :class:`petsc4py.PETSc.Vec`
+           The input :class:`petsc4py.PETSc.Vec`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_new(x, *, name=None, static=False, cache=None, rel_space_type='primal')
+
+   
+   Return a new variable defined using the same space as `x`.
+
+   :arg x: A variable.
+   :arg name: A :class:`str` name for the new variable.
+   :arg static: Defines whether the new variable is static, meaning that it is
+       stored by reference in checkpointing/replay, and an associated
+       tangent-linear variable is zero.
+   :arg cache: Defines whether results involving the new variable may be
+       cached. Default `static`.
+   :arg rel_space_type: Defines the space type of the new variable, relative
+       to the space type of `x`.
+   :returns: The new variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_new_conjugate(x, *, name=None, static=False, cache=None)
+
+   
+   Return a new conjugate variable. See :func:`.var_new`.
+
+   :returns: A new variable defined using the same space as `x`, with space
+       type conjugate to the space type for `x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_new_dual(x, *, name=None, static=False, cache=None)
+
+   
+   Return a new dual variable. See :func:`.var_new`.
+
+   :returns: A new variable defined using the same space as `x`, with space
+       type dual to the space type for `x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_new_conjugate_dual(x, *, name=None, static=False, cache=None)
+
+   
+   Return a new conjugate dual variable. See :func:`.var_new`.
+
+   :returns: A new variable defined using the same space as `x`, with space
+       type conjugate dual to the space type for `x`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_copy(x, *, name=None, static=False, cache=None)
+
+   
+   Copy a variable. See :func:`.var_new`.
+
+   :returns: The copied variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_replacement(x)
+
+   
+   Return a variable, associated with the same variable as `x`, but
+   possibly without a value.
+
+   :arg x: The variable.
+   :returns: A variable which symbolically represents the same variable as
+       `x`, but which may not store a value. May return `x` itself.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_is_replacement(x)
+
+   
+   Return whether a variable is a 'replacement', meaning that it has no
+   associated value.
+
+   :arg x: The variable.
+   :returns: Whether `x` is a replacement.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_is_scalar(x)
+
+   
+   Return whether a variable defines a scalar variable.
+
+   :arg x: The variable.
+   :returns: Whether `x` defines a scalar variable.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_scalar_value(x)
+
+   
+   If `x` defines a scalar variable, returns its value.
+
+   :arg x: The variable, defining a scalar variable.
+   :returns: The scalar value.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: var_is_alias(x)
+
+   
+   Return whether a variable is an 'alias', meaning part or all of the
+   degree of freedom vector associated with the variable is shared with some
+   different aliased variable. A variable may not appear as an equation
+   dependency if it is an alias.
+
+   :arg x: The variable.
+   :returns: Whether the variable is an alias.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: subtract_adjoint_derivative_action(x, y)
+
+   
+   Subtract an adjoint right-hand-side contribution defined by `y` from
+   the right-hand-side defined by `x`.
+
+   :arg x: A variable storing the adjoint right-hand-side.
+   :arg y: A contribution to subtract from the adjoint right-hand-side. An
+       :meth:`.Equation.adjoint_derivative_action` return value. Valid types
+       depend upon the variable type. Typically this will be a variable, or a
+       two element :class:`tuple` `(alpha, F)`, where `alpha` is a
+       :class:`numbers.Complex` and `F` a variable, with the value to subtract
+       defined by the product of `alpha` and `F`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

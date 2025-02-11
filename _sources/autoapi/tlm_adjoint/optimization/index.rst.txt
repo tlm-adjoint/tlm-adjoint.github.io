@@ -1,0 +1,203 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.optimization`
+==================================
+
+.. py:module:: tlm_adjoint.optimization
+
+
+Module Contents
+---------------
+
+.. py:function:: minimize_scipy(forward, M0, *, manager=None, **kwargs)
+
+   
+   Minimize a functional using :func:`scipy.optimize.minimize`.
+
+
+   :Parameters:
+
+       **forward** : callable
+           Accepts one or more variable arguments, and returns a scalar variable
+           defining the functional.
+
+       **M0** : variable or Sequence[variable, ...]
+           The initial guess.
+
+       **manager** : :class:`.EquationManager`
+           Used to create an internal manager via :meth:`.EquationManager.new`.
+           `manager()` is used if not supplied.
+
+       **kwargs**
+           Passed to :func:`scipy.optimize.minimize`.
+
+
+
+   :Returns:
+
+       **M** : variable or Sequence[variable, ...]
+           The result of the minimization
+
+       minimize_return_value
+           The return value from :func:`scipy.optimize.minimize`.
+
+
+
+
+
+
+   .. warning::
+
+       Data is gathered onto the root process (process zero) so that the serial
+       :func:`scipy.optimize.minimize` can be used.
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: TAOSolver(forward, space, *, solver_parameters=None, H_0_action=None, M_inv_action=None, manager=None)
+
+
+   
+   Functional minimization using TAO.
+
+
+   :Parameters:
+
+       **forward** : callable
+           Accepts one or more variable arguments, and returns a scalar variable
+           defining the functional.
+
+       **space** : space or Sequence[space, ...]
+           The control space.
+
+       **solver_parameters** : Mapping
+           TAO solver parameters.
+
+       **H_0_action** : callable
+           Defines the initial Hessian inverse approximation. Accepts one or more
+           variables as arguments, defining a direction, and returns a variable or
+           a :class:`Sequence` of variables defining the (conjugate of) the action
+           of an initial Hessian inverse approximation on this direction.
+           Arguments should not be modified.
+
+       **M_inv_action** : callable
+           Defines a dual space norm. Accepts one or more variables as arguments,
+           defining a direction, and returns a variable or a :class:`Sequence` of
+           variables defining the (conjugate of) the action of a Hermitian and
+           positive definite matrix on this direction. Arguments should not be
+           modified. `H_0_action` is used if not supplied.
+
+       **manager** : :class:`.EquationManager`
+           Used to create an internal manager via :meth:`.EquationManager.new`.
+           `manager()` is used if not supplied.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+   .. py:property:: tao
+
+      
+      The :class:`petsc4py.PETSc.TAO` used to solve the optimization
+      problem.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+   .. py:method:: solve(M)
+
+      
+      Solve the optimization problem.
+
+
+      :Parameters:
+
+          **M** : variable or Sequence[variable, ...]
+              Defines the initial guess, and stores the result of the
+              minimization.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:function:: minimize_tao(forward, M0, *args, **kwargs)
+
+   
+   Minimize a functional using TAO.
+
+
+   :Parameters:
+
+       **forward** : callable
+           Accepts one or more variable arguments, and returns a scalar variable
+           defining the functional.
+
+       **M0** : variable or Sequence[variable, ...]
+           The initial guess.
+
+       **args, kwargs**
+           Passed to the :class:`.TAOSolver` constructor.
+
+
+
+   :Returns:
+
+       variable or Sequence[variable, ...]
+           The result of the minimization.
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

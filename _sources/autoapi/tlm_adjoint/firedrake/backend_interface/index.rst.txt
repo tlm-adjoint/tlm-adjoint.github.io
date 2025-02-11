@@ -1,0 +1,37 @@
+:orphan:
+
+:py:mod:`tlm_adjoint.firedrake.backend_interface`
+=================================================
+
+.. py:module:: tlm_adjoint.firedrake.backend_interface
+
+
+Module Contents
+---------------
+
+.. py:function:: linear_solver(A, linear_solver_parameters)
+
+   
+   Construct a :class:`firedrake.linear_solver.LinearSolver`.
+
+   :arg A: A :class:`firedrake.matrix.Matrix`.
+   :arg linear_solver_parameters: Linear solver parameters.
+   :returns: The :class:`firedrake.linear_solver.LinearSolver`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

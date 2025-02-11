@@ -1,0 +1,229 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlm_adjoint.optimization &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.optimization</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/autoapi/tlm_adjoint/optimization/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlm_adjoint.optimization">
+<span id="tlm-adjoint-optimization"></span><h1><a class="reference internal" href="#module-tlm_adjoint.optimization" title="tlm_adjoint.optimization"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tlm_adjoint.optimization</span></code></a><a class="headerlink" href="#module-tlm_adjoint.optimization" title="Link to this heading"></a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.minimize_scipy">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">minimize_scipy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.minimize_scipy" title="Link to this definition"></a></dt>
+<dd><p>Minimize a functional using <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.15.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>forward</strong><span class="classifier">callable</span></dt><dd><p>Accepts one or more variable arguments, and returns a scalar variable
+defining the functional.</p>
+</dd>
+<dt><strong>M0</strong><span class="classifier">variable or Sequence[variable, …]</span></dt><dd><p>The initial guess.</p>
+</dd>
+<dt><strong>manager</strong><span class="classifier"><a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a></span></dt><dd><p>Used to create an internal manager via <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.new" title="tlm_adjoint.tlm_adjoint.EquationManager.new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.new()</span></code></a>.
+<cite>manager()</cite> is used if not supplied.</p>
+</dd>
+<dt><strong>kwargs</strong></dt><dd><p>Passed to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.15.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>M</strong><span class="classifier">variable or Sequence[variable, …]</span></dt><dd><p>The result of the minimization</p>
+</dd>
+<dt>minimize_return_value</dt><dd><p>The return value from <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.15.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Data is gathered onto the root process (process zero) so that the serial
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.15.1)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a> can be used.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.TAOSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">TAOSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_parameters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H_0_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_inv_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.TAOSolver" title="Link to this definition"></a></dt>
+<dd><p>Functional minimization using TAO.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>forward</strong><span class="classifier">callable</span></dt><dd><p>Accepts one or more variable arguments, and returns a scalar variable
+defining the functional.</p>
+</dd>
+<dt><strong>space</strong><span class="classifier">space or Sequence[space, …]</span></dt><dd><p>The control space.</p>
+</dd>
+<dt><strong>solver_parameters</strong><span class="classifier">Mapping</span></dt><dd><p>TAO solver parameters.</p>
+</dd>
+<dt><strong>H_0_action</strong><span class="classifier">callable</span></dt><dd><p>Defines the initial Hessian inverse approximation. Accepts one or more
+variables as arguments, defining a direction, and returns a variable or
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of variables defining the (conjugate of) the action
+of an initial Hessian inverse approximation on this direction.
+Arguments should not be modified.</p>
+</dd>
+<dt><strong>M_inv_action</strong><span class="classifier">callable</span></dt><dd><p>Defines a dual space norm. Accepts one or more variables as arguments,
+defining a direction, and returns a variable or a <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code> of
+variables defining the (conjugate of) the action of a Hermitian and
+positive definite matrix on this direction. Arguments should not be
+modified. <cite>H_0_action</cite> is used if not supplied.</p>
+</dd>
+<dt><strong>manager</strong><span class="classifier"><a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager" title="tlm_adjoint.tlm_adjoint.EquationManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">EquationManager</span></code></a></span></dt><dd><p>Used to create an internal manager via <a class="reference internal" href="../tlm_adjoint/index.html#tlm_adjoint.tlm_adjoint.EquationManager.new" title="tlm_adjoint.tlm_adjoint.EquationManager.new"><code class="xref py py-meth docutils literal notranslate"><span class="pre">EquationManager.new()</span></code></a>.
+<cite>manager()</cite> is used if not supplied.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.TAOSolver.tao">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tao</span></span><a class="headerlink" href="#tlm_adjoint.optimization.TAOSolver.tao" title="Link to this definition"></a></dt>
+<dd><p>The <a class="reference external" href="https://petsc.org/main/petsc4py/reference/petsc4py.PETSc.TAO.html#petsc4py.PETSc.TAO" title="(in Python v3.22)"><code class="xref py py-class docutils literal notranslate"><span class="pre">petsc4py.PETSc.TAO</span></code></a> used to solve the optimization
+problem.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.TAOSolver.solve">
+<span class="sig-name descname"><span class="pre">solve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.TAOSolver.solve" title="Link to this definition"></a></dt>
+<dd><p>Solve the optimization problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>M</strong><span class="classifier">variable or Sequence[variable, …]</span></dt><dd><p>Defines the initial guess, and stores the result of the
+minimization.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlm_adjoint.optimization.minimize_tao">
+<span class="sig-prename descclassname"><span class="pre">tlm_adjoint.optimization.</span></span><span class="sig-name descname"><span class="pre">minimize_tao</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">forward</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlm_adjoint.optimization.minimize_tao" title="Link to this definition"></a></dt>
+<dd><p>Minimize a functional using TAO.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>forward</strong><span class="classifier">callable</span></dt><dd><p>Accepts one or more variable arguments, and returns a scalar variable
+defining the functional.</p>
+</dd>
+<dt><strong>M0</strong><span class="classifier">variable or Sequence[variable, …]</span></dt><dd><p>The initial guess.</p>
+</dd>
+<dt><strong>args, kwargs</strong></dt><dd><p>Passed to the <a class="reference internal" href="#tlm_adjoint.optimization.TAOSolver" title="tlm_adjoint.optimization.TAOSolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">TAOSolver</span></code></a> constructor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>variable or Sequence[variable, …]</dt><dd><p>The result of the minimization.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

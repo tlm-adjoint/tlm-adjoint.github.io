@@ -1,0 +1,835 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time-independent example &mdash; tlm_adjoint  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3b5de6fd" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tlm_adjoint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">tlm_adjoint</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../acknowledgements.html">References and acknowledgements</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tlm_adjoint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Time-independent example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/1_time_independent.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Time-independent-example">
+<h1>Time-independent example<a class="headerlink" href="#Time-independent-example" title="Link to this heading"></a></h1>
+<p>This notebook describes adjoint calculations, and Hessian calculations, using tlm_adjoint with the <a class="reference external" href="https://firedrakeproject.org/">Firedrake</a> backend. A time-independent problem is considered, and importantly checkpointing is not used for the adjoint calculations. This notebook further describes how variables may be flagged to facilitate caching.</p>
+<p>The high-level algorithmic differentiation approach used by tlm_adjoint is based on the method described in:</p>
+<ul class="simple">
+<li><p>P. E. Farrell, D. A. Ham, S. W. Funke, and M. E. Rognes, ‘Automated derivation of the adjoint of high-level transient finite element programs’, SIAM Journal on Scientific Computing 35(4), pp. C369–C393, 2013, doi: 10.1137/120873558</p></li>
+</ul>
+<p>The caching of data in tlm_adjoint uses an approach based on that described in:</p>
+<ul class="simple">
+<li><p>J. R. Maddison and P. E. Farrell, ‘Rapid development and adjoining of transient finite element models’, Computer Methods in Applied Mechanics and Engineering, 276, 95–121, 2014, doi: 10.1016/j.cma.2014.03.010</p></li>
+</ul>
+<section id="Forward-problem">
+<h2>Forward problem<a class="headerlink" href="#Forward-problem" title="Link to this heading"></a></h2>
+<p>We consider the solution of a linear time-independent partial differential equation, followed by the calculation of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the solution. Extra non-linearity is introduced by allowing the right-hand-side of the partial differential equation to depend non-linearly on the control. We assume real spaces and a real build of Firedrake throughout.</p>
+<p>Specifically we consider the solution <span class="math notranslate nohighlight">\(u \in V_0\)</span> of</p>
+<div class="math notranslate nohighlight">
+\[\forall \zeta \in V_0 \qquad \int_\Omega \nabla \zeta \cdot \nabla u = \int_\Omega \zeta m^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(V\)</span> is a real <span class="math notranslate nohighlight">\(P_1\)</span> continuous finite element space defining functions on the domain <span class="math notranslate nohighlight">\(\Omega = \left( 0, 1 \right)^2\)</span>, with <span class="math notranslate nohighlight">\(m \in V\)</span>, and where <span class="math notranslate nohighlight">\(V_0\)</span> consists of the functions in <span class="math notranslate nohighlight">\(V\)</span> which have zero trace. This corresponds to a discretization of the partial differential equation</p>
+<div class="math notranslate nohighlight">
+\[-\nabla^2 u = m^2 \quad \text{on } \left( x, y \right) \in \left( 0, 1 \right)^2,\]</div>
+<p>subject to homogeneous Dirichlet boundary conditions.</p>
+<p>A simple implementation in Firedrake, with <span class="math notranslate nohighlight">\(m = x y\)</span>, takes the form:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+<span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+      <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+<span class="n">J_sq</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Adding-tlm_adjoint">
+<h2>Adding tlm_adjoint<a class="headerlink" href="#Adding-tlm_adjoint" title="Link to this heading"></a></h2>
+<p>We first modify the code so that tlm_adjoint processes the calculations:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+          <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(True, True)
+</pre></div></div>
+</div>
+<p>The key changes here are:</p>
+<ul class="simple">
+<li><p>To import tlm_adjoint with the Firedrake backend.</p></li>
+<li><p>Controlling the ‘manager’ – an object tlm_adjoint uses to process equations.</p></li>
+<li><p>Using a <code class="docutils literal notranslate"><span class="pre">Functional</span></code> to compute the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the solution of the (discretized) partial differential equation. This facilitates the calculation of simple functionals e.g. using finite element assembly.</p></li>
+<li><p>Taking the square root of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm using NumPy.</p></li>
+</ul>
+<p>Let’s display the information recorded by tlm_adjoint:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">manager_info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Equation manager status:
+Annotation state: AnnotationState.STOPPED
+Tangent-linear state: TangentLinearState.STOPPED
+Equations:
+  Block 0
+    Equation 0, EquationSolver solving for u (id 6)
+      Dependency 0, u (id 6), linear
+      Dependency 1, m (id 1), non-linear
+    Equation 1, Assembly solving for J_sq (id 12)
+      Dependency 0, J_sq (id 12), linear
+      Dependency 1, u (id 6), non-linear
+    Equation 2, FloatEquation solving for f_14 (id 14)
+      Dependency 0, f_14 (id 14), linear
+      Dependency 1, J_sq (id 12), non-linear
+Storage:
+  Storing initial conditions: yes
+  Storing equation non-linear dependencies: yes
+  Initial conditions stored: 1
+  Initial conditions referenced: 0
+Checkpointing:
+  Method: memory
+</pre></div></div>
+</div>
+<p>We see that there are three records.</p>
+<ul class="simple">
+<li><p>Equation 0, an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code>. This records the solution of the finite element variational problem for <code class="docutils literal notranslate"><span class="pre">u</span></code>.</p></li>
+<li><p>Equation 1, an <code class="docutils literal notranslate"><span class="pre">Assembly</span></code>. This records the calculation of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm.</p></li>
+<li><p>Equation 2, a <code class="docutils literal notranslate"><span class="pre">FloatEquation</span></code>. This records the calculation of the square root of the square of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm.</p></li>
+</ul>
+</section>
+<section id="Computing-derivatives-using-an-adjoint">
+<h2>Computing derivatives using an adjoint<a class="headerlink" href="#Computing-derivatives-using-an-adjoint" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code> function can be used to compute derivatives using the adjoint method. Here we compute the derivative of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the resulting solution, considered a function of the control defined by <code class="docutils literal notranslate"><span class="pre">m</span></code>, with respect to this control:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dJ_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here each degree of freedom associated with <code class="docutils literal notranslate"><span class="pre">dJ_dm</span></code> contains the derivative of the functional with respect to the corresponding degree of freedom for the control. <code class="docutils literal notranslate"><span class="pre">dJ_dm</span></code> represents a ‘dual space’ object, defining a linear functional which, given a ‘direction’ <span class="math notranslate nohighlight">\(\zeta \in V\)</span>, can be used to compute the directional derivative with respect to <span class="math notranslate nohighlight">\(m\)</span> with direction <span class="math notranslate nohighlight">\(\zeta\)</span>.</p>
+<p>For example we can compute the directional derivative of the functional with respect to the control <span class="math notranslate nohighlight">\(m\)</span> with direction equal to the unity valued function via:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">one</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">)</span>
+<span class="n">one</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+
+<span class="n">dJ_dm_one</span> <span class="o">=</span> <span class="n">assemble</span><span class="p">(</span><span class="n">action</span><span class="p">(</span><span class="n">dJ_dm</span><span class="p">,</span> <span class="n">one</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dJ_dm_one</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dJ_dm_one=0.020351453243200264
+</pre></div></div>
+</div>
+<p>This result is the derivative of the <span class="math notranslate nohighlight">\(L^2\)</span>-norm of the solution with respect to the amplitude of a spatially constant perturbation to the control <span class="math notranslate nohighlight">\(m\)</span>. We can compare with the result from finite differencing:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">dJ_dm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1.0e-7</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">J</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="n">eps</span><span class="p">)</span> <span class="o">-</span> <span class="n">J</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">eps</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">eps</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dJ_dm_one approximation = </span><span class="si">{</span><span class="n">dJ_dm</span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="n">eps</span><span class="p">:</span><span class="w"> </span><span class="nb">float</span><span class="p">(</span><span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">eps</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">one</span><span class="p">)),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dJ_dm_one approximation = 0.020351453248329543
+</pre></div></div>
+</div>
+</section>
+<section id="Computing-Hessian-information-using-an-adjoint-of-a-tangent-linear">
+<h2>Computing Hessian information using an adjoint of a tangent-linear<a class="headerlink" href="#Computing-Hessian-information-using-an-adjoint-of-a-tangent-linear" title="Link to this heading"></a></h2>
+<section id="Single-direction">
+<h3>Single direction<a class="headerlink" href="#Single-direction" title="Link to this heading"></a></h3>
+<p>We next seek to compute the action of the Hessian of the functional on some direction <span class="math notranslate nohighlight">\(\zeta \in V\)</span>, using the adjoint method applied to tangent-linear and forward calculations. This can be handled directly, by configuring the relevant tangent-linear and computing the derivative using <code class="docutils literal notranslate"><span class="pre">compute_gradient</span></code>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+          <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dm_zeta_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Hessian</span></code> class applies the same approach, but handles several of the steps for us:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+          <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">H</span> <span class="o">=</span> <span class="n">Hessian</span><span class="p">(</span><span class="n">forward</span><span class="p">)</span>
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">_</span><span class="p">,</span> <span class="n">dJ_dm_zeta</span><span class="p">,</span> <span class="n">d2J_dm_zeta_dm</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Multiple-directions">
+<h3>Multiple directions<a class="headerlink" href="#Multiple-directions" title="Link to this heading"></a></h3>
+<p>If we want to compute the Hessian action on <em>multiple</em> directions we can define multiple tangent-linears:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+          <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_0&quot;</span><span class="p">)</span>
+<span class="n">zeta_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta_0</span><span class="p">))</span>
+
+<span class="n">zeta_1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_1&quot;</span><span class="p">)</span>
+<span class="n">zeta_1</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta_1</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm_zeta_0</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta_0</span><span class="p">))</span>
+<span class="n">dJ_dm_zeta_1</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta_1</span><span class="p">))</span>
+
+<span class="n">d2J_dm_zeta_0_dm</span><span class="p">,</span> <span class="n">d2J_dm_zeta_1_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">((</span><span class="n">dJ_dm_zeta_0</span><span class="p">,</span> <span class="n">dJ_dm_zeta_1</span><span class="p">),</span> <span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>There are now calculations for two sets of tangent-linear variables, two sets of first order adjoint variables, and two sets of second order adjoint variables. However the two sets of first order adjoint variables have the same values – by default tlm_adjoint detects this and only computes them once.</p>
+<p>The above approach requires us to know the directions <em>before</em> the forward calculation. However some algorithms can generate the directions sequentially, and we do not know the next direction until a Hessian action on the previous direction has been computed. If possible we still want to avoid re-running the forward calculation each time we have a new direction.</p>
+<p>If we have sufficient memory available, and in particular so long as we do not need to use checkpointing for the adjoint calculations, we can make use of the <code class="docutils literal notranslate"><span class="pre">CachedHessian</span></code> class. This stores the forward solution and, by default, caches and reuses first order adjoint values. Here we do <em>not</em> need to configure the tangent-linear before the forward calculation – instead tlm_adjoint performs the tangent-linear calculations <em>after</em> the forward calculations:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">solve</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+          <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">))</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">H</span> <span class="o">=</span> <span class="n">CachedHessian</span><span class="p">(</span><span class="n">J</span><span class="p">)</span>
+
+<span class="n">zeta_0</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_0&quot;</span><span class="p">)</span>
+<span class="n">zeta_0</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">zeta_1</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta_1&quot;</span><span class="p">)</span>
+<span class="n">zeta_1</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="n">_</span><span class="p">,</span> <span class="n">dJ_dm_zeta_0</span><span class="p">,</span> <span class="n">d2J_dm_zeta_0_dm</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta_0</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">dJ_dm_zeta_1</span><span class="p">,</span> <span class="n">d2J_dm_zeta_1_dm</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta_1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Assembly-and-solver-caching">
+<h2>Assembly and solver caching<a class="headerlink" href="#Assembly-and-solver-caching" title="Link to this heading"></a></h2>
+<section id="Using-an-EquationSolver">
+<h3>Using an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code><a class="headerlink" href="#Using-an-EquationSolver" title="Link to this heading"></a></h3>
+<p>The calculation for the Hessian action includes four discrete Poisson equations: one for the original forward calculation, one for the tangent-linear calculation, and one each for first and second order adjoint calculations. In this self-adjoint problem the finite element matrix – a stiffness matrix – is the <em>same</em> across all four calculations. Hence we can cache and reuse it. Moreover we can cache and reuse linear solver data – for example we can cache and reuse the Cholesky factorization.</p>
+<p>tlm_adjoint can apply such caching automatically, but we must interact directly with the object tlm_adjoint uses to record the solution of finite element variational problems – the <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code> previously seen when we used <code class="docutils literal notranslate"><span class="pre">manager_info()</span></code>. This looks like:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+        <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">),</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dm_zeta_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The key changes here are:</p>
+<ul class="simple">
+<li><p>The use of <code class="docutils literal notranslate"><span class="pre">clear_caches</span></code>. This ensures that any previously cached data is cleared, avoiding memory leaks if the code is run more than once.</p></li>
+<li><p>The instantiation of an <code class="docutils literal notranslate"><span class="pre">EquationSolver</span></code>, and the call to its <code class="docutils literal notranslate"><span class="pre">solve</span></code> method.</p></li>
+</ul>
+<p>If we query the relevant tlm_adjoint caches we find:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+len(assembly_cache())=1
+len(linear_solver_cache())=1
+</pre></div></div>
+</div>
+<p>and in particular we see that tlm_adjoint has cached data associated with a single matrix, and has cached a single assembled object (which turns out to be the matrix itself). The latter is a stiffness matrix, and the former stores its Cholesky factorization. The factorization is used four times: in the forward, tangent-linear, and first and second order adjoint calculations.</p>
+</section>
+<section id="Flagging-data-for-caching">
+<h3>Flagging data for caching<a class="headerlink" href="#Flagging-data-for-caching" title="Link to this heading"></a></h3>
+<p>Now consider the slightly different calculation:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">one</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">one</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+        <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">),</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dm_zeta_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+len(assembly_cache())=0
+len(linear_solver_cache())=0
+</pre></div></div>
+</div>
+<p>The only difference is the introduction of the multiplication by <code class="docutils literal notranslate"><span class="pre">one</span></code> on the left-hand-side of the finite element variational problem. However we now find that no matrix or linear solver data has been cached. The issue is that tlm_adjoint does not know that it should cache the results of calculations involving <code class="docutils literal notranslate"><span class="pre">one</span></code>.</p>
+<section id="The-'cache'-flag">
+<h4>The ‘cache’ flag<a class="headerlink" href="#The-'cache'-flag" title="Link to this heading"></a></h4>
+<p>To resolve this, we can flag <code class="docutils literal notranslate"><span class="pre">one</span></code> for caching using <code class="docutils literal notranslate"><span class="pre">cache=True</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">one</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">one</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+        <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">),</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dm_zeta_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">2</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+len(assembly_cache())=2
+len(linear_solver_cache())=1
+</pre></div></div>
+</div>
+<p>We now see that tlm_adjoint has cached linear solver data associated with a single matrix. However assembly of two objects has been cached – it turns out there are now <em>two</em> cached matrices.</p>
+<p>The extra cached matrix appears in the tangent-linear calculations, involving the tangent-linear variable associated with <code class="docutils literal notranslate"><span class="pre">one</span></code> – a tangent-linear right-hand-side term has been converted into a matrix multiply using a <em>different</em> matrix. However in the above calculation we know that this tangent-linear variable must be zero, since the calculation for <code class="docutils literal notranslate"><span class="pre">one</span></code> doesn’t depend on the control variable. The extra term in the tangent-linear calculation is similarly also known to be zero.</p>
+</section>
+<section id="The-'static'-flag">
+<h4>The ‘static’ flag<a class="headerlink" href="#The-'static'-flag" title="Link to this heading"></a></h4>
+<p>We can let tlm_adjoint know that <code class="docutils literal notranslate"><span class="pre">one</span></code> does not change, and resolve this inefficiency, by instead using <code class="docutils literal notranslate"><span class="pre">static=True</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tlm_adjoint.firedrake</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">reset_manager</span><span class="p">()</span>
+<span class="n">clear_caches</span><span class="p">()</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">UnitSquareMesh</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">SpatialCoordinate</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="n">space</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">TestFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+<span class="n">trial</span> <span class="o">=</span> <span class="n">TrialFunction</span><span class="p">(</span><span class="n">space</span><span class="p">)</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">one</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;one&quot;</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u&quot;</span><span class="p">)</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="p">(</span>
+        <span class="n">one</span> <span class="o">*</span> <span class="n">inner</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">trial</span><span class="p">),</span> <span class="n">grad</span><span class="p">(</span><span class="n">test</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">==</span> <span class="n">inner</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">test</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span>
+        <span class="n">DirichletBC</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;on_boundary&quot;</span><span class="p">),</span>
+        <span class="n">solver_parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;cholesky&quot;</span><span class="p">})</span>
+    <span class="n">eq</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+    <span class="n">J_sq</span> <span class="o">=</span> <span class="n">Functional</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;J_sq&quot;</span><span class="p">)</span>
+    <span class="n">J_sq</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">inner</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">J_sq</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">J</span>
+
+
+<span class="n">zeta</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">space</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zeta&quot;</span><span class="p">)</span>
+<span class="n">zeta</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">pi</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="n">configure_tlm</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">start_manager</span><span class="p">()</span>
+<span class="n">J</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">stop_manager</span><span class="p">()</span>
+
+<span class="n">dJ_dm_zeta</span> <span class="o">=</span> <span class="n">var_tlm</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">zeta</span><span class="p">))</span>
+
+<span class="n">d2J_dm_zeta_dm</span> <span class="o">=</span> <span class="n">compute_gradient</span><span class="p">(</span><span class="n">dJ_dm_zeta</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">assembly_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_solver_cache</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+len(assembly_cache())=1
+len(linear_solver_cache())=1
+</pre></div></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">static=True</span></code> leads to <code class="docutils literal notranslate"><span class="pre">one</span></code> being flagged as a variable whose value is never updated. From this tlm_adjoint can infer that the relevant associated tangent-linear variable is zero, and avoid adding the zero-valued tangent-linear term.</p>
+<p>The key difference between using <code class="docutils literal notranslate"><span class="pre">cache=True</span></code> and <code class="docutils literal notranslate"><span class="pre">static=True</span></code> is that in the former the value of the variable <em>may</em> be updated. So long as tlm_adjoint is aware of the update (which happens, for example, when tlm_adjoint records a calculation) then updating the value of a variable invalidates cache entries, and invalidated cache entries are cleared automatically.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
